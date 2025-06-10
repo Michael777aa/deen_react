@@ -2,11 +2,12 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import { useColorScheme } from "react-native";
+import { useEffect, useState } from "react";
+import { useColorScheme, View, Text, Image, StyleSheet, Animated } from "react-native";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { trpc, trpcClient } from "@/lib/trpc";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { colors } from "@/constants/colors";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -21,6 +22,9 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const { darkMode } = useSettingsStore();
   const colorScheme = useColorScheme();
+  const [appIsReady, setAppIsReady] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+  const fadeAnim = new Animated.Value(1);
   
   const [loaded, error] = useFonts({
     ...FontAwesome.font,
@@ -44,13 +48,67 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    async function prepare() {
+      try {
+        // Pre-load fonts, make any API calls you need to do here
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Artificial delay for splash screen
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
     }
-  }, [loaded]);
 
-  if (!loaded) {
-    return null;
+    prepare();
+  }, []);
+
+  useEffect(() => {
+    if (loaded && appIsReady) {
+      // Hide the native splash screen
+      SplashScreen.hideAsync();
+      
+      // Fade out our custom splash screen
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
+        setShowSplash(false);
+      });
+    }
+  }, [loaded, appIsReady]);
+
+  if (!loaded || !appIsReady || showSplash) {
+    return (
+      <Animated.View style={[
+        styles.splashContainer, 
+        { 
+          backgroundColor: darkMode ? colors.dark.background : colors.light.background,
+          opacity: fadeAnim 
+        }
+      ]}>
+        <View style={styles.splashContent}>
+          <View style={styles.logoContainer}>
+            <View style={[styles.logoCircle, { backgroundColor: colors.light.primary }]}>
+              <Text style={styles.logoIcon}>☪️</Text>
+            </View>
+          </View>
+          <Text style={[
+            styles.appTitle, 
+            { color: darkMode ? colors.dark.text : colors.light.text }
+          ]}>
+            Deen Daily
+          </Text>
+          <Text style={[
+            styles.appTagline, 
+            { color: darkMode ? colors.dark.inactive : colors.light.inactive }
+          ]}>
+            Your daily companion for Islamic lifestyle
+          </Text>
+        </View>
+      </Animated.View>
+    );
   }
 
   return (
@@ -175,3 +233,43 @@ function RootLayoutNav() {
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+  splashContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  splashContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    marginBottom: 24,
+  },
+  logoCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  logoIcon: {
+    fontSize: 60,
+  },
+  appTitle: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  appTagline: {
+    fontSize: 16,
+    textAlign: 'center',
+    paddingHorizontal: 32,
+  },
+});

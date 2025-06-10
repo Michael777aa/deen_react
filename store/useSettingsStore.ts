@@ -13,6 +13,9 @@ type SettingsState = {
   notificationType: NotificationType;
   locationEnabled: boolean;
   downloadEnabled: boolean;
+  fontSizeQuran: number;
+  fontSizeApp: number;
+  appTheme: string;
   toggleDarkMode: () => void;
   setLanguage: (language: string) => void;
   toggleNotifications: () => void;
@@ -21,6 +24,9 @@ type SettingsState = {
   setNotificationType: (type: NotificationType) => void;
   toggleLocationEnabled: () => void;
   toggleDownloadEnabled: () => void;
+  setFontSizeQuran: (size: number) => void;
+  setFontSizeApp: (size: number) => void;
+  setAppTheme: (theme: string) => void;
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -34,6 +40,9 @@ export const useSettingsStore = create<SettingsState>()(
       notificationType: 'adhan',
       locationEnabled: true,
       downloadEnabled: true,
+      fontSizeQuran: 18,
+      fontSizeApp: 16,
+      appTheme: 'default',
       toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
       setLanguage: (language) => set({ language }),
       toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
@@ -42,6 +51,9 @@ export const useSettingsStore = create<SettingsState>()(
       setNotificationType: (type) => set({ notificationType: type }),
       toggleLocationEnabled: () => set((state) => ({ locationEnabled: !state.locationEnabled })),
       toggleDownloadEnabled: () => set((state) => ({ downloadEnabled: !state.downloadEnabled })),
+      setFontSizeQuran: (size) => set({ fontSizeQuran: size }),
+      setFontSizeApp: (size) => set({ fontSizeApp: size }),
+      setAppTheme: (theme) => set({ appTheme: theme }),
     }),
     {
       name: 'settings-storage',

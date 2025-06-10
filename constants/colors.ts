@@ -10,6 +10,8 @@ export const colors = {
     error: "#F44336",
     success: "#4CAF50",
     inactive: "#9E9E9E",
+    accent: "#009688",
+    highlight: "#BBDEFB",
   },
   dark: {
     primary: "#388E3C",
@@ -22,5 +24,7 @@ export const colors = {
     error: "#F44336",
     success: "#4CAF50",
     inactive: "#757575",
+    accent: "#26A69A",
+    highlight: "#1A237E",
   }
 };

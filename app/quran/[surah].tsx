@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -8,7 +8,8 @@ import {
   ActivityIndicator,
   Platform,
   Image,
-  Animated
+  Animated,
+  SafeAreaView
 } from 'react-native';
 import { Stack, useLocalSearchParams, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -32,7 +33,7 @@ import { quranSurahs, getQuranVerses } from '@/mocks/quranData';
 
 export default function SurahDetailScreen() {
   const params = useLocalSearchParams();
-  const surahNumber = parseInt(params.surah as string);
+  const surahNumber = parseInt(params.surah as string || "1");
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
   
@@ -46,7 +47,7 @@ export default function SurahDetailScreen() {
   const [bookmarkedVerses, setBookmarkedVerses] = useState<number[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
-  const fadeAnim = useState(new Animated.Value(0))[0];
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const loadSurah = async () => {
@@ -170,289 +171,288 @@ export default function SurahDetailScreen() {
   }
 
   return (
-    <>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors[theme].background }]}>
       <Stack.Screen 
         options={{ 
           title: `Surah ${surahInfo.englishName}`,
           headerShown: false
         }} 
       />
-      <View style={[styles.container, { backgroundColor: colors[theme].background }]}>
-        {/* Custom Header */}
-        <View style={[styles.customHeader, { backgroundColor: colors[theme].card }]}>
-          <TouchableOpacity onPress={goBack} style={styles.headerButton}>
-            <ArrowLeft size={24} color={colors[theme].text} />
+      
+      {/* Custom Header */}
+      <View style={[styles.customHeader, { backgroundColor: colors[theme].card }]}>
+        <TouchableOpacity onPress={goBack} style={styles.headerButton}>
+          <ArrowLeft size={24} color={colors[theme].text} />
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors[theme].text }]}>
+          Surah {surahInfo.englishName}
+        </Text>
+        <TouchableOpacity style={styles.headerButton}>
+          <Share2 size={24} color={colors[theme].text} />
+        </TouchableOpacity>
+      </View>
+
+      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+        {/* Beautiful Surah Header */}
+        <Card style={styles.surahHeader}>
+          <View style={styles.surahHeaderContent}>
+            <View style={[styles.surahNumberBadge, { backgroundColor: colors[theme].primary }]}>
+              <Text style={styles.surahNumberText}>
+                {surahInfo.number}
+              </Text>
+            </View>
+            <Text style={[styles.surahName, { color: colors[theme].text }]}>
+              {surahInfo.englishName}
+            </Text>
+            <Text style={[styles.surahNameArabic, { color: colors[theme].text }]}>
+              {surahInfo.name}
+            </Text>
+            <Text style={[styles.surahInfo, { color: colors[theme].inactive }]}>
+              {surahInfo.revelationType} • {surahInfo.numberOfAyahs} verses
+            </Text>
+          </View>
+          
+          <View style={styles.surahActions}>
+            <TouchableOpacity 
+              style={[styles.actionButton, { backgroundColor: colors[theme].card }]}
+              onPress={() => toggleBookmark(0)}
+            >
+              <Bookmark 
+                size={20} 
+                color={colors[theme].primary} 
+                fill={bookmarkedVerses.includes(0) ? colors[theme].primary : 'transparent'} 
+              />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.playButton, { backgroundColor: colors[theme].primary }]}
+              onPress={togglePlayPause}
+            >
+              {isPlaying ? (
+                <Pause size={20} color="#FFFFFF" />
+              ) : (
+                <Play size={20} color="#FFFFFF" fill="#FFFFFF" />
+              )}
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.actionButton, { backgroundColor: colors[theme].card }]}
+              onPress={downloadAudio}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <View style={styles.downloadProgress}>
+                  <Text style={[styles.downloadProgressText, { color: colors[theme].primary }]}>
+                    {Math.round(downloadProgress * 100)}%
+                  </Text>
+                </View>
+              ) : (
+                <Download size={20} color={colors[theme].primary} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </Card>
+
+        {/* Settings Bar */}
+        <View style={styles.settingsBar}>
+          <TouchableOpacity 
+            style={[
+              styles.settingButton, 
+              { 
+                backgroundColor: showTranslation ? colors[theme].primary + '20' : colors[theme].card 
+              }
+            ]}
+            onPress={() => setShowTranslation(!showTranslation)}
+          >
+            <Text style={[
+              styles.settingButtonText, 
+              { 
+                color: showTranslation ? colors[theme].primary : colors[theme].inactive 
+              }
+            ]}>
+              Translation
+            </Text>
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors[theme].text }]}>
-            Surah {surahInfo.englishName}
-          </Text>
-          <TouchableOpacity style={styles.headerButton}>
-            <Share2 size={24} color={colors[theme].text} />
+          
+          <TouchableOpacity 
+            style={[
+              styles.settingButton, 
+              { 
+                backgroundColor: showTransliteration ? colors[theme].primary + '20' : colors[theme].card 
+              }
+            ]}
+            onPress={() => setShowTransliteration(!showTransliteration)}
+          >
+            <Text style={[
+              styles.settingButtonText, 
+              { 
+                color: showTransliteration ? colors[theme].primary : colors[theme].inactive 
+              }
+            ]}>
+              Transliteration
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[
+              styles.settingButton, 
+              { backgroundColor: colors[theme].card }
+            ]}
+          >
+            <Settings size={16} color={colors[theme].text} />
           </TouchableOpacity>
         </View>
 
-        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-          {/* Beautiful Surah Header */}
-          <Card style={styles.surahHeader}>
-            <View style={styles.surahHeaderContent}>
-              <View style={[styles.surahNumberBadge, { backgroundColor: colors[theme].primary }]}>
-                <Text style={styles.surahNumberText}>
-                  {surahInfo.number}
-                </Text>
-              </View>
-              <Text style={[styles.surahName, { color: colors[theme].text }]}>
-                {surahInfo.englishName}
-              </Text>
-              <Text style={[styles.surahNameArabic, { color: colors[theme].text }]}>
-                {surahInfo.name}
-              </Text>
-              <Text style={[styles.surahInfo, { color: colors[theme].inactive }]}>
-                {surahInfo.revelationType} • {surahInfo.numberOfAyahs} verses
-              </Text>
-            </View>
-            
-            <View style={styles.surahActions}>
-              <TouchableOpacity 
-                style={[styles.actionButton, { backgroundColor: colors[theme].card }]}
-                onPress={() => toggleBookmark(0)}
-              >
-                <Bookmark 
-                  size={20} 
-                  color={colors[theme].primary} 
-                  fill={bookmarkedVerses.includes(0) ? colors[theme].primary : 'transparent'} 
-                />
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.playButton, { backgroundColor: colors[theme].primary }]}
-                onPress={togglePlayPause}
-              >
-                {isPlaying ? (
-                  <Pause size={20} color="#FFFFFF" />
-                ) : (
-                  <Play size={20} color="#FFFFFF" fill="#FFFFFF" />
-                )}
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.actionButton, { backgroundColor: colors[theme].card }]}
-                onPress={downloadAudio}
-                disabled={isDownloading}
-              >
-                {isDownloading ? (
-                  <View style={styles.downloadProgress}>
-                    <Text style={[styles.downloadProgressText, { color: colors[theme].primary }]}>
-                      {Math.round(downloadProgress * 100)}%
-                    </Text>
-                  </View>
-                ) : (
-                  <Download size={20} color={colors[theme].primary} />
-                )}
-              </TouchableOpacity>
-            </View>
-          </Card>
-
-          {/* Settings Bar */}
-          <View style={styles.settingsBar}>
+        {/* Font Size Control */}
+        <View style={styles.fontSizeControl}>
+          <Text style={[styles.fontSizeLabel, { color: colors[theme].text }]}>
+            Font Size
+          </Text>
+          <View style={styles.fontSizeSlider}>
             <TouchableOpacity 
-              style={[
-                styles.settingButton, 
-                { 
-                  backgroundColor: showTranslation ? colors[theme].primary + '20' : colors[theme].card 
-                }
-              ]}
-              onPress={() => setShowTranslation(!showTranslation)}
+              style={[styles.fontSizeButton, { backgroundColor: colors[theme].card }]}
+              onPress={() => setFontSize(Math.max(14, fontSize - 1))}
             >
-              <Text style={[
-                styles.settingButtonText, 
-                { 
-                  color: showTranslation ? colors[theme].primary : colors[theme].inactive 
-                }
-              ]}>
-                Translation
-              </Text>
+              <Text style={{ color: colors[theme].text }}>-</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[
-                styles.settingButton, 
-                { 
-                  backgroundColor: showTransliteration ? colors[theme].primary + '20' : colors[theme].card 
-                }
-              ]}
-              onPress={() => setShowTransliteration(!showTransliteration)}
-            >
-              <Text style={[
-                styles.settingButtonText, 
-                { 
-                  color: showTransliteration ? colors[theme].primary : colors[theme].inactive 
-                }
-              ]}>
-                Transliteration
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[
-                styles.settingButton, 
-                { backgroundColor: colors[theme].card }
-              ]}
-            >
-              <Settings size={16} color={colors[theme].text} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Font Size Control */}
-          <View style={styles.fontSizeControl}>
-            <Text style={[styles.fontSizeLabel, { color: colors[theme].text }]}>
-              Font Size
+            <Text style={[styles.fontSizeValue, { color: colors[theme].text }]}>
+              {fontSize}
             </Text>
-            <View style={styles.fontSizeSlider}>
-              <TouchableOpacity 
-                style={[styles.fontSizeButton, { backgroundColor: colors[theme].card }]}
-                onPress={() => setFontSize(Math.max(14, fontSize - 1))}
-              >
-                <Text style={{ color: colors[theme].text }}>-</Text>
-              </TouchableOpacity>
-              <Text style={[styles.fontSizeValue, { color: colors[theme].text }]}>
-                {fontSize}
-              </Text>
-              <TouchableOpacity 
-                style={[styles.fontSizeButton, { backgroundColor: colors[theme].card }]}
-                onPress={() => setFontSize(Math.min(30, fontSize + 1))}
-              >
-                <Text style={{ color: colors[theme].text }}>+</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity 
+              style={[styles.fontSizeButton, { backgroundColor: colors[theme].card }]}
+              onPress={() => setFontSize(Math.min(30, fontSize + 1))}
+            >
+              <Text style={{ color: colors[theme].text }}>+</Text>
+            </TouchableOpacity>
           </View>
+        </View>
 
-          <ScrollView style={styles.versesContainer} showsVerticalScrollIndicator={false}>
-            {/* Bismillah for all surahs except At-Tawbah (9) */}
-            {surahNumber !== 9 && (
-              <Card style={styles.bismillahCard}>
-                <Text style={[styles.bismillahText, { color: colors[theme].text }]}>
-                  بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-                </Text>
-                <Text style={[styles.bismillahTranslation, { color: colors[theme].inactive }]}>
-                  In the name of Allah, the Most Gracious, the Most Merciful
-                </Text>
-              </Card>
-            )}
-            
-            {verses.map((verse, index) => (
-              <Card key={index} style={styles.verseCard}>
-                <View style={styles.verseHeader}>
-                  <View style={[
-                    styles.verseNumberContainer, 
-                    { backgroundColor: colors[theme].primary + '20' }
-                  ]}>
-                    <Text style={[styles.verseNumber, { color: colors[theme].primary }]}>
-                      {verse.number}
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.verseActions}>
-                    <TouchableOpacity 
-                      style={styles.verseActionButton}
-                      onPress={() => toggleBookmark(verse.number)}
-                    >
-                      <Bookmark 
-                        size={16} 
-                        color={bookmarkedVerses.includes(verse.number) ? colors[theme].primary : colors[theme].inactive} 
-                        fill={bookmarkedVerses.includes(verse.number) ? colors[theme].primary : 'transparent'}
-                      />
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity style={styles.verseActionButton}>
-                      <Play size={16} color={colors[theme].inactive} />
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity style={styles.verseActionButton}>
-                      <Share2 size={16} color={colors[theme].inactive} />
-                    </TouchableOpacity>
-                  </View>
+        <ScrollView style={styles.versesContainer} showsVerticalScrollIndicator={false}>
+          {/* Bismillah for all surahs except At-Tawbah (9) */}
+          {surahNumber !== 9 && (
+            <Card style={styles.bismillahCard}>
+              <Text style={[styles.bismillahText, { color: colors[theme].text }]}>
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </Text>
+              <Text style={[styles.bismillahTranslation, { color: colors[theme].inactive }]}>
+                In the name of Allah, the Most Gracious, the Most Merciful
+              </Text>
+            </Card>
+          )}
+          
+          {verses.map((verse, index) => (
+            <Card key={index} style={styles.verseCard}>
+              <View style={styles.verseHeader}>
+                <View style={[
+                  styles.verseNumberContainer, 
+                  { backgroundColor: colors[theme].primary + '20' }
+                ]}>
+                  <Text style={[styles.verseNumber, { color: colors[theme].primary }]}>
+                    {verse.number}
+                  </Text>
                 </View>
                 
-                <Text style={[
-                  styles.verseArabic, 
-                  { 
-                    color: colors[theme].text,
-                    fontSize: fontSize,
-                  }
-                ]}>
-                  {verse.arabic}
+                <View style={styles.verseActions}>
+                  <TouchableOpacity 
+                    style={styles.verseActionButton}
+                    onPress={() => toggleBookmark(verse.number)}
+                  >
+                    <Bookmark 
+                      size={16} 
+                      color={bookmarkedVerses.includes(verse.number) ? colors[theme].primary : colors[theme].inactive} 
+                      fill={bookmarkedVerses.includes(verse.number) ? colors[theme].primary : 'transparent'}
+                    />
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity style={styles.verseActionButton}>
+                    <Play size={16} color={colors[theme].inactive} />
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity style={styles.verseActionButton}>
+                    <Share2 size={16} color={colors[theme].inactive} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              
+              <Text style={[
+                styles.verseArabic, 
+                { 
+                  color: colors[theme].text,
+                  fontSize: fontSize,
+                }
+              ]}>
+                {verse.arabic}
+              </Text>
+              
+              {showTransliteration && (
+                <Text style={[styles.verseTransliteration, { color: colors[theme].text }]}>
+                  {verse.transliteration}
                 </Text>
-                
-                {showTransliteration && (
-                  <Text style={[styles.verseTransliteration, { color: colors[theme].text }]}>
-                    {verse.transliteration}
-                  </Text>
-                )}
-                
-                {showTranslation && (
-                  <Text style={[styles.verseTranslation, { color: colors[theme].inactive }]}>
-                    {verse.translation}
-                  </Text>
-                )}
-              </Card>
-            ))}
-          </ScrollView>
+              )}
+              
+              {showTranslation && (
+                <Text style={[styles.verseTranslation, { color: colors[theme].inactive }]}>
+                  {verse.translation}
+                </Text>
+              )}
+            </Card>
+          ))}
+        </ScrollView>
 
-          {/* Navigation Bar */}
-          <View style={[
-            styles.navigationBar, 
-            { backgroundColor: colors[theme].card }
-          ]}>
-            <TouchableOpacity 
-              style={styles.navigationButton}
-              onPress={navigateToPreviousSurah}
-              disabled={surahNumber === 1}
-            >
-              <ChevronLeft 
-                size={24} 
-                color={surahNumber === 1 ? colors[theme].inactive : colors[theme].text} 
-              />
-              <Text style={[
-                styles.navigationText, 
-                { 
-                  color: surahNumber === 1 ? colors[theme].inactive : colors[theme].text 
-                }
-              ]}>
-                Previous
-              </Text>
-            </TouchableOpacity>
-            
-            <View style={styles.navigationInfo}>
-              <Text style={[styles.navigationSurah, { color: colors[theme].text }]}>
-                {surahInfo.englishName}
-              </Text>
-              <Text style={[styles.navigationNumber, { color: colors[theme].inactive }]}>
-                {surahInfo.number}/114
-              </Text>
-            </View>
-            
-            <TouchableOpacity 
-              style={styles.navigationButton}
-              onPress={navigateToNextSurah}
-              disabled={surahNumber === 114}
-            >
-              <Text style={[
-                styles.navigationText, 
-                { 
-                  color: surahNumber === 114 ? colors[theme].inactive : colors[theme].text 
-                }
-              ]}>
-                Next
-              </Text>
-              <ChevronRight 
-                size={24} 
-                color={surahNumber === 114 ? colors[theme].inactive : colors[theme].text} 
-              />
-            </TouchableOpacity>
+        {/* Navigation Bar */}
+        <View style={[
+          styles.navigationBar, 
+          { backgroundColor: colors[theme].card }
+        ]}>
+          <TouchableOpacity 
+            style={styles.navigationButton}
+            onPress={navigateToPreviousSurah}
+            disabled={surahNumber === 1}
+          >
+            <ChevronLeft 
+              size={24} 
+              color={surahNumber === 1 ? colors[theme].inactive : colors[theme].text} 
+            />
+            <Text style={[
+              styles.navigationText, 
+              { 
+                color: surahNumber === 1 ? colors[theme].inactive : colors[theme].text 
+              }
+            ]}>
+              Previous
+            </Text>
+          </TouchableOpacity>
+          
+          <View style={styles.navigationInfo}>
+            <Text style={[styles.navigationSurah, { color: colors[theme].text }]}>
+              {surahInfo.englishName}
+            </Text>
+            <Text style={[styles.navigationNumber, { color: colors[theme].inactive }]}>
+              {surahInfo.number}/114
+            </Text>
           </View>
-        </Animated.View>
-      </View>
-    </>
+          
+          <TouchableOpacity 
+            style={styles.navigationButton}
+            onPress={navigateToNextSurah}
+            disabled={surahNumber === 114}
+          >
+            <Text style={[
+              styles.navigationText, 
+              { 
+                color: surahNumber === 114 ? colors[theme].inactive : colors[theme].text 
+              }
+            ]}>
+              Next
+            </Text>
+            <ChevronRight 
+              size={24} 
+              color={surahNumber === 114 ? colors[theme].inactive : colors[theme].text} 
+            />
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+    </SafeAreaView>
   );
 }
 
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingTop: Platform.OS === 'ios' ? 48 : 16,
+    paddingTop: Platform.OS === 'ios' ? 12 : 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

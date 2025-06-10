@@ -9,7 +9,9 @@ import {
   Image,
   Dimensions,
   Animated,
-  Vibration
+  Vibration,
+  SafeAreaView,
+  StatusBar
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -25,11 +27,13 @@ import {
   Zap,
   Share2,
   AlertTriangle,
-  Check
+  Check,
+  Moon,
+  Sun
 } from 'lucide-react-native';
 
-const { width } = Dimensions.get('window');
-const COMPASS_SIZE = Math.min(width * 0.8, 300);
+const { width, height } = Dimensions.get('window');
+const COMPASS_SIZE = Math.min(width * 0.85, 320);
 
 export default function QiblaScreen() {
   const { darkMode } = useSettingsStore();
@@ -41,11 +45,13 @@ export default function QiblaScreen() {
   const [calibrationNeeded, setCalibrationNeeded] = useState(false);
   const [calibrationSuccess, setCalibrationSuccess] = useState(false);
   const [accuracy, setAccuracy] = useState('high'); // 'high', 'medium', 'low'
+  const [timeOfDay, setTimeOfDay] = useState<'day' | 'night'>('day');
   
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const calibrationAnim = useRef(new Animated.Value(0)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
 
   const requestLocationPermission = async () => {
     setIsLoading(true);
@@ -117,6 +123,10 @@ export default function QiblaScreen() {
   useEffect(() => {
     requestLocationPermission();
     
+    // Determine time of day
+    const hour = new Date().getHours();
+    setTimeOfDay(hour >= 6 && hour < 18 ? 'day' : 'night');
+    
     // Start pulse animation
     Animated.loop(
       Animated.sequence([
@@ -139,6 +149,22 @@ export default function QiblaScreen() {
       duration: 800,
       useNativeDriver: true
     }).start();
+    
+    // Glow animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0.3,
+          duration: 2000,
+          useNativeDriver: true
+        })
+      ])
+    ).start();
   }, []);
 
   const spin = rotateAnim.interpolate({
@@ -165,113 +191,154 @@ export default function QiblaScreen() {
   };
 
   return (
-    <>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors[theme].background }]}>
+      <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} />
       <Stack.Screen 
         options={{ 
           title: "Qibla Compass",
           headerShown: false
         }} 
       />
-      <View style={[styles.container, { backgroundColor: colors[theme].background }]}>
-        {/* Custom Header */}
-        <View style={[styles.customHeader, { backgroundColor: colors[theme].card }]}>
-          <TouchableOpacity onPress={goBack} style={styles.backButton}>
-            <ArrowLeft size={24} color={colors[theme].text} />
+      
+      {/* Custom Header */}
+      <View style={[styles.customHeader, { backgroundColor: colors[theme].card }]}>
+        <TouchableOpacity onPress={goBack} style={styles.backButton}>
+          <ArrowLeft size={24} color={colors[theme].text} />
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors[theme].text }]}>
+          Qibla Compass
+        </Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.headerButton}>
+            <Share2 size={22} color={colors[theme].text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors[theme].text }]}>
-            Qibla Compass
-          </Text>
-          <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.headerButton}>
-              <Share2 size={22} color={colors[theme].text} />
-            </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.headerButton}
+            onPress={() => setShowInfo(!showInfo)}
+          >
+            <Info size={22} color={colors[theme].text} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.content}>
+        {/* Location Card */}
+        <Card style={styles.locationCard}>
+          <View style={styles.locationContainer}>
+            <View style={[styles.locationIcon, { backgroundColor: colors[theme].primary + '20' }]}>
+              <MapPin size={20} color={colors[theme].primary} />
+            </View>
+            <View style={styles.locationInfo}>
+              <Text style={[styles.locationLabel, { color: colors[theme].inactive }]}>
+                Current Location
+              </Text>
+              <Text style={[styles.locationText, { color: colors[theme].text }]}>
+                {userLocation}
+              </Text>
+            </View>
             <TouchableOpacity 
-              style={styles.headerButton}
-              onPress={() => setShowInfo(!showInfo)}
+              style={[styles.refreshButton, { backgroundColor: colors[theme].primary }]}
+              onPress={requestLocationPermission}
+              disabled={isLoading}
             >
-              <Info size={22} color={colors[theme].text} />
+              <RefreshCw size={16} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
-        </View>
+        </Card>
 
-        <View style={styles.content}>
-          {/* Location Card */}
-          <Card style={styles.locationCard}>
-            <View style={styles.locationContainer}>
-              <View style={[styles.locationIcon, { backgroundColor: colors[theme].primary + '20' }]}>
-                <MapPin size={20} color={colors[theme].primary} />
-              </View>
-              <View style={styles.locationInfo}>
-                <Text style={[styles.locationLabel, { color: colors[theme].inactive }]}>
-                  Current Location
+        {/* Calibration Alert */}
+        {calibrationNeeded && (
+          <Card style={[styles.alertCard, { borderLeftColor: '#FF9800' }]}>
+            <View style={styles.alertContent}>
+              <AlertTriangle size={20} color="#FF9800" />
+              <View style={styles.alertTextContainer}>
+                <Text style={[styles.alertTitle, { color: colors[theme].text }]}>
+                  Calibration Needed
                 </Text>
-                <Text style={[styles.locationText, { color: colors[theme].text }]}>
-                  {userLocation}
+                <Text style={[styles.alertDescription, { color: colors[theme].inactive }]}>
+                  Wave your device in a figure-8 pattern to improve compass accuracy
                 </Text>
               </View>
-              <TouchableOpacity 
-                style={[styles.refreshButton, { backgroundColor: colors[theme].primary }]}
-                onPress={requestLocationPermission}
-                disabled={isLoading}
-              >
-                <RefreshCw size={16} color="#FFFFFF" />
-              </TouchableOpacity>
+            </View>
+            <TouchableOpacity 
+              style={[styles.calibrateButton, { backgroundColor: '#FF9800' }]}
+              onPress={calibrateCompass}
+            >
+              <Text style={styles.calibrateButtonText}>Calibrate</Text>
+            </TouchableOpacity>
+          </Card>
+        )}
+
+        {/* Calibration Success */}
+        {calibrationSuccess && (
+          <Card style={[styles.alertCard, { borderLeftColor: '#4CAF50' }]}>
+            <View style={styles.alertContent}>
+              <Check size={20} color="#4CAF50" />
+              <View style={styles.alertTextContainer}>
+                <Text style={[styles.alertTitle, { color: colors[theme].text }]}>
+                  Calibration Successful
+                </Text>
+                <Text style={[styles.alertDescription, { color: colors[theme].inactive }]}>
+                  Your compass is now calibrated for better accuracy
+                </Text>
+              </View>
             </View>
           </Card>
+        )}
 
-          {/* Calibration Alert */}
-          {calibrationNeeded && (
-            <Card style={[styles.alertCard, { borderLeftColor: '#FF9800' }]}>
-              <View style={styles.alertContent}>
-                <AlertTriangle size={20} color="#FF9800" />
-                <View style={styles.alertTextContainer}>
-                  <Text style={[styles.alertTitle, { color: colors[theme].text }]}>
-                    Calibration Needed
-                  </Text>
-                  <Text style={[styles.alertDescription, { color: colors[theme].inactive }]}>
-                    Wave your device in a figure-8 pattern to improve compass accuracy
-                  </Text>
-                </View>
-              </View>
-              <TouchableOpacity 
-                style={[styles.calibrateButton, { backgroundColor: '#FF9800' }]}
-                onPress={calibrateCompass}
-              >
-                <Text style={styles.calibrateButtonText}>Calibrate</Text>
-              </TouchableOpacity>
-            </Card>
-          )}
-
-          {/* Calibration Success */}
-          {calibrationSuccess && (
-            <Card style={[styles.alertCard, { borderLeftColor: '#4CAF50' }]}>
-              <View style={styles.alertContent}>
-                <Check size={20} color="#4CAF50" />
-                <View style={styles.alertTextContainer}>
-                  <Text style={[styles.alertTitle, { color: colors[theme].text }]}>
-                    Calibration Successful
-                  </Text>
-                  <Text style={[styles.alertDescription, { color: colors[theme].inactive }]}>
-                    Your compass is now calibrated for better accuracy
-                  </Text>
-                </View>
-              </View>
-            </Card>
-          )}
-
-          {/* Compass Container */}
-          <View style={styles.compassContainer}>
-            {isLoading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={colors[theme].primary} />
-                <Text style={[styles.loadingText, { color: colors[theme].text }]}>
-                  Finding Qibla direction...
-                </Text>
-              </View>
-            ) : (
-              <>
-                <Animated.View style={[styles.compassWrapper, { transform: [{ scale: scaleAnim }] }]}>
-                  <View style={[styles.compassBackground, { backgroundColor: colors[theme].card }]}>
+        {/* Compass Container */}
+        <View style={styles.compassContainer}>
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors[theme].primary} />
+              <Text style={[styles.loadingText, { color: colors[theme].text }]}>
+                Finding Qibla direction...
+              </Text>
+            </View>
+          ) : (
+            <>
+              <Animated.View style={[styles.compassWrapper, { transform: [{ scale: scaleAnim }] }]}>
+                {/* Sky background for day/night effect */}
+                <View style={[
+                  styles.skyBackground, 
+                  { 
+                    backgroundColor: timeOfDay === 'day' 
+                      ? '#E3F2FD' 
+                      : '#0D1B2A'
+                  }
+                ]}>
+                  {timeOfDay === 'night' && (
+                    <>
+                      <View style={[styles.star, { top: '10%', left: '20%' }]} />
+                      <View style={[styles.star, { top: '15%', left: '80%' }]} />
+                      <View style={[styles.star, { top: '30%', left: '50%' }]} />
+                      <View style={[styles.star, { top: '25%', left: '30%' }]} />
+                      <View style={[styles.star, { top: '40%', left: '70%' }]} />
+                      <View style={[styles.star, { top: '60%', left: '25%' }]} />
+                      <View style={[styles.star, { top: '70%', left: '60%' }]} />
+                      <View style={[styles.star, { top: '80%', left: '40%' }]} />
+                      <View style={[styles.star, { top: '85%', left: '80%' }]} />
+                      <View style={[styles.star, { top: '20%', left: '10%' }]} />
+                      <View style={[styles.star, { top: '50%', left: '90%' }]} />
+                    </>
+                  )}
+                  
+                  {/* Day/Night Icon */}
+                  <View style={styles.timeIcon}>
+                    {timeOfDay === 'day' ? (
+                      <Sun size={24} color="#FF9800" />
+                    ) : (
+                      <Moon size={24} color="#BBDEFB" />
+                    )}
+                  </View>
+                  
+                  <View style={[
+                    styles.compassBackground, 
+                    { 
+                      backgroundColor: colors[theme].card,
+                      shadowColor: timeOfDay === 'night' ? '#4FC3F7' : '#000'
+                    }
+                  ]}>
                     {/* Compass Background Pattern */}
                     <View style={styles.compassPattern}>
                       {Array(24).fill(0).map((_, i) => (
@@ -304,6 +371,15 @@ export default function QiblaScreen() {
                         { transform: [{ rotate: spin }] }
                       ]}
                     >
+                      <Animated.View 
+                        style={[
+                          styles.arrowGlow,
+                          { 
+                            backgroundColor: colors[theme].primary,
+                            opacity: glowAnim
+                          }
+                        ]} 
+                      />
                       <View style={[styles.arrowHead, { backgroundColor: colors[theme].primary }]} />
                       <View style={[styles.arrowTail, { backgroundColor: colors[theme].inactive }]} />
                     </Animated.View>
@@ -342,111 +418,111 @@ export default function QiblaScreen() {
                       </Animated.View>
                     )}
                   </View>
-                </Animated.View>
-                
-                {/* Direction Info */}
-                <Card style={styles.directionCard}>
-                  <View style={styles.directionInfo}>
-                    <View style={styles.directionMain}>
-                      <Text style={[styles.directionText, { color: colors[theme].primary }]}>
-                        {qiblaDirection}°
-                      </Text>
-                      <Text style={[styles.directionSubtext, { color: colors[theme].text }]}>
-                        {qiblaDirection > 0 && qiblaDirection < 90 ? 'Northeast' : 
-                         qiblaDirection >= 90 && qiblaDirection < 180 ? 'Southeast' :
-                         qiblaDirection >= 180 && qiblaDirection < 270 ? 'Southwest' : 'Northwest'}
-                      </Text>
-                    </View>
-                    <View style={[
-                      styles.accuracyIndicator, 
-                      { backgroundColor: getAccuracyColor() + '20' }
-                    ]}>
-                      <Zap size={16} color={getAccuracyColor()} />
-                      <Text style={[styles.accuracyText, { color: getAccuracyColor() }]}>
-                        {accuracy === 'high' ? 'High' : accuracy === 'medium' ? 'Medium' : 'Low'} Accuracy
-                      </Text>
-                    </View>
+                </View>
+              </Animated.View>
+              
+              {/* Direction Info */}
+              <Card style={styles.directionCard}>
+                <View style={styles.directionInfo}>
+                  <View style={styles.directionMain}>
+                    <Text style={[styles.directionText, { color: colors[theme].primary }]}>
+                      {qiblaDirection}°
+                    </Text>
+                    <Text style={[styles.directionSubtext, { color: colors[theme].text }]}>
+                      {qiblaDirection > 0 && qiblaDirection < 90 ? 'Northeast' : 
+                       qiblaDirection >= 90 && qiblaDirection < 180 ? 'Southeast' :
+                       qiblaDirection >= 180 && qiblaDirection < 270 ? 'Southwest' : 'Northwest'}
+                    </Text>
                   </View>
-                  <Text style={[styles.directionHelp, { color: colors[theme].inactive }]}>
-                    Point the green arrow towards the Qibla direction
-                  </Text>
-                </Card>
+                  <View style={[
+                    styles.accuracyIndicator, 
+                    { backgroundColor: getAccuracyColor() + '20' }
+                  ]}>
+                    <Zap size={16} color={getAccuracyColor()} />
+                    <Text style={[styles.accuracyText, { color: getAccuracyColor() }]}>
+                      {accuracy === 'high' ? 'High' : accuracy === 'medium' ? 'Medium' : 'Low'} Accuracy
+                    </Text>
+                  </View>
+                </View>
+                <Text style={[styles.directionHelp, { color: colors[theme].inactive }]}>
+                  Point the green arrow towards the Qibla direction
+                </Text>
+              </Card>
+            </>
+          )}
+        </View>
+
+        {/* Info Card */}
+        {showInfo && (
+          <Card style={styles.infoCard}>
+            <View style={styles.infoHeader}>
+              <Compass size={20} color={colors[theme].primary} />
+              <Text style={[styles.infoTitle, { color: colors[theme].text }]}>
+                About Qibla
+              </Text>
+            </View>
+            <Text style={[styles.infoText, { color: colors[theme].text }]}>
+              The Qibla is the direction that Muslims face during prayer. It points toward the Kaaba in Mecca, Saudi Arabia, which is the most sacred site in Islam.
+            </Text>
+            <Text style={[styles.infoText, { color: colors[theme].text, marginTop: 12 }]}>
+              For accurate results, please ensure your device's compass is calibrated and you are away from magnetic interference.
+            </Text>
+            
+            <View style={styles.infoTips}>
+              <Text style={[styles.infoTipsTitle, { color: colors[theme].primary }]}>
+                Tips for Better Accuracy:
+              </Text>
+              <View style={styles.infoTipItem}>
+                <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
+                <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
+                  Keep away from electronic devices and metal objects
+                </Text>
+              </View>
+              <View style={styles.infoTipItem}>
+                <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
+                <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
+                  Calibrate your compass by moving your device in a figure-8 pattern
+                </Text>
+              </View>
+              <View style={styles.infoTipItem}>
+                <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
+                <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
+                  Hold your device flat and parallel to the ground
+                </Text>
+              </View>
+            </View>
+          </Card>
+        )}
+
+        {/* Action Buttons */}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity 
+            style={[styles.mainActionButton, { backgroundColor: colors[theme].primary }]}
+            onPress={requestLocationPermission}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <>
+                <Navigation size={20} color="#FFFFFF" />
+                <Text style={styles.mainActionButtonText}>
+                  Recalibrate
+                </Text>
               </>
             )}
-          </View>
-
-          {/* Info Card */}
-          {showInfo && (
-            <Card style={styles.infoCard}>
-              <View style={styles.infoHeader}>
-                <Compass size={20} color={colors[theme].primary} />
-                <Text style={[styles.infoTitle, { color: colors[theme].text }]}>
-                  About Qibla
-                </Text>
-              </View>
-              <Text style={[styles.infoText, { color: colors[theme].text }]}>
-                The Qibla is the direction that Muslims face during prayer. It points toward the Kaaba in Mecca, Saudi Arabia, which is the most sacred site in Islam.
-              </Text>
-              <Text style={[styles.infoText, { color: colors[theme].text, marginTop: 12 }]}>
-                For accurate results, please ensure your device's compass is calibrated and you are away from magnetic interference.
-              </Text>
-              
-              <View style={styles.infoTips}>
-                <Text style={[styles.infoTipsTitle, { color: colors[theme].primary }]}>
-                  Tips for Better Accuracy:
-                </Text>
-                <View style={styles.infoTipItem}>
-                  <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
-                  <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
-                    Keep away from electronic devices and metal objects
-                  </Text>
-                </View>
-                <View style={styles.infoTipItem}>
-                  <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
-                  <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
-                    Calibrate your compass by moving your device in a figure-8 pattern
-                  </Text>
-                </View>
-                <View style={styles.infoTipItem}>
-                  <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
-                  <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
-                    Hold your device flat and parallel to the ground
-                  </Text>
-                </View>
-              </View>
-            </Card>
-          )}
-
-          {/* Action Buttons */}
-          <View style={styles.actionButtons}>
-            <TouchableOpacity 
-              style={[styles.mainActionButton, { backgroundColor: colors[theme].primary }]}
-              onPress={requestLocationPermission}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <>
-                  <Navigation size={20} color="#FFFFFF" />
-                  <Text style={styles.mainActionButtonText}>
-                    Recalibrate
-                  </Text>
-                </>
-              )}
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.secondaryActionButton, { backgroundColor: colors[theme].card }]}
-            >
-              <Text style={[styles.secondaryActionButtonText, { color: colors[theme].text }]}>
-                Share Location
-              </Text>
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.secondaryActionButton, { backgroundColor: colors[theme].card }]}
+          >
+            <Text style={[styles.secondaryActionButtonText, { color: colors[theme].text }]}>
+              Share Location
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 
@@ -460,7 +536,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingTop: Platform.OS === 'ios' ? 48 : 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -562,19 +637,42 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
+    borderRadius: COMPASS_SIZE / 2,
+    overflow: 'hidden',
   },
-  compassBackground: {
-    width: COMPASS_SIZE,
-    height: COMPASS_SIZE,
+  skyBackground: {
+    width: '100%',
+    height: '100%',
     borderRadius: COMPASS_SIZE / 2,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    shadowColor: '#000',
+  },
+  star: {
+    position: 'absolute',
+    width: 2,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: '#FFFFFF',
+    opacity: 0.8,
+  },
+  timeIcon: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    zIndex: 10,
+  },
+  compassBackground: {
+    width: COMPASS_SIZE * 0.85,
+    height: COMPASS_SIZE * 0.85,
+    borderRadius: (COMPASS_SIZE * 0.85) / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 8,
   },
   compassPattern: {
     position: 'absolute',
@@ -586,7 +684,7 @@ const styles = StyleSheet.create({
     width: 2,
     height: 20,
     top: 10,
-    left: COMPASS_SIZE/2 - 1,
+    left: COMPASS_SIZE * 0.85 / 2 - 1,
   },
   compassDirections: {
     position: 'absolute',
@@ -599,7 +697,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     width: 20,
     textAlign: 'center',
-    left: COMPASS_SIZE/2 - 10,
+    left: COMPASS_SIZE * 0.85 / 2 - 10,
   },
   qiblaArrow: {
     position: 'absolute',
@@ -607,6 +705,15 @@ const styles = StyleSheet.create({
     height: COMPASS_SIZE * 0.6,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  arrowGlow: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    top: 0,
+    marginTop: -10,
+    opacity: 0.5,
   },
   arrowHead: {
     position: 'absolute',
