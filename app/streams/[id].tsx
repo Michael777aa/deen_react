@@ -13,7 +13,8 @@ import {
 import { Stack, useLocalSearchParams, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
-import { streams, Stream, getStreamsByMosque, getStreamById } from '@/mocks/streamData';
+import { streams, getStreamsByMosque, getStreamById } from '@/mocks/streamData';
+import { Stream } from '@/types';
 import { StreamCard } from '@/components/StreamCard';
 import { 
   Play, 
@@ -264,7 +265,7 @@ export default function StreamDetailScreen() {
             
             {stream.tags && stream.tags.length > 0 && (
               <View style={styles.tags}>
-                {stream.tags.map((tag, index) => (
+                {stream.tags.map((tag: string, index: number) => (
                   <TouchableOpacity 
                     key={index}
                     style={[styles.tag, { backgroundColor: colors[theme].card }]}
