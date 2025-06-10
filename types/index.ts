@@ -97,3 +97,37 @@ export type Restaurant = {
     price: string;
   }[];
 };
+
+export type Mosque = {
+  id: string;
+  name: string;
+  address: string;
+  distance: string;
+  rating: number;
+  prayerTimes: {
+    fajr: string;
+    dhuhr: string;
+    asr: string;
+    maghrib: string;
+    isha: string;
+  };
+  facilities: string[];
+  imageUrl: string;
+};
+
+export type Stream = {
+  id: string;
+  title: string;
+  description: string;
+  mosqueId: string;
+  mosqueName: string;
+  type: 'live' | 'upcoming' | 'recorded';
+  startTime: string;
+  endTime?: string;
+  thumbnailUrl: string;
+  streamUrl: string;
+  viewCount: number;
+  likes: number;
+  speaker?: string;
+  tags?: string[];
+};

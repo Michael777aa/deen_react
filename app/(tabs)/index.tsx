@@ -41,7 +41,8 @@ import {
   Sun,
   Volume2,
   Vibrate,
-  Video
+  Video,
+  Users
 } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');

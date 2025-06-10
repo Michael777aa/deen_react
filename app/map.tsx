@@ -15,9 +15,10 @@ import { Stack, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
 import { Card } from '@/components/Card';
-import { Search, MapPin, Navigation, Clock, Star, Video } from 'lucide-react-native';
+import { Search, MapPin, Navigation, Clock, Star, Video, Users } from 'lucide-react-native';
 import { mosques } from '@/mocks/mosqueData';
 import { getStreamsByMosque } from '@/mocks/streamData';
+import { Mosque, Stream } from '@/types';
 
 export default function MapScreen() {
   const { darkMode } = useSettingsStore();
@@ -26,7 +27,7 @@ export default function MapScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [nearbyMosques, setNearbyMosques] = useState(mosques);
   const [userLocation, setUserLocation] = useState('New York, NY');
-  const [selectedMosque, setSelectedMosque] = useState(null);
+  const [selectedMosque, setSelectedMosque] = useState<Mosque | null>(null);
   const [showMosqueDetails, setShowMosqueDetails] = useState(false);
 
   const filteredMosques = mosques.filter(mosque => 
@@ -46,7 +47,7 @@ export default function MapScreen() {
     }, 1000);
   };
 
-  const handleMosqueSelect = (mosque) => {
+  const handleMosqueSelect = (mosque: Mosque) => {
     setSelectedMosque(mosque);
     setShowMosqueDetails(true);
   };
@@ -158,7 +159,7 @@ export default function MapScreen() {
           </Text>
           
           <View style={styles.facilitiesList}>
-            {selectedMosque.facilities.map((facility, index) => (
+            {selectedMosque.facilities.map((facility: string, index: number) => (
               <View key={index} style={styles.facilityItem}>
                 <View style={[styles.facilityDot, { backgroundColor: colors[theme].primary }]} />
                 <Text style={[styles.facilityText, { color: colors[theme].text }]}>
