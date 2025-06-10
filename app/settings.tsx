@@ -8,11 +8,13 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { useStreamStore } from '@/store/useStreamStore';
 import { colors } from '@/constants/colors';
 import { Card } from '@/components/Card';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { Stack } from 'expo-router';
+import { Video, Bell, Volume2, Vibrate } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const { 
@@ -20,10 +22,19 @@ export default function SettingsScreen() {
     notifications, 
     prayerReminders, 
     dailyQuote,
+    notificationType,
     toggleNotifications,
     togglePrayerReminders,
-    toggleDailyQuote
+    toggleDailyQuote,
+    setNotificationType
   } = useSettingsStore();
+  
+  const {
+    notifications: streamNotifications,
+    toggleNotifications: toggleStreamNotifications,
+    toggleUpcomingReminders,
+    toggleFavoriteStreamsOnly
+  } = useStreamStore();
   
   const theme = darkMode ? 'dark' : 'light';
 
@@ -57,7 +68,7 @@ export default function SettingsScreen() {
         </Card>
 
         <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
-          Notifications
+          Prayer Notifications
         </Text>
         
         <Card>
@@ -112,6 +123,166 @@ export default function SettingsScreen() {
               thumbColor="#FFFFFF"
               ios_backgroundColor="#D1D1D6"
               disabled={!notifications}
+            />
+          </View>
+          
+          <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
+          
+          <View style={styles.settingItem}>
+            <Text style={[styles.settingLabel, { color: colors[theme].text }]}>
+              Notification Type
+            </Text>
+          </View>
+          
+          <View style={styles.notificationTypes}>
+            <TouchableOpacity 
+              style={[
+                styles.notificationType,
+                notificationType === 'adhan' && [
+                  styles.selectedNotificationType,
+                  { borderColor: colors[theme].primary }
+                ]
+              ]}
+              onPress={() => setNotificationType('adhan')}
+              disabled={!notifications}
+            >
+              <Volume2 
+                size={24} 
+                color={notificationType === 'adhan' ? colors[theme].primary : colors[theme].inactive} 
+              />
+              <Text 
+                style={[
+                  styles.notificationTypeText, 
+                  { 
+                    color: notificationType === 'adhan' 
+                      ? colors[theme].primary 
+                      : colors[theme].inactive 
+                  }
+                ]}
+              >
+                Adhan
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[
+                styles.notificationType,
+                notificationType === 'vibration' && [
+                  styles.selectedNotificationType,
+                  { borderColor: colors[theme].primary }
+                ]
+              ]}
+              onPress={() => setNotificationType('vibration')}
+              disabled={!notifications}
+            >
+              <Vibrate 
+                size={24} 
+                color={notificationType === 'vibration' ? colors[theme].primary : colors[theme].inactive} 
+              />
+              <Text 
+                style={[
+                  styles.notificationTypeText, 
+                  { 
+                    color: notificationType === 'vibration' 
+                      ? colors[theme].primary 
+                      : colors[theme].inactive 
+                  }
+                ]}
+              >
+                Vibration
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[
+                styles.notificationType,
+                notificationType === 'text' && [
+                  styles.selectedNotificationType,
+                  { borderColor: colors[theme].primary }
+                ]
+              ]}
+              onPress={() => setNotificationType('text')}
+              disabled={!notifications}
+            >
+              <Bell 
+                size={24} 
+                color={notificationType === 'text' ? colors[theme].primary : colors[theme].inactive} 
+              />
+              <Text 
+                style={[
+                  styles.notificationTypeText, 
+                  { 
+                    color: notificationType === 'text' 
+                      ? colors[theme].primary 
+                      : colors[theme].inactive 
+                  }
+                ]}
+              >
+                Text Only
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Card>
+
+        <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
+          Live Stream Settings
+        </Text>
+        
+        <Card>
+          <View style={styles.settingItem}>
+            <View style={styles.settingLabelContainer}>
+              <Video size={20} color={colors[theme].text} style={styles.settingIcon} />
+              <Text style={[styles.settingLabel, { color: colors[theme].text }]}>
+                Stream Notifications
+              </Text>
+            </View>
+            <Switch
+              value={streamNotifications.enabled}
+              onValueChange={toggleStreamNotifications}
+              trackColor={{ 
+                false: '#D1D1D6', 
+                true: colors.dark.primary 
+              }}
+              thumbColor="#FFFFFF"
+              ios_backgroundColor="#D1D1D6"
+            />
+          </View>
+          
+          <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
+          
+          <View style={styles.settingItem}>
+            <Text style={[styles.settingLabel, { color: colors[theme].text }]}>
+              Upcoming Stream Reminders
+            </Text>
+            <Switch
+              value={streamNotifications.upcomingReminders}
+              onValueChange={toggleUpcomingReminders}
+              trackColor={{ 
+                false: '#D1D1D6', 
+                true: colors.dark.primary 
+              }}
+              thumbColor="#FFFFFF"
+              ios_backgroundColor="#D1D1D6"
+              disabled={!streamNotifications.enabled}
+            />
+          </View>
+          
+          <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
+          
+          <View style={styles.settingItem}>
+            <Text style={[styles.settingLabel, { color: colors[theme].text }]}>
+              Only Notify for Favorite Mosques
+            </Text>
+            <Switch
+              value={streamNotifications.favoriteStreamsOnly}
+              onValueChange={toggleFavoriteStreamsOnly}
+              trackColor={{ 
+                false: '#D1D1D6', 
+                true: colors.dark.primary 
+              }}
+              thumbColor="#FFFFFF"
+              ios_backgroundColor="#D1D1D6"
+              disabled={!streamNotifications.enabled}
             />
           </View>
         </Card>
@@ -236,6 +407,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
   },
+  settingLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  settingIcon: {
+    marginRight: 12,
+  },
   settingLabel: {
     fontSize: 16,
   },
@@ -245,5 +423,27 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     marginVertical: 4,
+  },
+  notificationTypes: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 12,
+  },
+  notificationType: {
+    width: '30%',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+  },
+  selectedNotificationType: {
+    borderWidth: 2,
+  },
+  notificationTypeText: {
+    fontSize: 12,
+    marginTop: 8,
+    fontWeight: '500',
   },
 });

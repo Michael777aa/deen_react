@@ -20,6 +20,8 @@ import { Card } from '@/components/Card';
 import { colors } from '@/constants/colors';
 import { prayerTimes, getNextPrayer } from '@/mocks/prayerTimes';
 import { PrayerTimeCard } from '@/components/PrayerTimeCard';
+import { StreamCard } from '@/components/StreamCard';
+import { getLiveStreams, getUpcomingStreams } from '@/mocks/streamData';
 import { 
   MessageCircle, 
   Calendar, 
@@ -38,7 +40,8 @@ import {
   Zap,
   Sun,
   Volume2,
-  Vibrate
+  Vibrate,
+  Video
 } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
@@ -81,6 +84,10 @@ export default function HomeScreen() {
       route: '/finance'
     }
   ];
+  
+  // Get live and upcoming streams
+  const liveStreams = getLiveStreams();
+  const upcomingStreams = getUpcomingStreams().slice(0, 3);
   
   useEffect(() => {
     if (!isAuthenticated) {
@@ -313,6 +320,108 @@ export default function HomeScreen() {
       
       <PrayerTimeCard prayerTime={nextPrayer} isNext={true} />
 
+      {/* Live Streams Section */}
+      {liveStreams.length > 0 && (
+        <>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
+              Live Now
+            </Text>
+            <TouchableOpacity onPress={() => router.push('/streams')}>
+              <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
+                See All
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.liveStreamContainer}>
+            <TouchableOpacity 
+              style={styles.liveStreamCard}
+              onPress={() => router.push(`/streams/${liveStreams[0].id}`)}
+            >
+              <Image 
+                source={{ uri: liveStreams[0].thumbnailUrl }} 
+                style={styles.liveStreamImage}
+              />
+              <View style={styles.liveStreamOverlay}>
+                <View style={styles.liveStreamIndicator}>
+                  <Text style={styles.liveStreamIndicatorText}>LIVE</Text>
+                </View>
+                <View style={styles.liveStreamContent}>
+                  <Text style={styles.liveStreamTitle} numberOfLines={2}>
+                    {liveStreams[0].title}
+                  </Text>
+                  <Text style={styles.liveStreamMosque}>
+                    {liveStreams[0].mosqueName}
+                  </Text>
+                  <View style={styles.liveStreamViewers}>
+                    <Users size={14} color="#FFFFFF" />
+                    <Text style={styles.liveStreamViewersText}>
+                      {liveStreams[0].viewCount} watching
+                    </Text>
+                  </View>
+                  <TouchableOpacity style={styles.watchNowButton}>
+                    <Text style={styles.watchNowText}>Watch Now</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
+      {/* Upcoming Streams */}
+      {upcomingStreams.length > 0 && (
+        <>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
+              Upcoming Streams
+            </Text>
+            <TouchableOpacity onPress={() => router.push('/streams')}>
+              <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
+                See All
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.upcomingStreamsScroll}
+          >
+            {upcomingStreams.map((stream) => (
+              <TouchableOpacity 
+                key={stream.id}
+                style={[styles.upcomingStreamCard, { backgroundColor: colors[theme].card }]}
+                onPress={() => router.push(`/streams/${stream.id}`)}
+              >
+                <Image 
+                  source={{ uri: stream.thumbnailUrl }} 
+                  style={styles.upcomingStreamImage}
+                />
+                <View style={styles.upcomingStreamContent}>
+                  <Text 
+                    style={[styles.upcomingStreamTitle, { color: colors[theme].text }]}
+                    numberOfLines={2}
+                  >
+                    {stream.title}
+                  </Text>
+                  <Text style={[styles.upcomingStreamMosque, { color: colors[theme].inactive }]}>
+                    {stream.mosqueName}
+                  </Text>
+                  <View style={styles.upcomingStreamTime}>
+                    <Clock size={12} color={colors[theme].primary} />
+                    <Text style={[styles.upcomingStreamTimeText, { color: colors[theme].primary }]}>
+                      {new Date(stream.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </>
+      )}
+
       {/* Quick Actions */}
       <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
         Quick Actions
@@ -411,6 +520,21 @@ export default function HomeScreen() {
             </Text>
             <Text style={[styles.actionSubtext, { color: colors[theme].inactive }]}>
               Remember Allah
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.actionCard, { backgroundColor: colors[theme].card }]}
+            onPress={() => router.push('/streams')}
+          >
+            <View style={[styles.actionIconContainer, { backgroundColor: '#F44336' + '20' }]}>
+              <Video size={24} color="#F44336" />
+            </View>
+            <Text style={[styles.actionText, { color: colors[theme].text }]}>
+              Streams
+            </Text>
+            <Text style={[styles.actionSubtext, { color: colors[theme].inactive }]}>
+              Live Khutbahs
             </Text>
           </TouchableOpacity>
         </ScrollView>
@@ -968,5 +1092,115 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  // Live Stream styles
+  liveStreamContainer: {
+    marginHorizontal: 16,
+    marginBottom: 20,
+  },
+  liveStreamCard: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    height: 220,
+  },
+  liveStreamImage: {
+    width: '100%',
+    height: '100%',
+  },
+  liveStreamOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 16,
+  },
+  liveStreamIndicator: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FF0000',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  liveStreamIndicatorText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  liveStreamContent: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  liveStreamTitle: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  liveStreamMosque: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    opacity: 0.9,
+    marginBottom: 8,
+  },
+  liveStreamViewers: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  liveStreamViewersText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    marginLeft: 6,
+  },
+  watchNowButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  watchNowText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Upcoming streams styles
+  upcomingStreamsScroll: {
+    paddingHorizontal: 16,
+  },
+  upcomingStreamCard: {
+    width: 200,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  upcomingStreamImage: {
+    width: '100%',
+    height: 120,
+  },
+  upcomingStreamContent: {
+    padding: 12,
+  },
+  upcomingStreamTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  upcomingStreamMosque: {
+    fontSize: 12,
+    marginBottom: 8,
+  },
+  upcomingStreamTime: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  upcomingStreamTimeText: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginLeft: 4,
   },
 });

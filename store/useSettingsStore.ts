@@ -16,6 +16,9 @@ type SettingsState = {
   fontSizeQuran: number;
   fontSizeApp: number;
   appTheme: string;
+  streamQuality: 'auto' | 'high' | 'medium' | 'low';
+  autoPlayStreams: boolean;
+  downloadStreams: boolean;
   toggleDarkMode: () => void;
   setLanguage: (language: string) => void;
   toggleNotifications: () => void;
@@ -27,6 +30,9 @@ type SettingsState = {
   setFontSizeQuran: (size: number) => void;
   setFontSizeApp: (size: number) => void;
   setAppTheme: (theme: string) => void;
+  setStreamQuality: (quality: 'auto' | 'high' | 'medium' | 'low') => void;
+  toggleAutoPlayStreams: () => void;
+  toggleDownloadStreams: () => void;
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -43,6 +49,9 @@ export const useSettingsStore = create<SettingsState>()(
       fontSizeQuran: 18,
       fontSizeApp: 16,
       appTheme: 'default',
+      streamQuality: 'auto',
+      autoPlayStreams: true,
+      downloadStreams: false,
       toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
       setLanguage: (language) => set({ language }),
       toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
@@ -54,6 +63,9 @@ export const useSettingsStore = create<SettingsState>()(
       setFontSizeQuran: (size) => set({ fontSizeQuran: size }),
       setFontSizeApp: (size) => set({ fontSizeApp: size }),
       setAppTheme: (theme) => set({ appTheme: theme }),
+      setStreamQuality: (quality) => set({ streamQuality: quality }),
+      toggleAutoPlayStreams: () => set((state) => ({ autoPlayStreams: !state.autoPlayStreams })),
+      toggleDownloadStreams: () => set((state) => ({ downloadStreams: !state.downloadStreams })),
     }),
     {
       name: 'settings-storage',
