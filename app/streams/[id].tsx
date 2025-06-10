@@ -10,10 +10,10 @@ import {
   Platform,
   Dimensions
 } from 'react-native';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
-import { streams, Stream, getStreamsByMosque } from '@/mocks/streamData';
+import { streams, Stream, getStreamsByMosque, getStreamById } from '@/mocks/streamData';
 import { StreamCard } from '@/components/StreamCard';
 import { 
   Play, 
@@ -46,7 +46,7 @@ export default function StreamDetailScreen() {
   
   useEffect(() => {
     // Find the stream by ID
-    const foundStream = streams.find(s => s.id === id);
+    const foundStream = getStreamById(id as string);
     if (foundStream) {
       setStream(foundStream);
       
@@ -93,6 +93,10 @@ export default function StreamDetailScreen() {
     setIsMuted(!isMuted);
   };
 
+  const handleBackPress = () => {
+    router.back();
+  };
+
   if (!stream) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: colors[theme].background }]}>
@@ -125,7 +129,7 @@ export default function StreamDetailScreen() {
                 style={styles.videoPlaceholder}
               />
               <View style={styles.videoControls}>
-                <TouchableOpacity style={styles.backButton} onPress={() => ChevronLeft}>
+                <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
                   <ChevronLeft size={24} color="#FFFFFF" />
                 </TouchableOpacity>
                 
@@ -195,7 +199,7 @@ export default function StreamDetailScreen() {
             <View style={styles.metaItem}>
               <Video size={16} color={colors[theme].inactive} />
               <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
-                {stream.category.charAt(0).toUpperCase() + stream.category.slice(1)}
+                {stream.category ? stream.category.charAt(0).toUpperCase() + stream.category.slice(1) : 'Other'}
               </Text>
             </View>
           </View>
@@ -238,7 +242,7 @@ export default function StreamDetailScreen() {
                 {stream.mosqueName}
               </Text>
               <Text style={[styles.imamName, { color: colors[theme].inactive }]}>
-                {stream.imamName}
+                {stream.imamName || 'Imam'}
               </Text>
             </View>
             <TouchableOpacity 
@@ -258,18 +262,20 @@ export default function StreamDetailScreen() {
               {stream.description}
             </Text>
             
-            <View style={styles.tags}>
-              {stream.tags.map((tag, index) => (
-                <TouchableOpacity 
-                  key={index}
-                  style={[styles.tag, { backgroundColor: colors[theme].card }]}
-                >
-                  <Text style={[styles.tagText, { color: colors[theme].primary }]}>
-                    #{tag}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            {stream.tags && stream.tags.length > 0 && (
+              <View style={styles.tags}>
+                {stream.tags.map((tag, index) => (
+                  <TouchableOpacity 
+                    key={index}
+                    style={[styles.tag, { backgroundColor: colors[theme].card }]}
+                  >
+                    <Text style={[styles.tagText, { color: colors[theme].primary }]}>
+                      #{tag}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
           
           {showComments && (

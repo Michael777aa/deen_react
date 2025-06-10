@@ -42,7 +42,7 @@ import {
   Volume2,
   Vibrate,
   Video,
-  Users
+  Users as UsersIcon
 } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
@@ -356,7 +356,7 @@ export default function HomeScreen() {
                     {liveStreams[0].mosqueName}
                   </Text>
                   <View style={styles.liveStreamViewers}>
-                    <Users size={14} color="#FFFFFF" />
+                    <UsersIcon size={14} color="#FFFFFF" />
                     <Text style={styles.liveStreamViewersText}>
                       {liveStreams[0].viewCount} watching
                     </Text>
@@ -604,7 +604,7 @@ export default function HomeScreen() {
         <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
           Islamic Calendar
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('/islamic-calendar')}>
           <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
             Full Calendar
           </Text>

@@ -25,7 +25,7 @@ export default function MapScreen() {
   const theme = darkMode ? 'dark' : 'light';
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [nearbyMosques, setNearbyMosques] = useState(mosques);
+  const [nearbyMosques, setNearbyMosques] = useState<Mosque[]>(mosques);
   const [userLocation, setUserLocation] = useState('New York, NY');
   const [selectedMosque, setSelectedMosque] = useState<Mosque | null>(null);
   const [showMosqueDetails, setShowMosqueDetails] = useState(false);
@@ -79,7 +79,7 @@ export default function MapScreen() {
         
         <View style={styles.mosqueImageContainer}>
           <Image 
-            source={{ uri: 'https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' }} 
+            source={{ uri: selectedMosque.imageUrl || 'https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' }} 
             style={styles.mosqueImage}
           />
           <View style={styles.mosqueImageOverlay}>

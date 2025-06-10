@@ -8,7 +8,7 @@ import {
   FlatList,
   RefreshControl
 } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
 import { StreamCard } from '@/components/StreamCard';

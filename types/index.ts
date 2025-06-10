@@ -112,7 +112,7 @@ export type Mosque = {
     isha: string;
   };
   facilities: string[];
-  imageUrl: string;
+  imageUrl?: string;
 };
 
 export type Stream = {
@@ -121,13 +121,14 @@ export type Stream = {
   description: string;
   mosqueId: string;
   mosqueName: string;
+  imamName?: string;
   type: 'live' | 'upcoming' | 'recorded';
+  category?: string;
   startTime: string;
   endTime?: string;
   thumbnailUrl: string;
   streamUrl: string;
   viewCount: number;
   likes: number;
-  speaker?: string;
   tags?: string[];
 };
