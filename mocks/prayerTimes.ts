@@ -1,67 +1,63 @@
+import { PrayerTime } from '@/types';
+
+// Mock prayer times data
 export const prayerTimes = [
   {
     name: 'Fajr',
     arabicName: 'الفجر',
-    time: '05:12 AM',
-  },
-  {
-    name: 'Sunrise',
-    arabicName: 'الشروق',
-    time: '06:34 AM',
+    time: '04:30 AM',
+    minutesSinceMidnight: 270
   },
   {
     name: 'Dhuhr',
     arabicName: 'الظهر',
-    time: '12:15 PM',
+    time: '12:30 PM',
+    minutesSinceMidnight: 750
   },
   {
     name: 'Asr',
     arabicName: 'العصر',
-    time: '03:45 PM',
+    time: '04:15 PM',
+    minutesSinceMidnight: 975
   },
   {
     name: 'Maghrib',
     arabicName: 'المغرب',
-    time: '06:52 PM',
+    time: '07:45 PM',
+    minutesSinceMidnight: 1185
   },
   {
     name: 'Isha',
     arabicName: 'العشاء',
-    time: '08:22 PM',
-  },
+    time: '09:15 PM',
+    minutesSinceMidnight: 1275
+  }
 ];
 
-export const getNextPrayer = () => {
+// Function to get the next prayer time
+export const getNextPrayer = (): PrayerTime => {
   const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  
-  // Convert prayer times to minutes since midnight for comparison
-  const prayerTimesInMinutes = prayerTimes.map(prayer => {
-    const [time, period] = prayer.time.split(' ');
-    const [hourStr, minuteStr] = time.split(':');
-    let hour = parseInt(hourStr);
-    const minute = parseInt(minuteStr);
-    
-    if (period === 'PM' && hour !== 12) {
-      hour += 12;
-    } else if (period === 'AM' && hour === 12) {
-      hour = 0;
-    }
-    
-    return {
-      ...prayer,
-      minutesSinceMidnight: hour * 60 + minute,
-    };
-  });
-  
-  const currentTimeInMinutes = currentHour * 60 + currentMinute;
+  const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
   
   // Find the next prayer
-  const nextPrayer = prayerTimesInMinutes.find(
-    prayer => prayer.minutesSinceMidnight > currentTimeInMinutes
-  );
+  const nextPrayer = prayerTimes.find(prayer => prayer.minutesSinceMidnight > minutesSinceMidnight);
   
-  // If no prayer is found (after Isha), return Fajr for the next day
-  return nextPrayer || prayerTimesInMinutes[0];
+  // If no next prayer today, return the first prayer for tomorrow
+  const prayer = nextPrayer || prayerTimes[0];
+  
+  // Calculate time remaining
+  let minutesRemaining = prayer.minutesSinceMidnight - minutesSinceMidnight;
+  if (minutesRemaining < 0) {
+    minutesRemaining += 24 * 60; // Add 24 hours if it's tomorrow
+  }
+  
+  const hoursRemaining = Math.floor(minutesRemaining / 60);
+  const minsRemaining = minutesRemaining % 60;
+  
+  const timeRemaining = `${hoursRemaining}h ${minsRemaining}m`;
+  
+  return {
+    ...prayer,
+    timeRemaining
+  };
 };

@@ -42,7 +42,8 @@ import {
   Volume2,
   Vibrate,
   Video,
-  Users
+  User,
+  Users as UsersIcon
 } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
@@ -392,7 +393,7 @@ export default function HomeScreen() {
                     {liveStreams[0].mosqueName}
                   </Text>
                   <View style={styles.liveStreamViewers}>
-                    <Users size={14} color="#FFFFFF" />
+                    <UsersIcon size={14} color="#FFFFFF" />
                     <Text style={styles.liveStreamViewersText}>
                       {liveStreams[0].viewCount} watching
                     </Text>

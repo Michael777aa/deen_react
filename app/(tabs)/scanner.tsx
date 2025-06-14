@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -17,7 +17,7 @@ import { colors } from '@/constants/colors';
 import { Card } from '@/components/Card';
 import { useProductStore } from '@/store/useProductStore';
 import { Product } from '@/types';
-import { Scan, Search, ChevronRight, ShoppingBag, Camera, Tag, Filter, Star } from 'lucide-react-native';
+import { Search, Scan, ChevronRight, ShoppingBag, Camera, Tag, Filter, Star } from 'lucide-react-native';
 import { mockProducts } from '@/mocks/productData';
 
 const { width } = Dimensions.get('window');
@@ -172,6 +172,11 @@ export default function ProductsScreen() {
         addScannedProduct(product);
       });
     }
+
+    // Add recommended products to scanned products
+    recommendedProducts.forEach(product => {
+      addScannedProduct(product);
+    });
 
     // Fade in animation
     Animated.parallel([

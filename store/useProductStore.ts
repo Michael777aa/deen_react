@@ -16,6 +16,7 @@ interface ProductState {
   getProductsByCategory: (category: string) => Product[];
   searchProducts: (query: string) => Product[];
   getRecommendedProducts: () => Product[];
+  addScannedProduct: (product: Product) => void;
 }
 
 export const useProductStore = create<ProductState>()(
@@ -81,6 +82,17 @@ export const useProductStore = create<ProductState>()(
         }
       },
       
+      addScannedProduct: (product: Product) => {
+        const existingProducts = get().scannedProducts;
+        const exists = existingProducts.some(p => p.id === product.id);
+        
+        if (!exists) {
+          set({ 
+            scannedProducts: [product, ...existingProducts]
+          });
+        }
+      },
+      
       getProductById: (id: string) => {
         // First check in scanned products
         const { scannedProducts } = get();
@@ -105,7 +117,7 @@ export const useProductStore = create<ProductState>()(
       getProductsByCategory: (category: string) => {
         // Filter products by category
         return mockProducts.filter(product => 
-          product.category.toLowerCase().includes(category.toLowerCase())
+          product.category?.toLowerCase().includes(category.toLowerCase())
         );
       },
       
@@ -116,7 +128,7 @@ export const useProductStore = create<ProductState>()(
         return mockProducts.filter(product => 
           product.name.toLowerCase().includes(searchQuery) || 
           product.brand.toLowerCase().includes(searchQuery) ||
-          product.category.toLowerCase().includes(searchQuery)
+          (product.category && product.category.toLowerCase().includes(searchQuery))
         );
       },
       

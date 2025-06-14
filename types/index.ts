@@ -7,7 +7,9 @@ export interface User {
 
 export interface PrayerTime {
   name: string;
+  arabicName: string;
   time: string;
+  minutesSinceMidnight: number;
   timeRemaining: string;
 }
 
@@ -72,14 +74,17 @@ export interface Stream {
   title: string;
   description: string;
   mosqueName: string;
-  mosqueLocation: string;
-  imamName: string;
+  mosqueId: string;
+  mosqueLocation?: string;
+  imamName?: string;
   thumbnailUrl: string;
   streamUrl: string;
-  isLive: boolean;
   viewCount: number;
+  likes?: number;
   startTime: string;
   endTime?: string;
+  type: 'live' | 'upcoming' | 'recorded';
+  category?: string;
   tags: string[];
 }
 
