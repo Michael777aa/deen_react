@@ -25,6 +25,7 @@ export default function RootLayout() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   const fadeAnim = new Animated.Value(1);
+  const scaleAnim = new Animated.Value(1);
   
   const [loaded, error] = useFonts({
     ...FontAwesome.font,
@@ -68,12 +69,25 @@ export default function RootLayout() {
       // Hide the native splash screen
       SplashScreen.hideAsync();
       
-      // Fade out our custom splash screen
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }).start(() => {
+      // Animate the logo
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 1.2,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        // Fade out our custom splash screen
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+        })
+      ]).start(() => {
         setShowSplash(false);
       });
     }
@@ -89,11 +103,14 @@ export default function RootLayout() {
         }
       ]}>
         <View style={styles.splashContent}>
-          <View style={styles.logoContainer}>
+          <Animated.View style={[
+            styles.logoContainer,
+            { transform: [{ scale: scaleAnim }] }
+          ]}>
             <View style={[styles.logoCircle, { backgroundColor: colors.light.primary }]}>
               <Text style={styles.logoIcon}>☪️</Text>
             </View>
-          </View>
+          </Animated.View>
           <Text style={[
             styles.appTitle, 
             { color: darkMode ? colors.dark.text : colors.light.text }
@@ -227,6 +244,20 @@ function RootLayoutNav() {
         name="scanner/info" 
         options={{ 
           title: "Scanner Info",
+          headerBackTitle: "Back",
+        }} 
+      />
+      <Stack.Screen 
+        name="islamic-calendar" 
+        options={{ 
+          title: "Islamic Calendar",
+          headerBackTitle: "Back",
+        }} 
+      />
+      <Stack.Screen 
+        name="streams/[id]" 
+        options={{ 
+          title: "Live Stream",
           headerBackTitle: "Back",
         }} 
       />

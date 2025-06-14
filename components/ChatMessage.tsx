@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { ChatMessage as ChatMessageType } from '@/types';
 import { colors } from '@/constants/colors';
 import { useSettingsStore } from '@/store/useSettingsStore';
+
+const { width } = Dimensions.get('window');
+const MAX_IMAGE_WIDTH = width * 0.6;
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -24,14 +27,24 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           ? [styles.userBubble, { backgroundColor: colors[theme].primary }] 
           : [styles.assistantBubble, { backgroundColor: colors[theme].card }],
       ]}>
-        <Text style={[
-          styles.text,
-          isUser 
-            ? { color: '#FFFFFF' } 
-            : { color: colors[theme].text },
-        ]}>
-          {message.content}
-        </Text>
+        {message.imageUri && (
+          <Image 
+            source={{ uri: message.imageUri }} 
+            style={styles.messageImage}
+            resizeMode="cover"
+          />
+        )}
+        
+        {message.content && (
+          <Text style={[
+            styles.text,
+            isUser 
+              ? { color: '#FFFFFF' } 
+              : { color: colors[theme].text },
+          ]}>
+            {message.content}
+          </Text>
+        )}
       </View>
       <Text style={[
         styles.timestamp,
@@ -57,6 +70,7 @@ const styles = StyleSheet.create({
   bubble: {
     borderRadius: 16,
     padding: 12,
+    overflow: 'hidden',
   },
   userBubble: {
     borderBottomRightRadius: 4,
@@ -67,6 +81,12 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     lineHeight: 22,
+  },
+  messageImage: {
+    width: MAX_IMAGE_WIDTH,
+    height: MAX_IMAGE_WIDTH * 0.75,
+    borderRadius: 8,
+    marginBottom: 8,
   },
   timestamp: {
     fontSize: 12,

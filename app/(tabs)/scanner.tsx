@@ -8,7 +8,8 @@ import {
   FlatList,
   Image,
   TextInput,
-  Dimensions
+  Dimensions,
+  Animated
 } from 'react-native';
 import { router, Stack } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -16,7 +17,8 @@ import { colors } from '@/constants/colors';
 import { Card } from '@/components/Card';
 import { useProductStore } from '@/store/useProductStore';
 import { Product } from '@/types';
-import { Scan, Search, ChevronRight } from 'lucide-react-native';
+import { Scan, Search, ChevronRight, ShoppingBag, Camera, Tag, Filter, Star } from 'lucide-react-native';
+import { mockProducts } from '@/mocks/productData';
 
 const { width } = Dimensions.get('window');
 const CAROUSEL_ITEM_WIDTH = width * 0.9;
@@ -58,12 +60,133 @@ const carouselItems = [
   }
 ];
 
+// Additional mock products for recommended section
+const recommendedProducts: Product[] = [
+  {
+    id: '9',
+    barcode: '8801987654321',
+    name: 'Organic Coconut Water',
+    brand: 'Pure Nature',
+    imageUrl: 'https://images.unsplash.com/photo-1536759808958-1a71d5899bb5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+    halalStatus: 'halal',
+    certification: 'Global Halal Authority',
+    certificationNumber: 'GHA-2023-1234',
+    certificationExpiry: '2025-06-30',
+    category: 'Beverages',
+    ingredients: 'Organic Coconut Water, Vitamin C',
+    nutritionalInfo: {
+      'Calories': '45 kcal',
+      'Protein': '0g',
+      'Carbohydrates': '11g',
+      'Fat': '0g',
+      'Sodium': '25mg',
+      'Potassium': '470mg'
+    },
+    manufacturer: 'Pure Nature Foods Inc.',
+    countryOfOrigin: 'Thailand',
+    scanDate: '2023-07-10T14:20:00Z'
+  },
+  {
+    id: '10',
+    barcode: '8801234987654',
+    name: 'Almond Date Energy Bar',
+    brand: 'Healthy Bites',
+    imageUrl: 'https://images.unsplash.com/photo-1571748982800-fa51082c2224?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+    halalStatus: 'halal',
+    certification: 'International Halal Integrity Alliance',
+    certificationNumber: 'IHIA-2022-5678',
+    certificationExpiry: '2024-12-15',
+    category: 'Snacks',
+    ingredients: 'Dates, Almonds, Honey, Chia Seeds, Cinnamon',
+    nutritionalInfo: {
+      'Calories': '180 kcal',
+      'Protein': '5g',
+      'Carbohydrates': '25g',
+      'Fat': '8g',
+      'Fiber': '4g'
+    },
+    manufacturer: 'Healthy Bites Co.',
+    countryOfOrigin: 'United Arab Emirates',
+    scanDate: '2023-07-12T09:15:00Z'
+  },
+  {
+    id: '11',
+    barcode: '8801122334455',
+    name: 'Halal Beef Jerky',
+    brand: 'Protein Pack',
+    imageUrl: 'https://images.unsplash.com/photo-1626082929543-5bfa38eae193?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+    halalStatus: 'halal',
+    certification: 'American Halal Foundation',
+    certificationNumber: 'AHF-2023-9012',
+    certificationExpiry: '2024-08-20',
+    category: 'Snacks',
+    ingredients: 'Halal Beef, Sea Salt, Black Pepper, Paprika, Natural Smoke Flavor',
+    nutritionalInfo: {
+      'Calories': '80 kcal',
+      'Protein': '16g',
+      'Carbohydrates': '3g',
+      'Fat': '1.5g',
+      'Sodium': '390mg'
+    },
+    manufacturer: 'Protein Pack Foods',
+    countryOfOrigin: 'USA',
+    scanDate: '2023-07-15T16:45:00Z'
+  },
+  {
+    id: '12',
+    barcode: '8801567890123',
+    name: 'Organic Honey',
+    brand: 'Nature\'s Gold',
+    imageUrl: 'https://images.unsplash.com/photo-1587049352851-8d4e89133924?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+    halalStatus: 'halal',
+    certification: 'Malaysia Islamic Development Department (JAKIM)',
+    certificationNumber: 'JAKIM-2022-3456',
+    certificationExpiry: '2025-01-10',
+    category: 'Condiments',
+    ingredients: '100% Pure Organic Honey',
+    nutritionalInfo: {
+      'Calories': '60 kcal',
+      'Protein': '0g',
+      'Carbohydrates': '17g',
+      'Fat': '0g'
+    },
+    manufacturer: 'Nature\'s Gold Apiaries',
+    countryOfOrigin: 'Malaysia',
+    scanDate: '2023-07-18T11:30:00Z'
+  }
+];
+
 export default function ProductsScreen() {
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
-  const { scannedProducts } = useProductStore();
+  const { scannedProducts, addScannedProduct } = useProductStore();
   const [activeCarouselIndex, setActiveCarouselIndex] = useState(0);
   const carouselRef = useRef(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  // Initialize with mock products if empty
+  React.useEffect(() => {
+    if (scannedProducts.length === 0) {
+      mockProducts.forEach(product => {
+        addScannedProduct(product);
+      });
+    }
+
+    // Fade in animation
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true
+      })
+    ]).start();
+  }, []);
 
   const renderHalalStatus = (status: string) => {
     if (status === 'halal') {
@@ -160,7 +283,7 @@ export default function ProductsScreen() {
     <>
       <Stack.Screen 
         options={{
-          title: "Products",
+          title: "Halal Scanner",
           headerRight: () => (
             <TouchableOpacity 
               style={styles.scanButton}
@@ -176,6 +299,68 @@ export default function ProductsScreen() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
+        {/* Header Banner */}
+        <Animated.View 
+          style={[
+            styles.headerBanner,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }]
+            }
+          ]}
+        >
+          <Image 
+            source={{ uri: 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80' }} 
+            style={styles.headerImage}
+          />
+          <View style={styles.headerOverlay}>
+            <View style={styles.headerContent}>
+              <ShoppingBag size={32} color="#FFFFFF" />
+              <Text style={styles.headerTitle}>Halal Product Scanner</Text>
+              <Text style={styles.headerSubtitle}>Verify products with confidence</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.scanNowButton}
+              onPress={() => router.push('/scanner/scan')}
+            >
+              <Camera size={16} color="#FFFFFF" />
+              <Text style={styles.scanNowButtonText}>Scan Now</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+        
+        {/* Search */}
+        <TouchableOpacity 
+          style={[styles.searchButton, { backgroundColor: colors[theme].card }]}
+          onPress={() => router.push('/scanner/search')}
+        >
+          <Search size={20} color={colors[theme].inactive} />
+          <Text style={[styles.searchText, { color: colors[theme].inactive }]}>
+            Search for products...
+          </Text>
+        </TouchableOpacity>
+        
+        {/* Categories */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
+            Categories
+          </Text>
+          <TouchableOpacity onPress={() => router.push('/scanner/categories')}>
+            <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
+              See All
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
+        <FlatList
+          data={categories}
+          renderItem={renderCategoryItem}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoriesList}
+        />
+        
         {/* Carousel */}
         <View style={styles.carouselContainer}>
           <FlatList
@@ -211,38 +396,6 @@ export default function ProductsScreen() {
           </View>
         </View>
         
-        {/* Search */}
-        <TouchableOpacity 
-          style={[styles.searchButton, { backgroundColor: colors[theme].card }]}
-          onPress={() => router.push('/scanner/search')}
-        >
-          <Search size={20} color={colors[theme].inactive} />
-          <Text style={[styles.searchText, { color: colors[theme].inactive }]}>
-            Search for products...
-          </Text>
-        </TouchableOpacity>
-        
-        {/* Categories */}
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
-            Categories
-          </Text>
-          <TouchableOpacity onPress={() => router.push('/scanner/categories')}>
-            <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
-              See All
-            </Text>
-          </TouchableOpacity>
-        </View>
-        
-        <FlatList
-          data={categories}
-          renderItem={renderCategoryItem}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesList}
-        />
-        
         {/* Recommended Products */}
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
@@ -256,7 +409,7 @@ export default function ProductsScreen() {
         </View>
         
         <FlatList
-          data={scannedProducts.length > 0 ? scannedProducts : useProductStore.getState().scannedProducts}
+          data={recommendedProducts}
           renderItem={renderProductItem}
           keyExtractor={(item) => item.id}
           horizontal
@@ -291,6 +444,73 @@ export default function ProductsScreen() {
             </View>
           }
         />
+
+        {/* Popular Halal Brands */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
+            Popular Halal Brands
+          </Text>
+          <TouchableOpacity>
+            <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
+              See All
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.brandsList}
+        >
+          {['Saffron Road', 'Al Safa', 'Crescent Foods', 'Midamar', 'Halal Guys'].map((brand, index) => (
+            <TouchableOpacity 
+              key={index}
+              style={[styles.brandItem, { backgroundColor: colors[theme].card }]}
+            >
+              <View style={[styles.brandIcon, { backgroundColor: colors[theme].primary + '20' }]}>
+                <Tag size={24} color={colors[theme].primary} />
+              </View>
+              <Text style={[styles.brandName, { color: colors[theme].text }]}>{brand}</Text>
+              <View style={styles.brandRating}>
+                <Star size={12} color="#FFD700" fill="#FFD700" />
+                <Text style={[styles.brandRatingText, { color: colors[theme].inactive }]}>
+                  {(4 + Math.random()).toFixed(1)}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Halal Certification Guide */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
+            Halal Certification Guide
+          </Text>
+        </View>
+
+        <TouchableOpacity 
+          style={[styles.guideCard, { backgroundColor: colors[theme].card }]}
+          onPress={() => router.push('/scanner/info')}
+        >
+          <Image 
+            source={{ uri: 'https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' }}
+            style={styles.guideImage}
+          />
+          <View style={styles.guideContent}>
+            <Text style={[styles.guideTitle, { color: colors[theme].text }]}>
+              Understanding Halal Certifications
+            </Text>
+            <Text style={[styles.guideDescription, { color: colors[theme].inactive }]}>
+              Learn how to identify authentic halal certifications and what they mean
+            </Text>
+            <View style={styles.guideButton}>
+              <Text style={[styles.guideButtonText, { color: colors[theme].primary }]}>
+                Read Guide
+              </Text>
+              <ChevronRight size={16} color={colors[theme].primary} />
+            </View>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </>
   );
@@ -305,6 +525,53 @@ const styles = StyleSheet.create({
   },
   scanButton: {
     marginRight: 16,
+  },
+  headerBanner: {
+    height: 200,
+    marginBottom: 20,
+  },
+  headerImage: {
+    width: '100%',
+    height: '100%',
+  },
+  headerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  headerContent: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerTitle: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 12,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  headerSubtitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    opacity: 0.9,
+    textAlign: 'center',
+  },
+  scanNowButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(76, 175, 80, 0.9)',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+  },
+  scanNowButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
   },
   carouselContainer: {
     marginBottom: 20,
@@ -457,5 +724,71 @@ const styles = StyleSheet.create({
   emptyListText: {
     fontSize: 14,
     fontStyle: 'italic',
+  },
+  brandsList: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  brandItem: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    marginRight: 12,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  brandName: {
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  brandRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  brandRatingText: {
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  guideCard: {
+    marginHorizontal: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  guideImage: {
+    width: '100%',
+    height: 120,
+  },
+  guideContent: {
+    padding: 16,
+  },
+  guideTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  guideDescription: {
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  guideButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  guideButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginRight: 4,
   },
 });

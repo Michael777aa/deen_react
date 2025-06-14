@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
   Text, 
   StyleSheet, 
   FlatList, 
-  TouchableOpacity, 
+  TouchableOpacity,
   TextInput,
   ActivityIndicator,
   ScrollView,
   Image,
   Dimensions,
   Animated,
-  Platform
+  Platform,
+  Vibration
 } from 'react-native';
 import { router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -26,7 +27,12 @@ import {
   Play, 
   Download,
   Heart,
-  Bell
+  Bell,
+  ChevronDown,
+  ChevronUp,
+  Headphones,
+  Share2,
+  BookOpenCheck
 } from 'lucide-react-native';
 import { quranSurahs } from '@/mocks/quranData';
 
@@ -42,8 +48,12 @@ export default function QuranScreen() {
   const [favorites, setFavorites] = useState<number[]>([2, 18, 36, 55, 67]); // Mock favorite surahs
   const [downloadingSurah, setDownloadingSurah] = useState<number | null>(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
-  const fadeAnim = useState(new Animated.Value(0))[0];
-  const slideAnim = useState(new Animated.Value(50))[0];
+  const [showAllSurahs, setShowAllSurahs] = useState(false);
+  const [expandedSurah, setExpandedSurah] = useState<number | null>(null);
+  
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     // Fade in animation
@@ -67,6 +77,8 @@ export default function QuranScreen() {
     surah.number.toString().includes(searchQuery)
   );
 
+  const displayedSurahs = showAllSurahs ? filteredSurahs : filteredSurahs.slice(0, 20);
+
   const handleSearch = (text: string) => {
     setSearchQuery(text);
   };
@@ -80,6 +92,11 @@ export default function QuranScreen() {
       setFavorites(favorites.filter(num => num !== surahNumber));
     } else {
       setFavorites([...favorites, surahNumber]);
+    }
+    
+    // Provide haptic feedback
+    if (Platform.OS !== 'web') {
+      Vibration.vibrate(50);
     }
   };
 
@@ -106,6 +123,10 @@ export default function QuranScreen() {
     }, 300);
   };
 
+  const toggleExpandSurah = (surahNumber: number) => {
+    setExpandedSurah(expandedSurah === surahNumber ? null : surahNumber);
+  };
+
   const renderSurahItem = ({ item }: { item: typeof quranSurahs[0] }) => (
     <TouchableOpacity 
       style={[
@@ -114,56 +135,102 @@ export default function QuranScreen() {
       ]}
       onPress={() => navigateToSurah(item.number)}
     >
-      <View style={[styles.surahNumberContainer, { backgroundColor: colors[theme].primary + '15' }]}>
-        <Text style={[styles.surahNumber, { color: colors[theme].primary }]}>
-          {item.number}
-        </Text>
-      </View>
-      <View style={styles.surahInfo}>
-        <Text style={[styles.surahName, { color: colors[theme].text }]}>
-          {item.englishName}
-        </Text>
-        <Text style={[styles.surahMeta, { color: colors[theme].inactive }]}>
-          {item.revelationType} • {item.numberOfAyahs} verses
-        </Text>
-      </View>
-      <View style={styles.surahActions}>
-        <Text style={[styles.surahArabicName, { color: colors[theme].text }]}>
-          {item.name}
-        </Text>
-        <View style={styles.actionButtons}>
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => toggleFavorite(item.number)}
-          >
-            <Heart 
-              size={16} 
-              color={colors[theme].primary} 
-              fill={favorites.includes(item.number) ? colors[theme].primary : 'transparent'} 
-            />
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => downloadSurah(item.number)}
-            disabled={downloadingSurah === item.number}
-          >
-            {downloadingSurah === item.number ? (
-              <View style={styles.downloadProgress}>
-                <Text style={[styles.downloadProgressText, { color: colors[theme].primary }]}>
-                  {Math.round(downloadProgress * 100)}%
-                </Text>
-              </View>
-            ) : (
-              <Download size={16} color={colors[theme].primary} />
-            )}
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.actionButton}>
-            <Play size={16} color={colors[theme].primary} fill={colors[theme].primary} />
-          </TouchableOpacity>
+      <View style={styles.surahItemHeader}>
+        <View style={styles.surahItemLeft}>
+          <View style={[styles.surahNumberContainer, { backgroundColor: colors[theme].primary + '15' }]}>
+            <Text style={[styles.surahNumber, { color: colors[theme].primary }]}>
+              {item.number}
+            </Text>
+          </View>
+          <View style={styles.surahInfo}>
+            <Text style={[styles.surahName, { color: colors[theme].text }]}>
+              {item.englishName}
+            </Text>
+            <Text style={[styles.surahMeta, { color: colors[theme].inactive }]}>
+              {item.revelationType} • {item.numberOfAyahs} verses
+            </Text>
+          </View>
+        </View>
+        
+        <View style={styles.surahActions}>
+          <Text style={[styles.surahArabicName, { color: colors[theme].text }]}>
+            {item.name}
+          </Text>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => toggleFavorite(item.number)}
+            >
+              <Heart 
+                size={16} 
+                color={colors[theme].primary} 
+                fill={favorites.includes(item.number) ? colors[theme].primary : 'transparent'} 
+              />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => toggleExpandSurah(item.number)}
+            >
+              {expandedSurah === item.number ? (
+                <ChevronUp size={16} color={colors[theme].primary} />
+              ) : (
+                <ChevronDown size={16} color={colors[theme].primary} />
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
+      
+      {expandedSurah === item.number && (
+        <View style={styles.expandedContent}>
+          <View style={styles.expandedActions}>
+            <TouchableOpacity 
+              style={[styles.expandedActionButton, { backgroundColor: colors[theme].primary + '15' }]}
+              onPress={() => navigateToSurah(item.number)}
+            >
+              <BookOpenCheck size={16} color={colors[theme].primary} />
+              <Text style={[styles.expandedActionText, { color: colors[theme].primary }]}>Read</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.expandedActionButton, { backgroundColor: colors[theme].primary + '15' }]}
+            >
+              <Headphones size={16} color={colors[theme].primary} />
+              <Text style={[styles.expandedActionText, { color: colors[theme].primary }]}>Listen</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.expandedActionButton, { backgroundColor: colors[theme].primary + '15' }]}
+              onPress={() => downloadSurah(item.number)}
+            >
+              {downloadingSurah === item.number ? (
+                <View style={styles.downloadProgress}>
+                  <Text style={[styles.downloadProgressText, { color: colors[theme].primary }]}>
+                    {Math.round(downloadProgress * 100)}%
+                  </Text>
+                </View>
+              ) : (
+                <>
+                  <Download size={16} color={colors[theme].primary} />
+                  <Text style={[styles.expandedActionText, { color: colors[theme].primary }]}>Download</Text>
+                </>
+              )}
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.expandedActionButton, { backgroundColor: colors[theme].primary + '15' }]}
+            >
+              <Share2 size={16} color={colors[theme].primary} />
+              <Text style={[styles.expandedActionText, { color: colors[theme].primary }]}>Share</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <Text style={[styles.expandedDescription, { color: colors[theme].inactive }]}>
+            {item.englishNameTranslation} - This surah has {item.numberOfAyahs} verses and was revealed in {item.revelationType}.
+          </Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 
@@ -200,7 +267,7 @@ export default function QuranScreen() {
         </View>
       </Animated.View>
 
-      {/* Daily Verse Card */}
+      {/* Daily Verse Card - Redesigned */}
       <Animated.View 
         style={[
           styles.dailyVerseContainer,
@@ -314,100 +381,119 @@ export default function QuranScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Content based on active tab */}
-      {activeTab === 'recent' && recentlyRead.length > 0 && (
-        <View style={styles.recentContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recentScrollView}>
-            {recentlyRead.map((surahNumber) => {
-              const surah = quranSurahs.find(s => s.number === surahNumber);
-              if (!surah) return null;
-              
-              return (
-                <TouchableOpacity 
-                  key={surah.number}
-                  style={[styles.recentCard, { backgroundColor: colors[theme].card }]}
-                  onPress={() => navigateToSurah(surah.number)}
-                >
-                  <BookOpen size={24} color={colors[theme].primary} />
-                  <Text style={[styles.recentSurahName, { color: colors[theme].text }]}>
-                    {surah.englishName}
-                  </Text>
-                  <Text style={[styles.recentSurahMeta, { color: colors[theme].inactive }]}>
-                    Surah {surah.number}
-                  </Text>
-                  <View style={styles.lastReadIndicator}>
-                    <Clock size={12} color="#FFFFFF" />
-                    <Text style={styles.lastReadText}>Last read</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-      )}
+      <ScrollView 
+        ref={scrollViewRef}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Content based on active tab */}
+        {activeTab === 'recent' && recentlyRead.length > 0 && (
+          <View style={styles.recentContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recentScrollView}>
+              {recentlyRead.map((surahNumber) => {
+                const surah = quranSurahs.find(s => s.number === surahNumber);
+                if (!surah) return null;
+                
+                return (
+                  <TouchableOpacity 
+                    key={surah.number}
+                    style={[styles.recentCard, { backgroundColor: colors[theme].card }]}
+                    onPress={() => navigateToSurah(surah.number)}
+                  >
+                    <BookOpen size={24} color={colors[theme].primary} />
+                    <Text style={[styles.recentSurahName, { color: colors[theme].text }]}>
+                      {surah.englishName}
+                    </Text>
+                    <Text style={[styles.recentSurahMeta, { color: colors[theme].inactive }]}>
+                      Surah {surah.number}
+                    </Text>
+                    <View style={styles.lastReadIndicator}>
+                      <Clock size={12} color="#FFFFFF" />
+                      <Text style={styles.lastReadText}>Last read</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        )}
 
-      {activeTab === 'bookmarks' && (
-        <View style={styles.bookmarksContainer}>
-          {favorites.length > 0 ? (
-            favorites.map(surahNumber => {
-              const surah = quranSurahs.find(s => s.number === surahNumber);
-              if (!surah) return null;
-              
-              return (
-                <TouchableOpacity 
-                  key={surah.number}
-                  style={[styles.bookmarkCard, { backgroundColor: colors[theme].card }]}
-                  onPress={() => navigateToSurah(surah.number)}
-                >
-                  <View style={styles.bookmarkIconContainer}>
-                    <Heart size={24} color={colors[theme].primary} fill={colors[theme].primary} />
-                  </View>
-                  <View style={styles.bookmarkInfo}>
-                    <Text style={[styles.bookmarkTitle, { color: colors[theme].text }]}>
-                      Surah {surah.englishName}
-                    </Text>
-                    <Text style={[styles.bookmarkMeta, { color: colors[theme].inactive }]}>
-                      {surah.revelationType} • {surah.numberOfAyahs} verses
-                    </Text>
-                  </View>
-                  <View style={styles.bookmarkActions}>
-                    <Play size={20} color={colors[theme].primary} fill={colors[theme].primary} />
-                  </View>
-                </TouchableOpacity>
-              );
-            })
-          ) : (
-            <View style={styles.emptyBookmarksContainer}>
-              <Bookmark size={48} color={colors[theme].inactive} />
-              <Text style={[styles.emptyBookmarksText, { color: colors[theme].text }]}>
-                No favorite surahs yet
-              </Text>
-              <Text style={[styles.emptyBookmarksSubtext, { color: colors[theme].inactive }]}>
-                Tap the heart icon on any surah to add it to your favorites
+        {activeTab === 'bookmarks' && (
+          <View style={styles.bookmarksContainer}>
+            {favorites.length > 0 ? (
+              favorites.map(surahNumber => {
+                const surah = quranSurahs.find(s => s.number === surahNumber);
+                if (!surah) return null;
+                
+                return (
+                  <TouchableOpacity 
+                    key={surah.number}
+                    style={[styles.bookmarkCard, { backgroundColor: colors[theme].card }]}
+                    onPress={() => navigateToSurah(surah.number)}
+                  >
+                    <View style={styles.bookmarkIconContainer}>
+                      <Heart size={24} color={colors[theme].primary} fill={colors[theme].primary} />
+                    </View>
+                    <View style={styles.bookmarkInfo}>
+                      <Text style={[styles.bookmarkTitle, { color: colors[theme].text }]}>
+                        Surah {surah.englishName}
+                      </Text>
+                      <Text style={[styles.bookmarkMeta, { color: colors[theme].inactive }]}>
+                        {surah.revelationType} • {surah.numberOfAyahs} verses
+                      </Text>
+                    </View>
+                    <View style={styles.bookmarkActions}>
+                      <Play size={20} color={colors[theme].primary} fill={colors[theme].primary} />
+                    </View>
+                  </TouchableOpacity>
+                );
+              })
+            ) : (
+              <View style={styles.emptyBookmarksContainer}>
+                <Bookmark size={48} color={colors[theme].inactive} />
+                <Text style={[styles.emptyBookmarksText, { color: colors[theme].text }]}>
+                  No favorite surahs yet
+                </Text>
+                <Text style={[styles.emptyBookmarksSubtext, { color: colors[theme].inactive }]}>
+                  Tap the heart icon on any surah to add it to your favorites
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {activeTab === 'all' && (
+          isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors[theme].primary} />
+              <Text style={[styles.loadingText, { color: colors[theme].text }]}>
+                Loading Surahs...
               </Text>
             </View>
-          )}
-        </View>
-      )}
-
-      {activeTab === 'all' && (
-        isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors[theme].primary} />
-            <Text style={[styles.loadingText, { color: colors[theme].text }]}>
-              Loading Surahs...
-            </Text>
-          </View>
-        ) : (
-          <FlatList
-            data={filteredSurahs}
-            renderItem={renderSurahItem}
-            keyExtractor={(item) => item.number.toString()}
-            contentContainerStyle={styles.surahList}
-            showsVerticalScrollIndicator={false}
-          />
-        )
-      )}
+          ) : (
+            <View style={styles.allSurahsContainer}>
+              {displayedSurahs.map(surah => renderSurahItem({ item: surah }))}
+              
+              {!showAllSurahs && filteredSurahs.length > 20 && (
+                <TouchableOpacity 
+                  style={[styles.showMoreButton, { backgroundColor: colors[theme].card }]}
+                  onPress={() => {
+                    setShowAllSurahs(true);
+                    setTimeout(() => {
+                      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+                    }, 100);
+                  }}
+                >
+                  <Text style={[styles.showMoreText, { color: colors[theme].primary }]}>
+                    Show All {filteredSurahs.length} Surahs
+                  </Text>
+                  <ChevronDown size={16} color={colors[theme].primary} />
+                </TouchableOpacity>
+              )}
+            </View>
+          )
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -415,6 +501,9 @@ export default function QuranScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
   },
   headerBanner: {
     height: 180,
@@ -666,21 +755,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 32,
   },
-  surahList: {
+  allSurahsContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 20,
   },
   surahItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
     borderRadius: 16,
-    padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    overflow: 'hidden',
+  },
+  surahItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  surahItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   surahNumberContainer: {
     width: 48,
@@ -721,6 +817,33 @@ const styles = StyleSheet.create({
     padding: 8,
     marginLeft: 4,
   },
+  expandedContent: {
+    padding: 16,
+    paddingTop: 0,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
+  },
+  expandedActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  expandedActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  expandedActionText: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  expandedDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
   downloadProgress: {
     width: 16,
     height: 16,
@@ -740,5 +863,19 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     marginTop: 16,
+  },
+  showMoreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  showMoreText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginRight: 8,
   },
 });
