@@ -13,7 +13,9 @@ export const mosques = [
       isha: "8:22 PM"
     },
     facilities: ["Parking", "Wudu Area", "Women's Section", "Library"],
-    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+    latitude: 40.7128,
+    longitude: -74.0060
   },
   {
     id: "2",
@@ -29,7 +31,9 @@ export const mosques = [
       isha: "8:25 PM"
     },
     facilities: ["Parking", "Wudu Area", "Women's Section", "Quran Classes"],
-    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+    latitude: 40.7168,
+    longitude: -74.0030
   },
   {
     id: "3",
@@ -45,7 +49,9 @@ export const mosques = [
       isha: "8:20 PM"
     },
     facilities: ["Parking", "Wudu Area", "Women's Section", "Community Hall"],
-    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+    latitude: 40.6782,
+    longitude: -73.9442
   },
   {
     id: "4",
@@ -61,7 +67,9 @@ export const mosques = [
       isha: "8:28 PM"
     },
     facilities: ["Parking", "Wudu Area", "Women's Section", "Islamic School"],
-    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+    latitude: 40.7282,
+    longitude: -73.7949
   },
   {
     id: "5",
@@ -77,6 +85,8 @@ export const mosques = [
       isha: "8:30 PM"
     },
     facilities: ["Parking", "Wudu Area", "Women's Section", "Youth Programs"],
-    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    imageUrl: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+    latitude: 40.8448,
+    longitude: -73.8648
   }
 ];
