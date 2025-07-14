@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useEffect, useRef, useState } from "react";
 import * as WebBrowser from "expo-web-browser";
 import { AuthError, makeRedirectUri, useAuthRequest } from "expo-auth-session";
 import * as jose from "jose";
@@ -18,6 +18,10 @@ const AuthContext = createContext({
   signIn: (provider: any) => {},
   signOut: () => {},
   isLoading: false,
+  signup: async (email: string, password: string, name: string) => {},
+  login: async (email: string, password: string) => {},
+  resetPassword: async (email: string) => {},
+  resetPasswordWithCode: async (code: string, newPassword: string) => {},
   error: null as AuthError | null,
   fetchWithAuth: (url: string, options: RequestInit) =>
     Promise.resolve(new Response()),
@@ -31,6 +35,8 @@ const configs = {
     scopes: ["openid", "profile", "email"],
     redirectUri: makeRedirectUri(),
   },
+
+  
   kakao: {
     clientId: "kakao",
     scopes: ["profile", "account_email"],
@@ -148,34 +154,126 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // 로그인 함수 (공급자 선택)
   // Sign in function (select provider)
-  const signIn = async (provider: "google" | "kakao" | "naver") => {
+  const signIn = (provider: "google" | "kakao" | "naver" | "email") => {
+    switch (provider) {
+      case "google":
+        googlePromptAsync?.();
+        break;
+      case "kakao":
+        kakaoPromptAsync?.();
+        break;
+      case "naver":
+        naverPromptAsync?.();
+        break;
+    }
+  };
+  const resetPassword = async (email: string) => {
+    setIsLoading(true);
+    setError(null);
     try {
-      console.log("Attempting to login with:", provider);
-      switch (provider) {
-        case "google":
-            if (googleRequest && googlePromptAsync) {
-              await googlePromptAsync();
-            } else {
-              console.warn("Google auth request not ready");
-            }
-          
-          break;
-          case "kakao":
-            if (kakaoRequest && kakaoPromptAsync) {
-              await kakaoPromptAsync();
-            }
-            break;
-          case "naver":
-            if (naverRequest && naverPromptAsync) {
-              await naverPromptAsync();
-            }
-            break;
-          
-          break;
+      const response = await fetch(`${BASE_URL}/api/v1/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Password reset failed');
       }
-    } catch (error) {
-      console.error("Sign in error:", error);
-      setError(error as AuthError);
+    } catch (err) {
+      console.error('Password reset error:', err);
+      setError(err as AuthError);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const resetPasswordWithCode = async (code: string, newPassword: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, newPassword }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Reset failed');
+      }
+  
+      const { accessToken, refreshToken } = await response.json();
+      await handleNativeTokens({ accessToken, refreshToken });
+    } catch (err) {
+      console.error('Reset with code error:', err);
+      setError(err as AuthError);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+   // Traditional signup function
+   const signup = async (email: string, password: string, name: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, name }),
+      });
+      console.log("RESPONSE",response);
+      
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Signup failed');
+      }
+
+      const { accessToken, refreshToken } = await response.json();
+      await handleNativeTokens({ accessToken, refreshToken });
+    } catch (err) {
+      console.error('Signup error:', err);
+      setError(err as AuthError);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Traditional login function
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      const { accessToken, refreshToken } = await response.json();
+      await handleNativeTokens({ accessToken, refreshToken });
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err as AuthError);
+      throw err;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -183,50 +281,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Refresh access token function
   const refreshAccessToken = async (
     tokenToUse?: string,
-    provider?: "google" | "kakao" | "naver"
+    provider?: "google" | "kakao" | "naver" | "email"
   ) => {
     if (refreshInProgressRef.current) return;
-
     refreshInProgressRef.current = true;
+  
     try {
       const currentRefreshToken = tokenToUse || refreshToken;
-      if (!currentRefreshToken || !provider) return;
-
+      if (!currentRefreshToken) return;
+  
+      const currentProvider = provider || user?.provider || "email";
+  
       const response = await fetch(`${BASE_URL}/api/v1/auth/refresh`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           platform: "native",
-          provider,
+          provider: currentProvider,
           refreshToken: currentRefreshToken,
         }),
       });
-
+  
       if (!response.ok) {
-        signOut();
-        return undefined;
+        throw new Error("Token refresh failed");
       }
-
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-        await response.json();
-
-      setAccessToken(newAccessToken);
-      setRefreshToken(newRefreshToken);
-      await tokenCache?.saveToken("accessToken", newAccessToken);
-      await tokenCache?.saveToken("refreshToken", newRefreshToken);
-      const decoded = jose.decodeJwt(newAccessToken);
-      setUser(decoded as AuthUser);
-
+  
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await response.json();
+  
+      await handleNativeTokens({ accessToken: newAccessToken, refreshToken: newRefreshToken });
+  
       return newAccessToken;
-    } catch (error) {
-      console.error("Token refresh error:", error);
-      signOut();
-      return undefined;
+    } catch (err) {
+      console.error("Token refresh error:", err);
+      await signOut();
+      return null;
     } finally {
       refreshInProgressRef.current = false;
     }
   };
-
+  
   // 토큰 저장 및 사용자 정보 설정
   // Save tokens and set user info
   const handleNativeTokens = async ({
@@ -241,7 +334,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await tokenCache?.saveToken("accessToken", accessToken);
     await tokenCache?.saveToken("refreshToken", refreshToken);
     const decoded = jose.decodeJwt(accessToken) as AuthUser;
-    console.log("USER INFO", decoded);
+    
+    // Ensure provider is set
+    if (!decoded.provider) {
+      decoded.provider = 'email';
+    }
     
     setUser(decoded);
   };
@@ -290,6 +387,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         signIn,
         signOut,
+        signup,
+        login,
+        resetPassword,
+        resetPasswordWithCode,
         isLoading,
         error,
         fetchWithAuth,
@@ -303,7 +404,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 // 사용자 정의 인증 훅
 // Custom auth hook
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = React.useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }

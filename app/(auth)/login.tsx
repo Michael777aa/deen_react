@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Image, 
-  KeyboardAvoidingView, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
-  SafeAreaView
+  SafeAreaView,
+  TextInput,
 } from 'react-native';
-import { router } from 'expo-router';
+import { useAuth } from '@/context/auth';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
-import { useAuth } from "@/context/auth";
+import { router } from 'expo-router';
 
 export default function LoginScreen() {
-  const { signInWithGoogle, signInWithKakao, signInWithNaver, user } = useAuth();
+  const { login, signInWithGoogle, signInWithKakao, signInWithNaver, user } = useAuth();
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -26,84 +31,110 @@ export default function LoginScreen() {
     }
   }, [user]);
 
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setValidationError('Please enter both email and password');
+      return;
+    }
+
+    setValidationError('');
+    try {
+      await login(email, password);
+    } catch (err) {
+      // Handled in auth context
+    }
+  };
+
   const navigateToSignup = () => {
     router.push('/signup');
+  };
+
+  const navigateToForget = () => {
+    router.push('/forgot-password');
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors[theme].background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoidingView}
+        style={{ flex: 1 }}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.logoContainer}>
-            <Image
-              source={{ uri: 'https://images.unsplash.com/photo-1564121211835-e88c852648ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80' }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
+          {/* Logo */}
+       
 
+          {/* Title */}
           <Text style={[styles.title, { color: colors[theme].text }]}>Welcome Back</Text>
           <Text style={[styles.subtitle, { color: colors[theme].inactive }]}>
-            Sign in to continue your Islamic journey
+            Sign in to continue your journey
           </Text>
 
+          {/* Email Login Form */}
           <View style={styles.form}>
-            <View style={styles.dividerContainer}>
-              <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
-              <Text style={[styles.dividerText, { color: colors[theme].inactive }]}>Login with</Text>
-              <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
-            </View>
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              style={[styles.input, { backgroundColor: colors[theme].card, color: colors[theme].text }]}
+              placeholderTextColor={colors[theme].inactive}
+            />
+            <TextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={[styles.input, { backgroundColor: colors[theme].card, color: colors[theme].text }]}
+              placeholderTextColor={colors[theme].inactive}
+            />
 
-            <View style={styles.socialButtons}>
-              <TouchableOpacity
-                style={[styles.socialButton, styles.naverButton]}
-                onPress={signInWithNaver}
-              >
-                <Image
-                  // source={require("@/assets/images/623afbb127d4946aceae2fb0.png")}
-                  style={styles.socialIcon}
-                />
-                <Text style={styles.socialText}>Naver</Text>
-              </TouchableOpacity>
+            {validationError ? (
+              <Text style={styles.errorText}>{validationError}</Text>
+            ) : null}
 
-              <TouchableOpacity
-                style={[styles.socialButton, styles.kakaoButton]}
-                onPress={signInWithKakao}
-              >
-                <Image
-                  // source={require("@/assets/images/5f9c58c2017800001.png")}
-                  style={styles.socialIcon}
-                />
-                <Text style={styles.socialText}>Kakao</Text>
-              </TouchableOpacity>
+<TouchableOpacity style={styles.forgotPassword} onPress={() => router.push('/forgot-password')}>
+  <Text style={[styles.forgotPasswordText, { color: colors[theme].primary }]}>
+    Forgot Password?
+  </Text>
+</TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.socialButton, styles.googleButton]}
-                onPress={signInWithGoogle}
-              >
-                <Image
-                  // source={require("@/assets/images/google-icon.png")}
-                  style={styles.socialIcon}
-                />
-                <Text style={styles.socialText}>Google</Text>
-              </TouchableOpacity>
-            </View>
+
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              <Text style={styles.loginButtonText}>Login</Text>
+            </TouchableOpacity>
           </View>
 
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
+            <Text style={[styles.dividerText, { color: colors[theme].inactive }]}>OR</Text>
+            <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
+          </View>
+
+          {/* Social Login */}
+          <View style={styles.socialButtons}>
+            <TouchableOpacity style={[styles.socialButton, styles.naverButton]} onPress={signInWithNaver}>
+              <Text style={styles.socialText}>Continue with Naver</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.socialButton, styles.kakaoButton]} onPress={signInWithKakao}>
+              <Text style={styles.socialText}>Continue with Kakao</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.socialButton, styles.googleButton]} onPress={signInWithGoogle}>
+              <Text style={styles.socialText}>Continue with Google</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Signup */}
           <View style={styles.signupContainer}>
             <Text style={[styles.signupText, { color: colors[theme].text }]}>
               Don't have an account?
             </Text>
             <TouchableOpacity onPress={navigateToSignup}>
-              <Text style={[styles.signupLink, { color: colors[theme].primary }]}>
-                Sign Up
-              </Text>
+              <Text style={[styles.signupLink, { color: colors[theme].primary }]}>Sign Up</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -116,41 +147,62 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
   scrollContent: {
     flexGrow: 1,
-    padding: 20,
+    padding: 24,
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 30,
+    marginVertical: 20,
   },
   logo: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     textAlign: 'center',
     marginTop: 8,
-    marginBottom: 30,
+    marginBottom: 24,
   },
   form: {
-    width: '100%',
+    marginBottom: 24,
+  },
+  input: {
+    height: 48,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 15,
+    marginBottom: 12,
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginBottom: 16,
+  },
+  forgotPasswordText: {
+    fontSize: 14,
+  },
+  loginButton: {
+    backgroundColor: '#1C64F2',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  loginButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 16,
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 30,
+    marginVertical: 20,
   },
   divider: {
     flex: 1,
@@ -158,26 +210,19 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     marginHorizontal: 10,
-    fontSize: 14,
+    fontSize: 13,
   },
   socialButtons: {
     gap: 12,
   },
   socialButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 14,
     borderRadius: 12,
-    marginBottom: 16,
-  },
-  socialIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 12,
+    alignItems: 'center',
+    marginBottom: 12,
   },
   socialText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
   },
   naverButton: {
@@ -195,14 +240,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 30,
-    marginBottom: 20,
   },
   signupText: {
-    fontSize: 16,
+    fontSize: 15,
   },
   signupLink: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
-    marginLeft: 5,
+    marginLeft: 6,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 13,
+    marginBottom: 8,
   },
 });

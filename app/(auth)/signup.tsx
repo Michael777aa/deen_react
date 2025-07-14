@@ -1,61 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  KeyboardAvoidingView, 
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
-  SafeAreaView
-} from 'react-native';
-import { router } from 'expo-router';
-import { useAuthStore } from '@/store/useAuthStore';
-import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import { colors } from '@/constants/colors';
-import { useSettingsStore } from '@/store/useSettingsStore';
+  SafeAreaView,
+} from "react-native";
+import { router } from "expo-router";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
+import { colors } from "@/constants/colors";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { useAuth } from "@/context/auth";
+import * as Animatable from "react-native-animatable";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function SignupScreen() {
-  const { signup, isAuthenticated, isLoading, error } = useAuthStore();
   const { darkMode } = useSettingsStore();
-  const theme = darkMode ? 'dark' : 'light';
-  
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [validationError, setValidationError] = useState('');
+  const theme = darkMode ? "dark" : "light";
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [validationError, setValidationError] = useState("");
+  const { signup, isLoading, error, user } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/(tabs)');
+    if (user) {
+      router.replace("/(tabs)");
     }
-  }, [isAuthenticated]);
+  }, [user]);
 
   const validateForm = () => {
     if (!name || !email || !password || !confirmPassword) {
-      setValidationError('All fields are required');
+      setValidationError("All fields are required");
       return false;
     }
-    
+
     if (password !== confirmPassword) {
-      setValidationError('Passwords do not match');
+      setValidationError("Passwords do not match");
       return false;
     }
-    
+
     if (password.length < 6) {
-      setValidationError('Password must be at least 6 characters');
+      setValidationError("Password must be at least 6 characters");
       return false;
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setValidationError('Please enter a valid email address');
+      setValidationError("Please enter a valid email address");
       return false;
     }
-    
-    setValidationError('');
+
+    setValidationError("");
     return true;
   };
 
@@ -66,28 +67,39 @@ export default function SignupScreen() {
   };
 
   const navigateToLogin = () => {
-    router.push('/login');
+    router.push("/login");
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors[theme].background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors[theme].background }]}
+    >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingView}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={[styles.title, { color: colors[theme].text }]}>Create Account</Text>
+          <Text style={[styles.title, { color: colors[theme].text }]}>
+            Create Account
+          </Text>
           <Text style={[styles.subtitle, { color: colors[theme].inactive }]}>
             Join our community and start your Islamic journey
           </Text>
 
-          {(error || validationError) && (
-            <Text style={styles.errorText}>
-              {validationError || error}
-            </Text>
+          {(validationError || error) && (
+            <Animatable.View
+              animation="fadeInDown"
+              duration={300}
+              style={styles.errorContainer}
+            >
+              <MaterialIcons name="error-outline" size={20} color="#D32F2F" />
+              <Text style={styles.errorMessage}>
+                {validationError || error?.message}
+              </Text>
+            </Animatable.View>
           )}
 
           <View style={styles.form}>
@@ -112,7 +124,7 @@ export default function SignupScreen() {
               placeholder="Create a password"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
+              secureTextEntry={false}
             />
 
             <Input
@@ -120,7 +132,7 @@ export default function SignupScreen() {
               placeholder="Confirm your password"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
-              secureTextEntry
+              secureTextEntry={false}
             />
 
             <Button
@@ -133,12 +145,16 @@ export default function SignupScreen() {
 
           <View style={styles.termsContainer}>
             <Text style={[styles.termsText, { color: colors[theme].inactive }]}>
-              By signing up, you agree to our{' '}
-              <Text style={[styles.termsLink, { color: colors[theme].primary }]}>
+              By signing up, you agree to our{" "}
+              <Text
+                style={[styles.termsLink, { color: colors[theme].primary }]}
+              >
                 Terms of Service
-              </Text>{' '}
-              and{' '}
-              <Text style={[styles.termsLink, { color: colors[theme].primary }]}>
+              </Text>{" "}
+              and{" "}
+              <Text
+                style={[styles.termsLink, { color: colors[theme].primary }]}
+              >
                 Privacy Policy
               </Text>
             </Text>
@@ -149,7 +165,9 @@ export default function SignupScreen() {
               Already have an account?
             </Text>
             <TouchableOpacity onPress={navigateToLogin}>
-              <Text style={[styles.loginLink, { color: colors[theme].primary }]}>
+              <Text
+                style={[styles.loginLink, { color: colors[theme].primary }]}
+              >
                 Login
               </Text>
             </TouchableOpacity>
@@ -173,18 +191,18 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginTop: 40,
   },
   subtitle: {
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 8,
     marginBottom: 30,
   },
   form: {
-    width: '100%',
+    width: "100%",
   },
   signupButton: {
     marginTop: 20,
@@ -194,15 +212,15 @@ const styles = StyleSheet.create({
   },
   termsText: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
   },
   termsLink: {
-    fontWeight: '500',
+    fontWeight: "500",
   },
   loginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 30,
     marginBottom: 20,
   },
@@ -211,12 +229,33 @@ const styles = StyleSheet.create({
   },
   loginLink: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 5,
   },
   errorText: {
-    color: '#F44336',
-    textAlign: 'center',
+    color: "#F44336",
+    textAlign: "center",
     marginBottom: 20,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fdecea",
+    borderLeftWidth: 4,
+    borderLeftColor: "#f44336",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  errorMessage: {
+    color: "#D32F2F",
+    marginLeft: 8,
+    fontSize: 14,
+    flexShrink: 1,
   },
 });
