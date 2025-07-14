@@ -11,44 +11,20 @@ import {
   SafeAreaView
 } from 'react-native';
 import { router } from 'expo-router';
-import { useAuthStore } from '@/store/useAuthStore';
-import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import { colors } from '@/constants/colors';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { colors } from '@/constants/colors';
+import { useAuth } from "@/context/auth";
 
 export default function LoginScreen() {
-  const { login, loginWithGoogle, loginWithApple, isAuthenticated, isLoading, error } = useAuthStore();
+  const { signInWithGoogle, signInWithKakao, signInWithNaver, user } = useAuth();
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       router.replace('/(tabs)');
     }
-  }, [isAuthenticated]);
-
-  const handleLogin = async () => {
-    if (!email || !password) {
-      setValidationError('Please enter both email and password');
-      return;
-    }
-    
-    setValidationError('');
-    await login(email, password);
-  };
-
-  const handleGoogleLogin = async () => {
-    await loginWithGoogle();
-  };
-
-  const handleAppleLogin = async () => {
-    await loginWithApple();
-  };
+  }, [user]);
 
   const navigateToSignup = () => {
     router.push('/signup');
@@ -77,63 +53,46 @@ export default function LoginScreen() {
             Sign in to continue your Islamic journey
           </Text>
 
-          {(error || validationError) && (
-            <Text style={styles.errorText}>
-              {validationError || error}
-            </Text>
-          )}
-
           <View style={styles.form}>
-            <Input
-              label="Email"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-
-            <Input
-              label="Password"
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={[styles.forgotPasswordText, { color: colors[theme].primary }]}>
-                Forgot Password?
-              </Text>
-            </TouchableOpacity>
-
-            <Button
-              title="Login"
-              onPress={handleLogin}
-              loading={isLoading}
-              style={styles.loginButton}
-            />
-
             <View style={styles.dividerContainer}>
               <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
-              <Text style={[styles.dividerText, { color: colors[theme].inactive }]}>OR</Text>
+              <Text style={[styles.dividerText, { color: colors[theme].inactive }]}>Login with</Text>
               <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
             </View>
 
             <View style={styles.socialButtons}>
-              <Button
-                title="Google"
-                onPress={handleGoogleLogin}
-                variant="outline"
-                style={styles.socialButton}
-              />
-              
-              <Button
-                title="Apple"
-                onPress={handleAppleLogin}
-                variant="outline"
-                style={styles.socialButton}
-              />
+              <TouchableOpacity
+                style={[styles.socialButton, styles.naverButton]}
+                onPress={signInWithNaver}
+              >
+                <Image
+                  // source={require("@/assets/images/623afbb127d4946aceae2fb0.png")}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.socialText}>Naver</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.socialButton, styles.kakaoButton]}
+                onPress={signInWithKakao}
+              >
+                <Image
+                  // source={require("@/assets/images/5f9c58c2017800001.png")}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.socialText}>Kakao</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.socialButton, styles.googleButton]}
+                onPress={signInWithGoogle}
+              >
+                <Image
+                  // source={require("@/assets/images/google-icon.png")}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.socialText}>Google</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -188,16 +147,6 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 20,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-  },
-  loginButton: {
-    marginTop: 10,
-  },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -212,11 +161,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 12,
   },
   socialButton: {
-    flex: 0.48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
+  },
+  socialText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  naverButton: {
+    backgroundColor: '#03C75A',
+  },
+  kakaoButton: {
+    backgroundColor: '#FEE500',
+  },
+  googleButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   signupContainer: {
     flexDirection: 'row',
@@ -231,10 +204,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 5,
-  },
-  errorText: {
-    color: '#F44336',
-    textAlign: 'center',
-    marginBottom: 20,
   },
 });

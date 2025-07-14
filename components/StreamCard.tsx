@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
 import { Play, Clock, Users, Video } from 'lucide-react-native';
+//@ts-ignore
 import { Stream } from '@/mocks/streamData';
 
 interface StreamCardProps {

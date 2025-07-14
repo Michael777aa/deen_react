@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Islamic Connect: Advanced Cross-Platform App",
-    "slug": "islamic-connect-advanced-cross-platform-app",
+    "name": "modernwash",
+    "slug": "modernwash",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "modernwash",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -15,28 +15,41 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.rork.islamic-connect-advanced-cross-platform-app"
+      "bundleIdentifier": "com.odette.carwash"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.islamic-connect-advanced-cross-platform-app"
+
+      "edgeToEdgeEnabled": true,
+      "package": "com.odette.carwash"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "expo-router",
       [
-        "expo-router",
+        "expo-splash-screen",
         {
-          "origin": "https://rork.com/"
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "203087cc-a677-4ca2-8e8b-f106778dce89"
+      }
     }
   }
 }

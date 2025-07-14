@@ -16,9 +16,11 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors[theme].card,
           borderTopColor: colors[theme].border,
-          height: 60,
+          height: 80,
           paddingBottom: 8,
           paddingTop: 8,
+          position: "relative",
+          
         },
         headerStyle: {
           backgroundColor: colors[theme].card,
@@ -65,7 +67,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
         }}
       />
-      
       {/* Hide these tabs from bottom navigation but keep them accessible via routing */}
       <Tabs.Screen
         name="map"
@@ -79,11 +80,9 @@ export default function TabLayout() {
           href: null, // This hides it from the tab bar
         }}
       />
-      <Tabs.Screen
-        name="streams"
-        options={{
-          href: null, // This hides it from the tab bar
-        }}
+          <Tabs.Screen
+        name="prayers"
+        options={{ href: null }} 
       />
     </Tabs>
   );

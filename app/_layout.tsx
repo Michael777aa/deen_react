@@ -5,9 +5,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { useColorScheme, View, Text, Image, StyleSheet, Animated } from "react-native";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { trpc, trpcClient } from "@/lib/trpc";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { colors } from "@/constants/colors";
+import { AuthProvider } from "@/context/auth";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -129,11 +129,9 @@ export default function RootLayout() {
   }
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
+    <AuthProvider>
         <RootLayoutNav />
-      </QueryClientProvider>
-    </trpc.Provider>
+        </AuthProvider>
   );
 }
 

@@ -80,13 +80,13 @@ export default function PrayersScreen() {
         Today's Prayer Times
       </Text>
       
-      {prayerTimes.map((prayer, index) => (
+      {/* {prayerTimes.map((prayer, index) => (
         <PrayerTimeCard 
           key={index} 
           prayerTime={prayer} 
           isNext={prayer.name === nextPrayer.name}
         />
-      ))}
+      ))} */}
 
       <Card style={styles.qiblaCard}>
         <Text style={[styles.qiblaTitle, { color: colors[theme].text }]}>

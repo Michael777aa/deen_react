@@ -222,7 +222,7 @@ export default function ProductsScreen() {
         if (item.action === 'scan') {
           router.push('/scanner/scan');
         } else if (item.action === 'discover') {
-          router.push('/scanner/discover');
+          // router.push('/scanner/discover');
         } else if (item.action === 'report') {
           router.push('/product/report');
         }

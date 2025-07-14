@@ -45,12 +45,13 @@ import {
   User,
   Users as UsersIcon
 } from 'lucide-react-native';
+import { useAuth } from '@/context/auth';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.7;
 
 export default function HomeScreen() {
-  const { user, isAuthenticated } = useAuthStore();
+    const { signInWithGoogle, signInWithKakao, signInWithNaver, user } = useAuth();
   const { darkMode, notifications, prayerReminders } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
   const [refreshing, setRefreshing] = useState(false);
@@ -92,7 +93,7 @@ export default function HomeScreen() {
   const upcomingStreams = getUpcomingStreams().slice(0, 3);
   
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!user) {
       router.replace('/(auth)/login');
     }
     
@@ -126,7 +127,7 @@ export default function HomeScreen() {
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  }, [user]);
 
   const nextPrayer = getNextPrayer();
   
@@ -206,7 +207,7 @@ export default function HomeScreen() {
               </View>
               <TouchableOpacity onPress={() => router.push('/settings')} style={styles.avatarContainer}>
                 <Image
-                  source={{ uri: user.photoURL || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80' }}
+                  source={{ uri: user.picture || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80' }}
                   style={styles.avatar}
                 />
                 <View style={styles.onlineIndicator} />
@@ -586,7 +587,7 @@ export default function HomeScreen() {
           setActiveSlide(Math.floor(contentOffset / viewSize));
         }}
       >
-        {featuredContent.map((item, index) => (
+        {featuredContent.map((item:any, index) => (
           <TouchableOpacity 
             key={item.id}
             style={styles.featuredCard}

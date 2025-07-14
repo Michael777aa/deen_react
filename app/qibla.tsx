@@ -247,7 +247,7 @@ export default function QiblaScreen() {
         </Card>
 
         {/* Calibration Alert */}
-        {calibrationNeeded && (
+        {/* {calibrationNeeded && (
           <Card style={[styles.alertCard, { borderLeftColor: '#FF9800' }]}>
             <View style={styles.alertContent}>
               <AlertTriangle size={20} color="#FF9800" />
@@ -267,10 +267,10 @@ export default function QiblaScreen() {
               <Text style={styles.calibrateButtonText}>Calibrate</Text>
             </TouchableOpacity>
           </Card>
-        )}
+        )} */}
 
         {/* Calibration Success */}
-        {calibrationSuccess && (
+        {/* {calibrationSuccess && (
           <Card style={[styles.alertCard, { borderLeftColor: '#4CAF50' }]}>
             <View style={styles.alertContent}>
               <Check size={20} color="#4CAF50" />
@@ -284,7 +284,7 @@ export default function QiblaScreen() {
               </View>
             </View>
           </Card>
-        )}
+        )} */}
 
         {/* Compass Container */}
         <View style={styles.compassContainer}>

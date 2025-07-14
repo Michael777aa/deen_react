@@ -24,9 +24,11 @@ import {
   Shield, 
   Share2 
 } from 'lucide-react-native';
+import { useAuth } from '@/context/auth';
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuthStore();
+  // const { user, logout } = useAuthStore();
+    const { user,signOut } = useAuth();
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
 
@@ -35,7 +37,7 @@ export default function ProfileScreen() {
   }
 
   const handleLogout = () => {
-    logout();
+    signOut();
     router.replace('/(auth)/login');
   };
 
@@ -58,7 +60,7 @@ export default function ProfileScreen() {
     >
       <View style={styles.profileHeader}>
         <Image
-          source={{ uri: user.photoURL || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80' }}
+          source={{ uri: user.picture || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80' }}
           style={styles.profileImage}
         />
         <Text style={[styles.profileName, { color: colors[theme].text }]}>
@@ -83,7 +85,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      <Card style={styles.subscriptionCard}>
+      {/* <Card style={styles.subscriptionCard}>
         <View style={styles.subscriptionHeader}>
           <Text style={[styles.subscriptionTitle, { color: colors[theme].text }]}>
             {user.subscription === 'premium' ? 'Premium Subscription' : 'Free Account'}
@@ -129,7 +131,7 @@ export default function ProfileScreen() {
             {user.subscription === 'premium' ? 'Manage Subscription' : 'Upgrade to Premium'}
           </Text>
         </TouchableOpacity>
-      </Card>
+      </Card> */}
 
       <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
         App Settings
