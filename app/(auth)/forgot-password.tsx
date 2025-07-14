@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,58 +9,59 @@ import {
   ScrollView,
   Platform,
   SafeAreaView,
-} from 'react-native';
-import { useAuth } from '@/context/auth';
-import { useSettingsStore } from '@/store/useSettingsStore';
-import { colors } from '@/constants/colors';
-import { router } from 'expo-router';
+} from "react-native";
+import { useAuth } from "@/context/auth";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { colors } from "@/constants/colors";
+import { router } from "expo-router";
 
 export default function ForgotPasswordScreen() {
   const { resetPassword } = useAuth();
   const { darkMode } = useSettingsStore();
-  const theme = darkMode ? 'dark' : 'light';
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const theme = darkMode ? "dark" : "light";
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = async () => {
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     if (!email) {
-      setError('Email is required');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Enter a valid email');
+      setError("Email is required");
       return;
     }
 
     try {
       setIsLoading(true);
       await resetPassword(email);
-      setSuccess('Password reset code sent! Check your email.');
+      setSuccess("Password reset code sent! Check your email please");
       setTimeout(() => {
-        router.push('/passwordreset');
-      }, 1500);
+        router.push("/password-reset");
+      }, 1000);
     } catch (err: any) {
-      setError(err.message || 'Something went wrong.');
+      setError(err.message || "Something went wrong.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors[theme].background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors[theme].background }]}
+    >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <Text style={[styles.title, { color: colors[theme].text }]}>Forgot Password?</Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={[styles.title, { color: colors[theme].text }]}>
+            Forgot Password?
+          </Text>
           <Text style={[styles.subtitle, { color: colors[theme].inactive }]}>
             Enter your email and we'll send you a 4-digit reset code.
           </Text>
@@ -85,21 +86,23 @@ export default function ForgotPasswordScreen() {
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
           {success ? <Text style={styles.successText}>{success}</Text> : null}
 
-          <TouchableOpacity 
-            style={styles.resetButton} 
-            onPress={handleReset} 
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={handleReset}
             disabled={isLoading}
           >
             <Text style={styles.resetButtonText}>
-              {isLoading ? 'Sending...' : 'Send Reset Code'}
+              {isLoading ? "Sending..." : "Send Reset Code"}
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            onPress={() => router.replace('/login')} 
+          <TouchableOpacity
+            onPress={() => router.replace("/login")}
             style={styles.backToLogin}
           >
-            <Text style={[styles.backToLoginText, { color: colors[theme].primary }]}>
+            <Text
+              style={[styles.backToLoginText, { color: colors[theme].primary }]}
+            >
               Back to Login
             </Text>
           </TouchableOpacity>
@@ -116,17 +119,17 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: 24,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   title: {
     fontSize: 26,
-    fontWeight: '700',
-    textAlign: 'center',
+    fontWeight: "700",
+    textAlign: "center",
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 24,
   },
   input: {
@@ -138,37 +141,37 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   resetButton: {
-    backgroundColor: '#1C64F2',
+    backgroundColor: "#1C64F2",
     paddingVertical: 14,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   resetButtonText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
     fontSize: 16,
   },
   errorText: {
-    color: '#D32F2F',
+    color: "#D32F2F",
     fontSize: 13,
     marginTop: 4,
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   successText: {
-    color: '#388E3C',
+    color: "#388E3C",
     fontSize: 13,
     marginTop: 4,
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   backToLogin: {
     marginTop: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   backToLoginText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

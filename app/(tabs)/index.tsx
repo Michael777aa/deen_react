@@ -51,7 +51,7 @@ const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.7;
 
 export default function HomeScreen() {
-    const { signInWithGoogle, signInWithKakao, signInWithNaver, user } = useAuth();
+    const {  user } = useAuth();
   const { darkMode, notifications, prayerReminders } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
   const [refreshing, setRefreshing] = useState(false);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,34 +10,34 @@ import {
   ScrollView,
   SafeAreaView,
   TextInput,
-} from 'react-native';
-import { useAuth } from '@/context/auth';
-import { useSettingsStore } from '@/store/useSettingsStore';
-import { colors } from '@/constants/colors';
-import { router } from 'expo-router';
+} from "react-native";
+import { useAuth } from "@/context/auth";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { colors } from "@/constants/colors";
+import { router } from "expo-router";
 
 export default function LoginScreen() {
-  const { login, signInWithGoogle, signInWithKakao, signInWithNaver, user } = useAuth();
+  const { login, signInWithGoogle, signInWithKakao, signInWithNaver, user } =
+    useAuth();
   const { darkMode } = useSettingsStore();
-  const theme = darkMode ? 'dark' : 'light';
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [validationError, setValidationError] = useState('');
+  const theme = darkMode ? "dark" : "light";
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [validationError, setValidationError] = useState("");
 
   useEffect(() => {
     if (user) {
-      router.replace('/(tabs)');
+      router.replace("/(tabs)");
     }
   }, [user]);
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setValidationError('Please enter both email and password');
+      setValidationError("Please enter both email and password");
       return;
     }
 
-    setValidationError('');
+    setValidationError("");
     try {
       await login(email, password);
     } catch (err) {
@@ -46,28 +46,24 @@ export default function LoginScreen() {
   };
 
   const navigateToSignup = () => {
-    router.push('/signup');
-  };
-
-  const navigateToForget = () => {
-    router.push('/forgot-password');
+    router.push("/signup");
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors[theme].background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors[theme].background }]}
+    >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Logo */}
-       
-
-          {/* Title */}
-          <Text style={[styles.title, { color: colors[theme].text }]}>Welcome Back</Text>
+          <Text style={[styles.title, { color: colors[theme].text }]}>
+            Welcome Back
+          </Text>
           <Text style={[styles.subtitle, { color: colors[theme].inactive }]}>
             Sign in to continue your journey
           </Text>
@@ -80,7 +76,13 @@ export default function LoginScreen() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              style={[styles.input, { backgroundColor: colors[theme].card, color: colors[theme].text }]}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors[theme].card,
+                  color: colors[theme].text,
+                },
+              ]}
               placeholderTextColor={colors[theme].inactive}
             />
             <TextInput
@@ -88,7 +90,13 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              style={[styles.input, { backgroundColor: colors[theme].card, color: colors[theme].text }]}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors[theme].card,
+                  color: colors[theme].text,
+                },
+              ]}
               placeholderTextColor={colors[theme].inactive}
             />
 
@@ -96,12 +104,19 @@ export default function LoginScreen() {
               <Text style={styles.errorText}>{validationError}</Text>
             ) : null}
 
-<TouchableOpacity style={styles.forgotPassword} onPress={() => router.push('/forgot-password')}>
-  <Text style={[styles.forgotPasswordText, { color: colors[theme].primary }]}>
-    Forgot Password?
-  </Text>
-</TouchableOpacity>
-
+            <TouchableOpacity
+              style={styles.forgotPassword}
+              onPress={() => router.push("/forgot-password")}
+            >
+              <Text
+                style={[
+                  styles.forgotPasswordText,
+                  { color: colors[theme].primary },
+                ]}
+              >
+                Forgot Password?
+              </Text>
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
               <Text style={styles.loginButtonText}>Login</Text>
@@ -110,20 +125,43 @@ export default function LoginScreen() {
 
           {/* Divider */}
           <View style={styles.dividerContainer}>
-            <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
-            <Text style={[styles.dividerText, { color: colors[theme].inactive }]}>OR</Text>
-            <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
+            <View
+              style={[
+                styles.divider,
+                { backgroundColor: colors[theme].border },
+              ]}
+            />
+            <Text
+              style={[styles.dividerText, { color: colors[theme].inactive }]}
+            >
+              OR
+            </Text>
+            <View
+              style={[
+                styles.divider,
+                { backgroundColor: colors[theme].border },
+              ]}
+            />
           </View>
 
           {/* Social Login */}
           <View style={styles.socialButtons}>
-            <TouchableOpacity style={[styles.socialButton, styles.naverButton]} onPress={signInWithNaver}>
+            <TouchableOpacity
+              style={[styles.socialButton, styles.naverButton]}
+              onPress={signInWithNaver}
+            >
               <Text style={styles.socialText}>Continue with Naver</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.socialButton, styles.kakaoButton]} onPress={signInWithKakao}>
+            <TouchableOpacity
+              style={[styles.socialButton, styles.kakaoButton]}
+              onPress={signInWithKakao}
+            >
               <Text style={styles.socialText}>Continue with Kakao</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.socialButton, styles.googleButton]} onPress={signInWithGoogle}>
+            <TouchableOpacity
+              style={[styles.socialButton, styles.googleButton]}
+              onPress={signInWithGoogle}
+            >
               <Text style={styles.socialText}>Continue with Google</Text>
             </TouchableOpacity>
           </View>
@@ -134,7 +172,11 @@ export default function LoginScreen() {
               Don't have an account?
             </Text>
             <TouchableOpacity onPress={navigateToSignup}>
-              <Text style={[styles.signupLink, { color: colors[theme].primary }]}>Sign Up</Text>
+              <Text
+                style={[styles.signupLink, { color: colors[theme].primary }]}
+              >
+                Sign Up
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -152,7 +194,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   logoContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
   },
   logo: {
@@ -162,12 +204,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: '700',
-    textAlign: 'center',
+    fontWeight: "700",
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 8,
     marginBottom: 24,
   },
@@ -182,26 +224,26 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   forgotPassword: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginBottom: 16,
   },
   forgotPasswordText: {
     fontSize: 14,
   },
   loginButton: {
-    backgroundColor: '#1C64F2',
+    backgroundColor: "#1C64F2",
     paddingVertical: 14,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   loginButtonText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
     fontSize: 16,
   },
   dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 20,
   },
   divider: {
@@ -218,27 +260,27 @@ const styles = StyleSheet.create({
   socialButton: {
     paddingVertical: 14,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 12,
   },
   socialText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   naverButton: {
-    backgroundColor: '#03C75A',
+    backgroundColor: "#03C75A",
   },
   kakaoButton: {
-    backgroundColor: '#FEE500',
+    backgroundColor: "#FEE500",
   },
   googleButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
   },
   signupContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 30,
   },
   signupText: {
@@ -246,11 +288,11 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 6,
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 13,
     marginBottom: 8,
   },

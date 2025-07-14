@@ -3,16 +3,16 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 
 export default function AuthLayout() {
   const { darkMode } = useSettingsStore();
-  
+
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: darkMode ? '#121212' : '#FFFFFF',
+          backgroundColor: darkMode ? "#121212" : "#FFFFFF",
         },
-        headerTintColor: darkMode ? '#FFFFFF' : '#212121',
+        headerTintColor: darkMode ? "#FFFFFF" : "#212121",
         contentStyle: {
-          backgroundColor: darkMode ? '#121212' : '#FFFFFF',
+          backgroundColor: darkMode ? "#121212" : "#FFFFFF",
         },
       }}
     >
@@ -29,19 +29,21 @@ export default function AuthLayout() {
           title: "Sign Up",
           headerShown: false,
         }}
-      />  <Stack.Screen
-      name="passwordReset"
-      options={{
-        title: "Reset Password",
-        headerShown: false,
-      }}
-    /><Stack.Screen
-    name="forgot-password"
-    options={{
-      title: "Forgot Password",
-      headerShown: false,
-    }}
-  />
+      />
+      <Stack.Screen
+        name="password-reset"
+        options={{
+          title: "Reset Password",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="forgot-password"
+        options={{
+          title: "Forgot Password",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }
