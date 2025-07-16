@@ -1,77 +1,89 @@
+// src/components/StreamCard.tsx
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Image,
+  ImageBackground
+} from 'react-native';
 import { router } from 'expo-router';
-import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
-import { Play, Clock, Users, Video } from 'lucide-react-native';
-//@ts-ignore
-import { Stream } from '@/mocks/streamData';
+import { Stream } from '@/types/stream';
+import { 
+  Clock, 
+  Users, 
+  Heart, 
+  MessageCircle,
+  Video as VideoIcon,
+  Calendar as CalendarIcon
+} from 'lucide-react-native';
+import { StreamStatus } from '@/types/stream.enum';
 
 interface StreamCardProps {
   stream: Stream;
   compact?: boolean;
 }
 
-export const StreamCard: React.FC<StreamCardProps> = ({ stream, compact = false }) => {
-  const { darkMode } = useSettingsStore();
-  const theme = darkMode ? 'dark' : 'light';
-
-  const formatDate = (dateString: string) => {
+const StreamCard: React.FC<StreamCardProps> = ({ stream, compact = false }) => {
+  const formatDate = (dateString: string | Date) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleDateString([], { 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const formatViewCount = (count: number) => {
+    if (count >= 1000000) {
+      return `${(count / 1000000).toFixed(1)}M`;
+    }
     if (count >= 1000) {
       return `${(count / 1000).toFixed(1)}K`;
     }
     return count.toString();
   };
 
-  const handlePress = () => {
-    router.push(`/streams/${stream.id}`);
+  const getStatusIcon = () => {
+    const statusIcons:any = {
+      LIVE: <VideoIcon size={14} color="#FF0000" />,
+      UPCOMING: <CalendarIcon size={14} color="#FFA500" />,
+      RECORDED: <Clock size={14} color="#888888" />
+    };
+  
+    return statusIcons[stream.status?.toUpperCase()] || (
+      <VideoIcon size={14} color="#888888" />
+    );
   };
+  
 
   if (compact) {
     return (
       <TouchableOpacity 
-        style={[styles.compactContainer, { backgroundColor: colors[theme].card }]}
-        onPress={handlePress}
+        style={[styles.compactContainer, { backgroundColor: colors.light.card }]}
+        onPress={() => router.push(`/streams/${stream._id}`)}
       >
-        <View style={styles.compactImageContainer}>
-          <Image source={{ uri: stream.thumbnailUrl }} style={styles.compactImage} />
-          {stream.type === 'live' && (
-            <View style={styles.liveIndicator}>
-              <Text style={styles.liveText}>LIVE</Text>
-            </View>
-          )}
-        </View>
+        <Image 
+          source={{ uri: stream.thumbnailUrl || 'https://via.placeholder.com/300' }} 
+          style={styles.compactImage}
+        />
         <View style={styles.compactContent}>
-          <Text 
-            style={[styles.compactTitle, { color: colors[theme].text }]}
-            numberOfLines={2}
-          >
+          <Text style={[styles.compactTitle, { color: colors.light.text }]} numberOfLines={2}>
             {stream.title}
           </Text>
-          <Text style={[styles.compactMosque, { color: colors[theme].inactive }]}>
-            {stream.mosqueName}
+          <Text style={[styles.compactMosque, { color: colors.light.inactive }]}>
+            {stream.center}
           </Text>
           <View style={styles.compactMeta}>
-            {stream.type === 'upcoming' ? (
-              <View style={styles.metaItem}>
-                <Clock size={12} color={colors[theme].inactive} />
-                <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
-                  {formatDate(stream.startTime)}
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.metaItem}>
-                <Users size={12} color={colors[theme].inactive} />
-                <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
-                  {formatViewCount(stream.viewCount)} viewers
-                </Text>
-              </View>
-            )}
+            {getStatusIcon()}
+            <Text style={[styles.compactMetaText, { color: colors.light.inactive }]}>
+              {stream?.status === StreamStatus.LIVE ? 
+                `${formatViewCount(stream.currentViewers || 0)} watching` : 
+                formatDate(stream.scheduledStartTime)}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -80,73 +92,63 @@ export const StreamCard: React.FC<StreamCardProps> = ({ stream, compact = false 
 
   return (
     <TouchableOpacity 
-      style={[styles.container, { backgroundColor: colors[theme].card }]}
-      onPress={handlePress}
+      style={[styles.container, { marginBottom: 16 }]}
+      onPress={() => router.push(`/streams/${stream._id}`)}
     >
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: stream.thumbnailUrl }} style={styles.image} />
-        {stream.type === 'live' && (
-          <View style={styles.liveIndicator}>
+      <ImageBackground
+        source={{ uri: stream.thumbnailUrl || 'https://via.placeholder.com/300' }}
+        style={styles.thumbnail}
+        imageStyle={styles.thumbnailImage}
+      >
+        {stream?.status === StreamStatus.LIVE && (
+          <View style={styles.liveBadge}>
             <Text style={styles.liveText}>LIVE</Text>
           </View>
         )}
-        {stream.type !== 'live' && (
-          <View style={styles.playButton}>
-            <Play size={24} color="#FFFFFF" fill="#FFFFFF" />
+        <View style={styles.thumbnailOverlay}>
+          <View style={styles.viewers}>
+            <Users size={14} color="#FFFFFF" />
+            <Text style={styles.viewersText}>{formatViewCount(stream.currentViewers || 0)}</Text>
           </View>
-        )}
-      </View>
-      
+        </View>
+      </ImageBackground>
+
       <View style={styles.content}>
-        <Text 
-          style={[styles.title, { color: colors[theme].text }]}
-          numberOfLines={2}
-        >
+        <Text style={[styles.title, { color: colors.light.text }]} numberOfLines={2}>
           {stream.title}
         </Text>
         
-        <View style={styles.mosqueRow}>
-          <Text style={[styles.mosque, { color: colors[theme].inactive }]}>
-            {stream.mosqueName}
+        <View style={styles.meta}>
+          <Text style={[styles.mosque, { color: colors.light.inactive }]}>
+            {stream.center} • {stream.imam}
           </Text>
-          <Text style={[styles.imam, { color: colors[theme].inactive }]}>
-            • {stream.imamName}
-          </Text>
-        </View>
-        
-        <View style={styles.metaRow}>
-          {stream.type === 'upcoming' ? (
-            <View style={styles.metaItem}>
-              <Clock size={14} color={colors[theme].inactive} />
-              <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
-                {formatDate(stream.startTime)}
-              </Text>
-            </View>
-          ) : (
-            <View style={styles.metaItem}>
-              <Users size={14} color={colors[theme].inactive} />
-              <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
-                {formatViewCount(stream.viewCount)} viewers
-              </Text>
-            </View>
-          )}
-          
-          <View style={styles.metaItem}>
-            <Video size={14} color={colors[theme].inactive} />
-            <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
-              {stream.category}
+          <View style={styles.typeBadge}>
+            <Text style={styles.typeText}>
+              {stream.type?.charAt(0).toUpperCase() + stream.type?.slice(1)}
             </Text>
           </View>
         </View>
-        
-        {!compact && (
-          <Text 
-            style={[styles.description, { color: colors[theme].inactive }]}
-            numberOfLines={2}
-          >
-            {stream.description}
-          </Text>
-        )}
+
+        <View style={styles.stats}>
+          <View style={styles.stat}>
+            <Heart size={14} color={colors.light.inactive} />
+            <Text style={[styles.statText, { color: colors.light.inactive }]}>
+              {formatViewCount(stream.likes || 0)}
+            </Text>
+          </View>
+          <View style={styles.stat}>
+            <MessageCircle size={14} color={colors.light.inactive} />
+            <Text style={[styles.statText, { color: colors.light.inactive }]}>
+              {stream.comments?.length || 0}
+            </Text>
+          </View>
+          <View style={styles.stat}>
+            <Clock size={14} color={colors.light.inactive} />
+            <Text style={[styles.statText, { color: colors.light.inactive }]}>
+              {formatDate(stream.scheduledStartTime)}
+            </Text>
+          </View>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -156,28 +158,28 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  imageContainer: {
-    height: 180,
-    position: 'relative',
-  },
-  image: {
+  thumbnail: {
     width: '100%',
-    height: '100%',
+    height: 180,
+    justifyContent: 'flex-end',
   },
-  liveIndicator: {
+  thumbnailImage: {
+    borderRadius: 12,
+  },
+  thumbnailOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    padding: 12,
+    justifyContent: 'flex-end',
+  },
+  liveBadge: {
     position: 'absolute',
     top: 12,
     left: 12,
     backgroundColor: '#FF0000',
-    paddingVertical: 4,
     paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 4,
   },
   liveText: {
@@ -185,79 +187,74 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
-  playButton: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -24 }, { translateY: -24 }],
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
+  viewers: {
+    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  viewersText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    marginLeft: 4,
   },
   content: {
-    padding: 16,
+    padding: 12,
+    backgroundColor: '#FFFFFF',
   },
   title: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
   },
-  mosqueRow: {
+  meta: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
   mosque: {
-    fontSize: 14,
+    fontSize: 12,
+    flex: 1,
   },
-  imam: {
-    fontSize: 14,
-    marginLeft: 4,
+  typeBadge: {
+    backgroundColor: '#F0F0F0',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
   },
-  metaRow: {
+  typeText: {
+    fontSize: 12,
+    color: '#666666',
+  },
+  stats: {
     flexDirection: 'row',
-    marginBottom: 8,
+    justifyContent: 'space-between',
   },
-  metaItem: {
+  stat: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 16,
   },
-  metaText: {
+  statText: {
     fontSize: 12,
     marginLeft: 4,
   },
-  description: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  // Compact styles
   compactContainer: {
     flexDirection: 'row',
     borderRadius: 8,
     overflow: 'hidden',
     marginBottom: 12,
-    height: 80,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  compactImageContainer: {
-    width: 120,
-    position: 'relative',
   },
   compactImage: {
-    width: '100%',
-    height: '100%',
+    width: 120,
+    height: 80,
   },
   compactContent: {
     flex: 1,
     padding: 8,
-    justifyContent: 'space-between',
   },
   compactTitle: {
     fontSize: 14,
@@ -266,9 +263,16 @@ const styles = StyleSheet.create({
   },
   compactMosque: {
     fontSize: 12,
+    marginBottom: 4,
   },
   compactMeta: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  compactMetaText: {
+    fontSize: 12,
+    marginLeft: 4,
+  },
 });
+
+export default StreamCard;

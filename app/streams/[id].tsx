@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// src/screens/StreamDetailScreen.tsx
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -7,15 +8,13 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-  Platform,
-  Dimensions
+  Dimensions,
+  TextInput
 } from 'react-native';
 import { Stack, useLocalSearchParams, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
-import { streams, getStreamsByMosque, getStreamById } from '@/mocks/streamData';
-import { Stream } from '@/types';
-import { StreamCard } from '@/components/StreamCard';
+import { Stream } from '@/types/stream';
 import { 
   Play, 
   Pause, 
@@ -27,15 +26,21 @@ import {
   MessageCircle, 
   Clock, 
   Users, 
-  Video,
-  ChevronLeft
+  Video as VideoIcon,
+  ChevronLeft,
+  Send
 } from 'lucide-react-native';
+import { useAuth } from '@/context/auth';
+import StreamCard from '@/components/StreamCard';
+import { StreamStatus } from '@/types/stream.enum';
+import { StreamService } from '@/redux/features/streams/streamApi';
 
 const { width } = Dimensions.get('window');
 
-export default function StreamDetailScreen() {
+const StreamDetailScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { darkMode } = useSettingsStore();
+  const { user } = useAuth();
   const theme = darkMode ? 'dark' : 'light';
   
   const [stream, setStream] = useState<Stream | null>(null);
@@ -44,27 +49,54 @@ export default function StreamDetailScreen() {
   const [isMuted, setIsMuted] = useState(false);
   const [relatedStreams, setRelatedStreams] = useState<Stream[]>([]);
   const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [isLiked, setIsLiked] = useState(false);
   
-  useEffect(() => {
-    // Find the stream by ID
-    const foundStream = getStreamById(id as string);
-    if (foundStream) {
-      setStream(foundStream);
+  const fetchStream = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const fetchedStream = await StreamService.getStreamById(id);
+      setStream(fetchedStream);
       
-      // Get related streams from the same mosque
-      const related = getStreamsByMosque(foundStream.mosqueId)
-        .filter(s => s.id !== id)
-        .slice(0, 5);
-      setRelatedStreams(related);
-    }
-    
-    // Simulate loading
-    setTimeout(() => {
+      const related = await StreamService.getStreamsByType(fetchedStream.type);
+      setRelatedStreams(related.filter((s:any) => s._id !== id).slice(0, 3));
+      setIsLiked(false);
+    } catch (error) {
+      console.error('Error fetching stream:', error);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   }, [id]);
 
-  const formatDate = (dateString: string) => {
+  useEffect(() => {
+    fetchStream();
+  }, [fetchStream]);
+
+  const handleLike = async () => {
+    if (!stream) return;
+    
+    try {
+      const updatedStream = await StreamService.likeStream(stream._id);
+      setStream(updatedStream);
+      setIsLiked(!isLiked);
+    } catch (error) {
+      console.error('Error liking stream:', error);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!stream || !user || !commentText.trim()) return;
+    
+    try {
+      const updatedStream = await StreamService.addComment(stream._id, user.email, commentText);
+      setStream(updatedStream);
+      setCommentText('');
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
+
+  const formatDate = (dateString: string | Date) => {
     const date = new Date(dateString);
     return date.toLocaleDateString([], { 
       weekday: 'long', 
@@ -86,22 +118,24 @@ export default function StreamDetailScreen() {
     return count.toString();
   };
 
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
+  const togglePlayPause = () => setIsPlaying(!isPlaying);
+  const toggleMute = () => setIsMuted(!isMuted);
+  const handleBackPress = () => router.back();
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
-
-  const handleBackPress = () => {
-    router.back();
-  };
-
-  if (!stream) {
+  if (isLoading) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: colors[theme].background }]}>
         <ActivityIndicator size="large" color={colors[theme].primary} />
+      </View>
+    );
+  }
+
+  if (!stream) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors[theme].background }]}>
+        <Text >
+          Stream not found
+        </Text>
       </View>
     );
   }
@@ -119,56 +153,48 @@ export default function StreamDetailScreen() {
         contentContainerStyle={styles.contentContainer}
       >
         <View style={styles.videoContainer}>
-          {isLoading ? (
-            <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color="#FFFFFF" />
+          <Image 
+            source={{ uri: stream.thumbnailUrl || 'https://via.placeholder.com/300' }} 
+            style={styles.videoPlaceholder}
+          />
+          <View style={styles.videoControls}>
+            <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+              <ChevronLeft size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            
+            <View style={styles.centerControls}>
+              <TouchableOpacity style={styles.playButton} onPress={togglePlayPause}>
+                {isPlaying ? (
+                  <Pause size={32} color="#FFFFFF" />
+                ) : (
+                  <Play size={32} color="#FFFFFF" fill="#FFFFFF" />
+                )}
+              </TouchableOpacity>
             </View>
-          ) : (
-            <>
-              <Image 
-                source={{ uri: stream.thumbnailUrl }} 
-                style={styles.videoPlaceholder}
-              />
-              <View style={styles.videoControls}>
-                <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-                  <ChevronLeft size={24} color="#FFFFFF" />
-                </TouchableOpacity>
-                
-                <View style={styles.centerControls}>
-                  <TouchableOpacity style={styles.playButton} onPress={togglePlayPause}>
-                    {isPlaying ? (
-                      <Pause size={32} color="#FFFFFF" />
-                    ) : (
-                      <Play size={32} color="#FFFFFF" fill="#FFFFFF" />
-                    )}
-                  </TouchableOpacity>
+            
+            <View style={styles.bottomControls}>
+              <TouchableOpacity style={styles.controlButton} onPress={toggleMute}>
+                {isMuted ? (
+                  <VolumeX size={20} color="#FFFFFF" />
+                ) : (
+                  <Volume2 size={20} color="#FFFFFF" />
+                )}
+              </TouchableOpacity>
+              
+              <View style={styles.progressContainer}>
+                <View style={styles.progressBar}>
+                  <View style={[styles.progress, { width: '30%' }]} />
                 </View>
-                
-                <View style={styles.bottomControls}>
-                  <TouchableOpacity style={styles.controlButton} onPress={toggleMute}>
-                    {isMuted ? (
-                      <VolumeX size={20} color="#FFFFFF" />
-                    ) : (
-                      <Volume2 size={20} color="#FFFFFF" />
-                    )}
-                  </TouchableOpacity>
-                  
-                  <View style={styles.progressContainer}>
-                    <View style={styles.progressBar}>
-                      <View style={[styles.progress, { width: '30%' }]} />
-                    </View>
-                    <Text style={styles.timeText}>12:34 / 45:00</Text>
-                  </View>
-                  
-                  <TouchableOpacity style={styles.controlButton}>
-                    <Maximize size={20} color="#FFFFFF" />
-                  </TouchableOpacity>
-                </View>
+                <Text style={styles.timeText}>00:00 / {stream.isPrivate || '--:--'}</Text>
               </View>
-            </>
-          )}
+              
+              <TouchableOpacity style={styles.controlButton}>
+                <Maximize size={20} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+          </View>
           
-          {stream.type === 'live' && (
+          {stream.status === StreamStatus.LIVE  && (
             <View style={styles.liveIndicator}>
               <Text style={styles.liveText}>LIVE</Text>
             </View>
@@ -181,35 +207,45 @@ export default function StreamDetailScreen() {
           </Text>
           
           <View style={styles.metaRow}>
-            {stream.type === 'live' ? (
+            {stream.status === StreamStatus.LIVE ? (
               <View style={styles.metaItem}>
                 <Users size={16} color={colors[theme].inactive} />
                 <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
-                  {formatViewCount(stream.viewCount)} watching now
+                  {formatViewCount(stream.currentViewers || 0)} watching now
                 </Text>
               </View>
             ) : (
               <View style={styles.metaItem}>
                 <Clock size={16} color={colors[theme].inactive} />
                 <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
-                  {formatDate(stream.startTime)}
+                  {formatDate(stream.scheduledStartTime)}
                 </Text>
               </View>
             )}
             
             <View style={styles.metaItem}>
-              <Video size={16} color={colors[theme].inactive} />
+              <VideoIcon size={16} color={colors[theme].inactive} />
               <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
-                {stream.category ? stream.category.charAt(0).toUpperCase() + stream.category.slice(1) : 'Other'}
+                {stream.type?.charAt(0).toUpperCase() + stream.type?.slice(1)}
               </Text>
             </View>
           </View>
           
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.actionButton}>
-              <Heart size={20} color={colors[theme].inactive} />
-              <Text style={[styles.actionText, { color: colors[theme].inactive }]}>
-                Like
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={handleLike}
+            >
+              <Heart 
+                size={20} 
+                color={isLiked ? colors[theme].primary : colors[theme].inactive} 
+                fill={isLiked ? colors[theme].primary : 'none'}
+              />
+              <Text style={[
+                styles.actionText, 
+                { color: isLiked ? colors[theme].primary : colors[theme].inactive }
+              ]}>
+                {stream.likes || 0}
               </Text>
             </TouchableOpacity>
             
@@ -219,7 +255,7 @@ export default function StreamDetailScreen() {
             >
               <MessageCircle size={20} color={colors[theme].inactive} />
               <Text style={[styles.actionText, { color: colors[theme].inactive }]}>
-                Comment
+                {stream.comments?.length || 0}
               </Text>
             </TouchableOpacity>
             
@@ -235,15 +271,15 @@ export default function StreamDetailScreen() {
           
           <View style={styles.mosqueInfo}>
             <Image 
-              source={{ uri: 'https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80' }} 
+              source={{ uri: 'https://via.placeholder.com/100' }} 
               style={styles.mosqueLogo}
             />
             <View style={styles.mosqueDetails}>
               <Text style={[styles.mosqueName, { color: colors[theme].text }]}>
-                {stream.mosqueName}
+                {stream.center}
               </Text>
               <Text style={[styles.imamName, { color: colors[theme].inactive }]}>
-                {stream.imamName || 'Imam'}
+                {stream.imam}
               </Text>
             </View>
             <TouchableOpacity 
@@ -282,30 +318,65 @@ export default function StreamDetailScreen() {
           {showComments && (
             <View style={styles.commentsSection}>
               <Text style={[styles.commentsTitle, { color: colors[theme].text }]}>
-                Comments
+                Comments ({stream.comments?.length || 0})
               </Text>
               
-              <View style={[styles.commentInput, { backgroundColor: colors[theme].card }]}>
-                <Text style={[styles.commentPlaceholder, { color: colors[theme].inactive }]}>
-                  Add a comment...
+              {user && (
+                <View style={[styles.commentInputContainer, { backgroundColor: colors[theme].card }]}>
+                  <TextInput
+                    style={[styles.commentInput, { color: colors[theme].text }]}
+                    placeholder="Add a comment..."
+                    placeholderTextColor={colors[theme].inactive}
+                    value={commentText}
+                    onChangeText={setCommentText}
+                  />
+                  <TouchableOpacity 
+                    style={styles.commentButton}
+                    onPress={handleAddComment}
+                    disabled={!commentText.trim()}
+                  >
+                    <Send size={20} color={commentText.trim() ? colors[theme].primary : colors[theme].inactive} />
+                  </TouchableOpacity>
+                </View>
+              )}
+              
+              {stream.comments && stream.comments.length > 0 ? (
+                stream.comments.map((comment, index) => (
+                  <View key={index} style={styles.commentItem}>
+                    <Image 
+                      source={{ uri: 'https://via.placeholder.com/50' }} 
+                      style={styles.commentAvatar}
+                    />
+                    <View style={styles.commentContent}>
+                      <Text style={[styles.commentAuthor, { color: colors[theme].text }]}>
+                        {comment.userId}
+                      </Text>
+                      <Text style={[styles.commentText, { color: colors[theme].text }]}>
+                        {comment.text}
+                      </Text>
+                      <Text style={[styles.commentTime, { color: colors[theme].inactive }]}>
+                        {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </Text>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text style={[styles.noComments, { color: colors[theme].inactive }]}>
+                  Be the first to comment on this stream
                 </Text>
-              </View>
-              
-              <Text style={[styles.noComments, { color: colors[theme].inactive }]}>
-                Be the first to comment on this stream
-              </Text>
+              )}
             </View>
           )}
           
           {relatedStreams.length > 0 && (
             <View style={styles.relatedSection}>
               <Text style={[styles.relatedTitle, { color: colors[theme].text }]}>
-                More from {stream.mosqueName}
+                More from {stream.center}
               </Text>
               
               {relatedStreams.map((relatedStream) => (
                 <StreamCard 
-                  key={relatedStream.id} 
+                  key={relatedStream._id} 
                   stream={relatedStream}
                   compact
                 />
@@ -316,7 +387,7 @@ export default function StreamDetailScreen() {
       </ScrollView>
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -332,74 +403,75 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     width: '100%',
-    height: 240,
-    backgroundColor: '#000000',
+    aspectRatio: 16/9,
+    backgroundColor: '#000',
     position: 'relative',
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   videoPlaceholder: {
     width: '100%',
     height: '100%',
+    resizeMode: 'cover',
   },
-  loadingOverlay: {
+  videoControls: {
     ...StyleSheet.absoluteFillObject,
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  videoControls: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 16,
-    left: 16,
-    zIndex: 10,
-  },
   centerControls: {
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   playButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   bottomControls: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    justifyContent: 'space-between',
   },
   controlButton: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   progressContainer: {
     flex: 1,
-    marginHorizontal: 8,
+    marginHorizontal: 10,
   },
   progressBar: {
-    height: 4,
+    height: 3,
     backgroundColor: 'rgba(255,255,255,0.3)',
-    borderRadius: 2,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progress: {
     height: '100%',
-    backgroundColor: '#FF0000',
+  
   },
   timeText: {
-    color: '#FFFFFF',
+    color: '#FFF',
     fontSize: 12,
     marginTop: 4,
   },
@@ -407,13 +479,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     right: 16,
-    backgroundColor: '#FF0000',
-    paddingVertical: 4,
     paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 4,
   },
   liveText: {
-    color: '#FFFFFF',
+    color: '#FFF',
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -423,25 +494,27 @@ const styles = StyleSheet.create({
   streamTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   metaRow: {
     flexDirection: 'row',
     marginBottom: 16,
+    flexWrap: 'wrap',
   },
   metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 16,
+    marginBottom: 8,
   },
   metaText: {
     fontSize: 14,
-    marginLeft: 6,
+    marginLeft: 4,
   },
   actionButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 16,
+    marginVertical: 16,
   },
   actionButton: {
     alignItems: 'center',
@@ -457,32 +530,32 @@ const styles = StyleSheet.create({
   mosqueInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 16,
   },
   mosqueLogo: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
   },
   mosqueDetails: {
     flex: 1,
-    marginLeft: 12,
   },
   mosqueName: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 2,
+    fontWeight: '600',
   },
   imamName: {
     fontSize: 14,
+    marginTop: 2,
   },
   subscribeButton: {
-    paddingVertical: 8,
     paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 20,
   },
   subscribeText: {
-    color: '#FFFFFF',
-    fontSize: 14,
+    color: '#FFF',
     fontWeight: '600',
   },
   descriptionContainer: {
@@ -490,7 +563,7 @@ const styles = StyleSheet.create({
   },
   descriptionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginBottom: 8,
   },
   description: {
@@ -501,46 +574,80 @@ const styles = StyleSheet.create({
   tags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginTop: 8,
   },
   tag: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 16,
     marginRight: 8,
     marginBottom: 8,
   },
   tagText: {
     fontSize: 12,
-    fontWeight: '500',
   },
   commentsSection: {
-    marginTop: 8,
-    marginBottom: 16,
+    marginTop: 16,
   },
   commentsTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginBottom: 12,
   },
-  commentInput: {
-    padding: 12,
-    borderRadius: 8,
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     marginBottom: 16,
   },
-  commentPlaceholder: {
+  commentInput: {
+    flex: 1,
     fontSize: 14,
+  },
+  commentButton: {
+    marginLeft: 8,
+  },
+  commentItem: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  commentAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  commentContent: {
+    flex: 1,
+  },
+  commentAuthor: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  commentText: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 4,
+  },
+  commentTime: {
+    fontSize: 12,
   },
   noComments: {
     fontSize: 14,
     textAlign: 'center',
-    marginTop: 8,
+    marginVertical: 16,
   },
   relatedSection: {
-    marginTop: 8,
+    marginTop: 24,
   },
   relatedTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginBottom: 12,
   },
 });
+
+export default StreamDetailScreen;

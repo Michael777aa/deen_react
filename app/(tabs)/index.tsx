@@ -18,9 +18,7 @@ import { router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { Card } from '@/components/Card';
 import { colors } from '@/constants/colors';
-import { PrayerTimeCard } from '@/components/PrayerTimeCard';
-import { StreamCard } from '@/components/StreamCard';
-import { getLiveStreams, getUpcomingStreams } from '@/mocks/streamData';
+
 import { 
   MessageCircle, 
   Calendar, 
@@ -49,6 +47,7 @@ import { API_BASE_URL } from '@/redux/features/api/apiSlice';
 import { IPrayerTime, IPrayerTimes } from '@/types/prayer';
 import { getNextPrayer, getPrayerTimes } from '@/redux/features/layouts/prayers/prayersApi';
 import { useLocation } from '@/context/useLocation';
+import { StreamTabs } from '@/components/StreamTabs';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.7;
@@ -156,9 +155,7 @@ export default function HomeScreen() {
     }
   ];
   
-  // Get live and upcoming streams
-  const liveStreams = getLiveStreams();
-  const upcomingStreams = getUpcomingStreams().slice(0, 3);
+
   
   useEffect(() => {
     if (!user) {
@@ -416,106 +413,7 @@ export default function HomeScreen() {
       </Animated.View>
 
       {/* Live Streams Section - Redesigned */}
-      {liveStreams.length > 0 && (
-        <>
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
-              Live Now
-            </Text>
-            <TouchableOpacity onPress={() => router.push('/streams')}>
-              <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
-                See All
-              </Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.liveStreamContainer}>
-            <TouchableOpacity 
-              style={styles.liveStreamCard}
-              onPress={() => router.push(`/streams/${liveStreams[0].id}`)}
-            >
-              <Image 
-                source={{ uri: liveStreams[0].thumbnailUrl }} 
-                style={styles.liveStreamImage}
-              />
-              <View style={styles.liveStreamOverlay}>
-                <View style={styles.liveStreamIndicator}>
-                  <Text style={styles.liveStreamIndicatorText}>LIVE</Text>
-                </View>
-                <View style={styles.liveStreamContent}>
-                  <Text style={styles.liveStreamTitle} numberOfLines={2}>
-                    {liveStreams[0].title}
-                  </Text>
-                  <Text style={styles.liveStreamMosque}>
-                    {liveStreams[0].mosqueName}
-                  </Text>
-                  <View style={styles.liveStreamViewers}>
-                    <UsersIcon size={14} color="#FFFFFF" />
-                    <Text style={styles.liveStreamViewersText}>
-                      {liveStreams[0].viewCount} watching
-                    </Text>
-                  </View>
-                  <TouchableOpacity style={styles.watchNowButton}>
-                    <Text style={styles.watchNowText}>Watch Now</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
-
-      {/* Upcoming Streams - Redesigned */}
-      {upcomingStreams.length > 0 && (
-        <>
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
-              Upcoming Streams
-            </Text>
-            <TouchableOpacity onPress={() => router.push('/streams')}>
-              <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
-                See All
-              </Text>
-            </TouchableOpacity>
-          </View>
-          
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.upcomingStreamsScroll}
-          >
-            {upcomingStreams.map((stream) => (
-              <TouchableOpacity 
-                key={stream.id}
-                style={[styles.upcomingStreamCard, { backgroundColor: colors[theme].card }]}
-                onPress={() => router.push(`/streams/${stream.id}`)}
-              >
-                <Image 
-                  source={{ uri: stream.thumbnailUrl }} 
-                  style={styles.upcomingStreamImage}
-                />
-                <View style={styles.upcomingStreamContent}>
-                  <Text 
-                    style={[styles.upcomingStreamTitle, { color: colors[theme].text }]}
-                    numberOfLines={2}
-                  >
-                    {stream.title}
-                  </Text>
-                  <Text style={[styles.upcomingStreamMosque, { color: colors[theme].inactive }]}>
-                    {stream.mosqueName}
-                  </Text>
-                  <View style={styles.upcomingStreamTime}>
-                    <Clock size={12} color={colors[theme].primary} />
-                    <Text style={[styles.upcomingStreamTimeText, { color: colors[theme].primary }]}>
-                      {new Date(stream.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </>
-      )}
+   <StreamTabs />
 
       {/* Quick Actions - Redesigned */}
       <Text style={[styles.sectionTitle, { color: colors[theme].text, marginTop: 24 }]}>

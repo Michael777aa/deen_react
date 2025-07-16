@@ -233,6 +233,7 @@ const QiblaScreen = () => {
 
         {/* Error Message */}
         {error && (
+          //@ts-ignore
           <Card style={[styles.alertCard, { borderLeftColor: '#F44336' }]}>
             <View style={styles.alertContent}>
               <AlertTriangle size={20} color="#F44336" />
