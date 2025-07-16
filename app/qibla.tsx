@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -11,7 +11,8 @@ import {
   Animated,
   Vibration,
   SafeAreaView,
-  StatusBar
+  StatusBar,
+  Share
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -27,103 +28,38 @@ import {
   Zap,
   Share2,
   AlertTriangle,
-  Check,
-  Moon,
-  Sun
+  Check
 } from 'lucide-react-native';
+import * as Location from 'expo-location';
+import { getQiblaDirection } from '@/redux/features/layouts/prayers/prayersApi';
+import { IQiblaDirection } from '@/types/prayer';
+import { useLocation } from '@/context/useLocation';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const COMPASS_SIZE = Math.min(width * 0.85, 320);
+const ARROW_IMAGE = { uri: 'https://cdn-icons-png.flaticon.com/512/271/271226.png' };
 
-export default function QiblaScreen() {
+const QiblaScreen = () => {
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
-  const [isLoading, setIsLoading] = useState(false);
-  const [qiblaDirection, setQiblaDirection] = useState(65);
-  const [userLocation, setUserLocation] = useState('New York, NY');
+  const [isLoading, setIsLoading] = useState(true);
+  const [qiblaData, setQiblaData] = useState<IQiblaDirection>({
+    direction: 0,
+    location: { latitude: 0, longitude: 0 },
+    locationName: ''
+  });
   const [showInfo, setShowInfo] = useState(false);
-  const [calibrationNeeded, setCalibrationNeeded] = useState(false);
-  const [calibrationSuccess, setCalibrationSuccess] = useState(false);
-  const [accuracy, setAccuracy] = useState('high'); // 'high', 'medium', 'low'
+  const [accuracy, setAccuracy] = useState<'high' | 'medium' | 'low'>('high');
+  const [error, setError] = useState<string | null>(null);
   const [timeOfDay, setTimeOfDay] = useState<'day' | 'night'>('day');
   
+  // Animation refs
   const rotateAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
-  const scaleAnim = useRef(new Animated.Value(0)).current;
-  const calibrationAnim = useRef(new Animated.Value(0)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
 
-  const requestLocationPermission = async () => {
-    setIsLoading(true);
-    setCalibrationNeeded(false);
-    setCalibrationSuccess(false);
-    
-    // Simulate location permission request and compass calculation
-    setTimeout(() => {
-      // Simulate a new qibla direction
-      const newDirection = Math.floor(Math.random() * 360);
-      setQiblaDirection(newDirection);
-      
-      // Animate the compass rotation
-      Animated.timing(rotateAnim, {
-        toValue: newDirection,
-        duration: 1000,
-        useNativeDriver: true
-      }).start();
-      
-      // Randomly decide if calibration is needed
-      const needsCalibration = Math.random() > 0.7;
-      setCalibrationNeeded(needsCalibration);
-      
-      // Set random accuracy
-      const accuracyValues = ['high', 'medium', 'low'];
-      const randomAccuracy = accuracyValues[Math.floor(Math.random() * accuracyValues.length)];
-      setAccuracy(randomAccuracy);
-      
-      setIsLoading(false);
-      
-      if (Platform.OS !== 'web') {
-        Vibration.vibrate(100);
-      }
-    }, 1500);
-  };
-
-  const calibrateCompass = () => {
-    setIsLoading(true);
-    
-    // Start calibration animation
-    Animated.loop(
-      Animated.timing(calibrationAnim, {
-        toValue: 1,
-        duration: 2000,
-        useNativeDriver: true
-      })
-    ).start();
-    
-    // Simulate calibration process
-    setTimeout(() => {
-      calibrationAnim.stopAnimation();
-      calibrationAnim.setValue(0);
-      setIsLoading(false);
-      setCalibrationNeeded(false);
-      setCalibrationSuccess(true);
-      setAccuracy('high');
-      
-      // Show success message briefly
-      setTimeout(() => {
-        setCalibrationSuccess(false);
-      }, 3000);
-      
-      if (Platform.OS !== 'web') {
-        Vibration.vibrate([0, 100, 50, 100]);
-      }
-    }, 3000);
-  };
-
+  // Determine time of day
   useEffect(() => {
-    requestLocationPermission();
-    
-    // Determine time of day
     const hour = new Date().getHours();
     setTimeOfDay(hour >= 6 && hour < 18 ? 'day' : 'night');
     
@@ -142,80 +78,135 @@ export default function QiblaScreen() {
         })
       ])
     ).start();
-
-    // Scale in animation
-    Animated.timing(scaleAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true
-    }).start();
-    
-    // Glow animation
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: true
-        }),
-        Animated.timing(glowAnim, {
-          toValue: 0.3,
-          duration: 2000,
-          useNativeDriver: true
-        })
-      ])
-    ).start();
   }, []);
 
+  // Memoized function to get direction text
+  const getDirectionText = useCallback((degrees: number) => {
+    const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+    const index = Math.round(((degrees % 360) / 45)) % 8;
+    return directions[index];
+  }, []);
+
+  // Share location function
+  const shareLocation = useCallback(async () => {
+    try {
+      const message = `My current location: ${qiblaData.locationName}\n` +
+        `Qibla direction: ${Math.round(qiblaData.direction)}° (${getDirectionText(qiblaData.direction)})\n` +
+        `Coordinates: ${qiblaData.location.latitude.toFixed(4)}, ${qiblaData.location.longitude.toFixed(4)}`;
+      
+      await Share.share({
+        message,
+        title: 'My Qibla Direction'
+      });
+    } catch (err) {
+      console.error('Error sharing location:', err);
+    }
+  }, [qiblaData]);
+
+  // Fetch Qibla direction with proper error handling
+  const fetchQiblaDirection = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Check and request location permissions
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        throw new Error('Location permission denied');
+      }
+
+      // Get current position with high accuracy
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High
+      });
+
+      // Fetch Qibla direction from API
+      const qiblaResponse = await getQiblaDirection(
+        location.coords.latitude,
+        location.coords.longitude
+      );
+
+      // Update accuracy based on location accuracy
+      const acc:any = location.coords.accuracy;
+      if (acc < 10) setAccuracy('high');
+      else if (acc < 50) setAccuracy('medium');
+      else setAccuracy('low');
+
+      // Update state with new data
+      setQiblaData({
+        direction: qiblaResponse.direction,
+        location: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude
+        },
+        locationName: qiblaResponse.locationName || 'Current Location'
+      });
+
+      // Animate the compass rotation smoothly
+      Animated.timing(rotateAnim, {
+        toValue: qiblaResponse.direction,
+        duration: 1000,
+        useNativeDriver: true
+      }).start();
+
+      // Fade in the compass
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true
+      }).start();
+
+      // Haptic feedback on success
+      if (Platform.OS !== 'web') {
+        Vibration.vibrate(50);
+      }
+    } catch (err: any) {
+      console.error('Qibla direction error:', err);
+      setError(err.message || 'Failed to get Qibla direction');
+      setQiblaData(prev => ({
+        ...prev,
+        locationName: 'Location unavailable'
+      }));
+      
+      // Error vibration pattern
+      if (Platform.OS !== 'web') {
+        Vibration.vibrate([100, 200, 100]);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    fetchQiblaDirection();
+  }, []);
+
+  // Spin interpolation for compass arrow
   const spin = rotateAnim.interpolate({
     inputRange: [0, 360],
     outputRange: ['0deg', '360deg']
   });
-  
-  const calibrationRotate = calibrationAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg']
-  });
 
-  const goBack = () => {
-    router.back();
-  };
-
-  const getAccuracyColor = () => {
-    switch(accuracy) {
-      case 'high': return '#4CAF50';
-      case 'medium': return '#FF9800';
-      case 'low': return '#F44336';
-      default: return '#4CAF50';
-    }
-  };
+  // Accuracy color
+  const accuracyColor = accuracy === 'high' ? '#4CAF50' : accuracy === 'medium' ? '#FF9800' : '#F44336';
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors[theme].background }]}>
       <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} />
-      <Stack.Screen 
-        options={{ 
-          title: "Qibla Compass",
-          headerShown: false
-        }} 
-      />
+      <Stack.Screen options={{ headerShown: false }} />
       
-      {/* Custom Header */}
-      <View style={[styles.customHeader, { backgroundColor: colors[theme].card }]}>
-        <TouchableOpacity onPress={goBack} style={styles.backButton}>
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: colors[theme].card }]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
           <ArrowLeft size={24} color={colors[theme].text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors[theme].text }]}>
-          Qibla Compass
-        </Text>
+        <Text style={[styles.headerTitle, { color: colors[theme].text }]}>Qibla Compass</Text>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity onPress={shareLocation} style={styles.headerButton}>
             <Share2 size={22} color={colors[theme].text} />
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.headerButton}
-            onPress={() => setShowInfo(!showInfo)}
-          >
+          <TouchableOpacity onPress={() => setShowInfo(!showInfo)} style={styles.headerButton}>
             <Info size={22} color={colors[theme].text} />
           </TouchableOpacity>
         </View>
@@ -233,58 +224,35 @@ export default function QiblaScreen() {
                 Current Location
               </Text>
               <Text style={[styles.locationText, { color: colors[theme].text }]}>
-                {userLocation}
+                {qiblaData.locationName}
               </Text>
             </View>
-            <TouchableOpacity 
-              style={[styles.refreshButton, { backgroundColor: colors[theme].primary }]}
-              onPress={requestLocationPermission}
-              disabled={isLoading}
-            >
-              <RefreshCw size={16} color="#FFFFFF" />
-            </TouchableOpacity>
+          
           </View>
         </Card>
 
-        {/* Calibration Alert */}
-        {/* {calibrationNeeded && (
-          <Card style={[styles.alertCard, { borderLeftColor: '#FF9800' }]}>
+        {/* Error Message */}
+        {error && (
+          <Card style={[styles.alertCard, { borderLeftColor: '#F44336' }]}>
             <View style={styles.alertContent}>
-              <AlertTriangle size={20} color="#FF9800" />
+              <AlertTriangle size={20} color="#F44336" />
               <View style={styles.alertTextContainer}>
                 <Text style={[styles.alertTitle, { color: colors[theme].text }]}>
-                  Calibration Needed
+                  Error Getting Qibla Direction
                 </Text>
                 <Text style={[styles.alertDescription, { color: colors[theme].inactive }]}>
-                  Wave your device in a figure-8 pattern to improve compass accuracy
+                  {error}
                 </Text>
               </View>
             </View>
             <TouchableOpacity 
-              style={[styles.calibrateButton, { backgroundColor: '#FF9800' }]}
-              onPress={calibrateCompass}
+              style={[styles.calibrateButton, { backgroundColor: colors[theme].primary }]}
+              onPress={fetchQiblaDirection}
             >
-              <Text style={styles.calibrateButtonText}>Calibrate</Text>
+              <Text style={styles.calibrateButtonText}>Try Again</Text>
             </TouchableOpacity>
           </Card>
-        )} */}
-
-        {/* Calibration Success */}
-        {/* {calibrationSuccess && (
-          <Card style={[styles.alertCard, { borderLeftColor: '#4CAF50' }]}>
-            <View style={styles.alertContent}>
-              <Check size={20} color="#4CAF50" />
-              <View style={styles.alertTextContainer}>
-                <Text style={[styles.alertTitle, { color: colors[theme].text }]}>
-                  Calibration Successful
-                </Text>
-                <Text style={[styles.alertDescription, { color: colors[theme].inactive }]}>
-                  Your compass is now calibrated for better accuracy
-                </Text>
-              </View>
-            </View>
-          </Card>
-        )} */}
+        )}
 
         {/* Compass Container */}
         <View style={styles.compassContainer}>
@@ -297,126 +265,78 @@ export default function QiblaScreen() {
             </View>
           ) : (
             <>
-              <Animated.View style={[styles.compassWrapper, { transform: [{ scale: scaleAnim }] }]}>
-                {/* Sky background for day/night effect */}
+              <Animated.View style={[
+                styles.compassWrapper, 
+                { 
+                  opacity: fadeAnim,
+                  transform: [{ scale: fadeAnim }] 
+                }
+              ]}>
+                {/* Compass Background */}
                 <View style={[
-                  styles.skyBackground, 
+                  styles.compassBackground, 
                   { 
-                    backgroundColor: timeOfDay === 'day' 
-                      ? '#E3F2FD' 
-                      : '#0D1B2A'
+                    backgroundColor: colors[theme].card,
+                    shadowColor: timeOfDay === 'night' ? '#4FC3F7' : '#000'
                   }
                 ]}>
-                  {timeOfDay === 'night' && (
-                    <>
-                      <View style={[styles.star, { top: '10%', left: '20%' }]} />
-                      <View style={[styles.star, { top: '15%', left: '80%' }]} />
-                      <View style={[styles.star, { top: '30%', left: '50%' }]} />
-                      <View style={[styles.star, { top: '25%', left: '30%' }]} />
-                      <View style={[styles.star, { top: '40%', left: '70%' }]} />
-                      <View style={[styles.star, { top: '60%', left: '25%' }]} />
-                      <View style={[styles.star, { top: '70%', left: '60%' }]} />
-                      <View style={[styles.star, { top: '80%', left: '40%' }]} />
-                      <View style={[styles.star, { top: '85%', left: '80%' }]} />
-                      <View style={[styles.star, { top: '20%', left: '10%' }]} />
-                      <View style={[styles.star, { top: '50%', left: '90%' }]} />
-                    </>
-                  )}
-                  
-                  {/* Day/Night Icon */}
-                  <View style={styles.timeIcon}>
-                    {timeOfDay === 'day' ? (
-                      <Sun size={24} color="#FF9800" />
-                    ) : (
-                      <Moon size={24} color="#BBDEFB" />
-                    )}
+                  {/* Compass ticks */}
+                  <View style={styles.compassPattern}>
+                    {Array.from({ length: 24 }).map((_, i) => (
+                      <View 
+                        key={`tick-${i}`}
+                        style={[
+                          styles.compassTick, 
+                          { 
+                            backgroundColor: i % 6 === 0 ? colors[theme].primary : colors[theme].border,
+                            height: i % 6 === 0 ? 20 : 10,
+                            transform: [{ rotate: `${i * 15}deg` }]
+                          }
+                        ]} 
+                      />
+                    ))}
                   </View>
                   
-                  <View style={[
-                    styles.compassBackground, 
-                    { 
-                      backgroundColor: colors[theme].card,
-                      shadowColor: timeOfDay === 'night' ? '#4FC3F7' : '#000'
-                    }
+                  {/* Direction Labels */}
+                  <Text style={[styles.directionLabel, styles.northLabel, { color: colors[theme].primary }]}>N</Text>
+                  <Text style={[styles.directionLabel, styles.westLabel, { color: colors[theme].text }]}>W</Text>
+                  <Text style={[styles.directionLabel, styles.eastLabel, { color: colors[theme].text }]}>E</Text>
+                  <Text style={[styles.directionLabel, styles.southLabel, { color: colors[theme].text }]}>S</Text>
+                  
+                  {/* Kaaba Indicator */}
+                  <View style={styles.kaabaIndicator}>
+                    <Compass size={20} color="#FFFFFF" />
+                    <Text style={styles.kaabaText}>Kaaba</Text>
+                  </View>
+                  
+                  {/* Qibla Arrow */}
+                  <Animated.View style={[
+                    styles.qiblaArrowContainer,
+                    { transform: [{ rotate: spin }] }
                   ]}>
-                    {/* Compass Background Pattern */}
-                    <View style={styles.compassPattern}>
-                      {Array(24).fill(0).map((_, i) => (
-                        <View 
-                          key={i} 
-                          style={[
-                            styles.compassTick, 
-                            { 
-                              backgroundColor: i % 6 === 0 ? colors[theme].primary : colors[theme].border,
-                              height: i % 6 === 0 ? 20 : 10,
-                              transform: [{ rotate: `${i * 15}deg` }]
-                            }
-                          ]} 
-                        />
-                      ))}
-                    </View>
-                    
-                    {/* Direction Labels */}
-                    <View style={styles.compassDirections}>
-                      <Text style={[styles.directionLabel, { color: colors[theme].primary, top: 20 }]}>N</Text>
-                      <Text style={[styles.directionLabel, { color: colors[theme].text, top: COMPASS_SIZE/2 - 10, left: 20 }]}>W</Text>
-                      <Text style={[styles.directionLabel, { color: colors[theme].text, top: COMPASS_SIZE/2 - 10, right: 20 }]}>E</Text>
-                      <Text style={[styles.directionLabel, { color: colors[theme].text, bottom: 20 }]}>S</Text>
-                    </View>
-                    
-                    {/* Qibla Arrow */}
-                    <Animated.View 
-                      style={[
-                        styles.qiblaArrow,
-                        { transform: [{ rotate: spin }] }
-                      ]}
-                    >
-                      <Animated.View 
-                        style={[
-                          styles.arrowGlow,
-                          { 
-                            backgroundColor: colors[theme].primary,
-                            opacity: glowAnim
-                          }
-                        ]} 
-                      />
-                      <View style={[styles.arrowHead, { backgroundColor: colors[theme].primary }]} />
-                      <View style={[styles.arrowTail, { backgroundColor: colors[theme].inactive }]} />
-                    </Animated.View>
-                    
-                    {/* Center Dot */}
-                    <View style={styles.compassCenter}>
-                      <Animated.View 
-                        style={[
-                          styles.compassCenterDot, 
-                          { 
-                            backgroundColor: colors[theme].primary,
-                            transform: [{ scale: pulseAnim }]
-                          }
-                        ]} 
-                      />
-                    </View>
-                    
-                    {/* Kaaba Indicator */}
-                    <View style={styles.kaabaIndicator}>
-                      <Compass size={20} color="#FFFFFF" />
-                      <Text style={styles.kaabaText}>Kaaba</Text>
-                    </View>
-                    
-                    {/* Calibration Overlay */}
-                    {isLoading && calibrationNeeded && (
-                      <Animated.View 
-                        style={[
-                          styles.calibrationOverlay,
-                          { transform: [{ rotate: calibrationRotate }] }
-                        ]}
-                      >
-                        <View style={styles.calibrationPattern}>
-                          <View style={[styles.calibrationLine, { borderColor: '#FF9800' }]} />
-                          <View style={[styles.calibrationLine, { borderColor: '#FF9800', transform: [{ rotate: '90deg' }] }]} />
-                        </View>
-                      </Animated.View>
-                    )}
+                    <Image 
+                      source={ARROW_IMAGE} 
+                      style={[styles.qiblaArrowImage, { tintColor: colors[theme].primary }]}
+                      resizeMode="contain"
+                    />
+                    <Animated.View style={[
+                      styles.arrowGlow, 
+                      { 
+                        backgroundColor: colors[theme].primary,
+                        transform: [{ scale: pulseAnim }]
+                      }
+                    ]} />
+                  </Animated.View>
+                  
+                  {/* Center Dot */}
+                  <View style={styles.compassCenter}>
+                    <Animated.View style={[
+                      styles.compassCenterDot, 
+                      { 
+                        backgroundColor: colors[theme].primary,
+                        transform: [{ scale: pulseAnim }]
+                      }
+                    ]} />
                   </View>
                 </View>
               </Animated.View>
@@ -426,26 +346,24 @@ export default function QiblaScreen() {
                 <View style={styles.directionInfo}>
                   <View style={styles.directionMain}>
                     <Text style={[styles.directionText, { color: colors[theme].primary }]}>
-                      {qiblaDirection}°
+                      {Math.round(qiblaData.direction)}°
                     </Text>
                     <Text style={[styles.directionSubtext, { color: colors[theme].text }]}>
-                      {qiblaDirection > 0 && qiblaDirection < 90 ? 'Northeast' : 
-                       qiblaDirection >= 90 && qiblaDirection < 180 ? 'Southeast' :
-                       qiblaDirection >= 180 && qiblaDirection < 270 ? 'Southwest' : 'Northwest'}
+                      {getDirectionText(qiblaData.direction)}
                     </Text>
                   </View>
                   <View style={[
                     styles.accuracyIndicator, 
-                    { backgroundColor: getAccuracyColor() + '20' }
+                    { backgroundColor: accuracyColor + '20' }
                   ]}>
-                    <Zap size={16} color={getAccuracyColor()} />
-                    <Text style={[styles.accuracyText, { color: getAccuracyColor() }]}>
+                    <Zap size={16} color={accuracyColor} />
+                    <Text style={[styles.accuracyText, { color: accuracyColor }]}>
                       {accuracy === 'high' ? 'High' : accuracy === 'medium' ? 'Medium' : 'Low'} Accuracy
                     </Text>
                   </View>
                 </View>
                 <Text style={[styles.directionHelp, { color: colors[theme].inactive }]}>
-                  Point the green arrow towards the Qibla direction
+                  Face the green arrow towards the Kaaba in Mecca
                 </Text>
               </Card>
             </>
@@ -458,36 +376,33 @@ export default function QiblaScreen() {
             <View style={styles.infoHeader}>
               <Compass size={20} color={colors[theme].primary} />
               <Text style={[styles.infoTitle, { color: colors[theme].text }]}>
-                About Qibla
+                About Qibla Direction
               </Text>
             </View>
             <Text style={[styles.infoText, { color: colors[theme].text }]}>
-              The Qibla is the direction that Muslims face during prayer. It points toward the Kaaba in Mecca, Saudi Arabia, which is the most sacred site in Islam.
-            </Text>
-            <Text style={[styles.infoText, { color: colors[theme].text, marginTop: 12 }]}>
-              For accurate results, please ensure your device's compass is calibrated and you are away from magnetic interference.
+              The Qibla is the direction Muslims face during prayer, pointing toward the Kaaba in Mecca. This compass shows the exact direction based on your current location.
             </Text>
             
             <View style={styles.infoTips}>
               <Text style={[styles.infoTipsTitle, { color: colors[theme].primary }]}>
-                Tips for Better Accuracy:
+                For Best Results:
               </Text>
               <View style={styles.infoTipItem}>
                 <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
                 <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
-                  Keep away from electronic devices and metal objects
-                </Text>
-              </View>
-              <View style={styles.infoTipItem}>
-                <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
-                <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
-                  Calibrate your compass by moving your device in a figure-8 pattern
-                </Text>
-              </View>
-              <View style={styles.infoTipItem}>
-                <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
-                <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
                   Hold your device flat and parallel to the ground
+                </Text>
+              </View>
+              <View style={styles.infoTipItem}>
+                <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
+                <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
+                  Move away from electronic devices and metal objects
+                </Text>
+              </View>
+              <View style={styles.infoTipItem}>
+                <View style={[styles.infoTipBullet, { backgroundColor: colors[theme].primary }]} />
+                <Text style={[styles.infoTipText, { color: colors[theme].text }]}>
+                  Ensure location services are enabled for best accuracy
                 </Text>
               </View>
             </View>
@@ -498,23 +413,18 @@ export default function QiblaScreen() {
         <View style={styles.actionButtons}>
           <TouchableOpacity 
             style={[styles.mainActionButton, { backgroundColor: colors[theme].primary }]}
-            onPress={requestLocationPermission}
+            onPress={fetchQiblaDirection}
             disabled={isLoading}
           >
-            {isLoading ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
-            ) : (
-              <>
-                <Navigation size={20} color="#FFFFFF" />
-                <Text style={styles.mainActionButtonText}>
-                  Recalibrate
-                </Text>
-              </>
-            )}
+            <Navigation size={20} color="#FFFFFF" />
+            <Text style={styles.mainActionButtonText}>
+              {isLoading ? 'Locating...' : 'Refresh Direction'}
+            </Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.secondaryActionButton, { backgroundColor: colors[theme].card }]}
+            onPress={shareLocation}
           >
             <Text style={[styles.secondaryActionButtonText, { color: colors[theme].text }]}>
               Share Location
@@ -524,13 +434,13 @@ export default function QiblaScreen() {
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  customHeader: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -542,7 +452,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  backButton: {
+  headerButton: {
     padding: 8,
   },
   headerTitle: {
@@ -551,10 +461,6 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: 'row',
-  },
-  headerButton: {
-    padding: 8,
-    marginLeft: 8,
   },
   content: {
     flex: 1,
@@ -637,40 +543,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
-    borderRadius: COMPASS_SIZE / 2,
-    overflow: 'hidden',
-  },
-  skyBackground: {
-    width: '100%',
-    height: '100%',
-    borderRadius: COMPASS_SIZE / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  star: {
-    position: 'absolute',
-    width: 2,
-    height: 2,
-    borderRadius: 1,
-    backgroundColor: '#FFFFFF',
-    opacity: 0.8,
-  },
-  timeIcon: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    zIndex: 10,
   },
   compassBackground: {
-    width: COMPASS_SIZE * 0.85,
-    height: COMPASS_SIZE * 0.85,
-    borderRadius: (COMPASS_SIZE * 0.85) / 2,
+    width: COMPASS_SIZE,
+    height: COMPASS_SIZE,
+    borderRadius: COMPASS_SIZE / 2,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 8,
   },
@@ -682,14 +564,9 @@ const styles = StyleSheet.create({
   compassTick: {
     position: 'absolute',
     width: 2,
-    height: 20,
     top: 10,
-    left: COMPASS_SIZE * 0.85 / 2 - 1,
-  },
-  compassDirections: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
+    left: '50%',
+    marginLeft: -1,
   },
   directionLabel: {
     position: 'absolute',
@@ -697,52 +574,58 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     width: 20,
     textAlign: 'center',
-    left: COMPASS_SIZE * 0.85 / 2 - 10,
   },
-  qiblaArrow: {
+  northLabel: {
+    top: 20,
+    left: '50%',
+    marginLeft: -10,
+  },
+  eastLabel: {
+    top: '50%',
+    right: 20,
+    marginTop: -10,
+  },
+  westLabel: {
+    top: '50%',
+    left: 20,
+    marginTop: -10,
+  },
+  southLabel: {
+    bottom: 20,
+    left: '50%',
+    marginLeft: -10,
+  },
+  qiblaArrowContainer: {
     position: 'absolute',
-    width: COMPASS_SIZE * 0.6,
-    height: COMPASS_SIZE * 0.6,
+    width: COMPASS_SIZE * 0.7,
+    height: COMPASS_SIZE * 0.7,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  qiblaArrowImage: {
+    width: '100%',
+    height: '100%',
+  },
   arrowGlow: {
     position: 'absolute',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    top: 0,
-    marginTop: -10,
-    opacity: 0.5,
-  },
-  arrowHead: {
-    position: 'absolute',
-    width: 6,
-    height: COMPASS_SIZE * 0.3,
-    borderRadius: 3,
-    top: 0,
-  },
-  arrowTail: {
-    position: 'absolute',
-    width: 4,
-    height: COMPASS_SIZE * 0.3,
-    borderRadius: 2,
-    bottom: 0,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    opacity: 0.3,
   },
   compassCenter: {
     position: 'absolute',
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
   compassCenterDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
   },
   kaabaIndicator: {
     position: 'absolute',
@@ -759,27 +642,6 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     fontWeight: 'bold',
     fontSize: 14,
-  },
-  calibrationOverlay: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  calibrationPattern: {
-    width: '100%',
-    height: '100%',
-    position: 'relative',
-  },
-  calibrationLine: {
-    position: 'absolute',
-    width: '100%',
-    height: 0,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    top: '50%',
-    left: 0,
   },
   directionCard: {
     marginBottom: 16,
@@ -900,3 +762,5 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
 });
+
+export default QiblaScreen;

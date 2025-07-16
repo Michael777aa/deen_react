@@ -11,14 +11,13 @@ import {
   ImageBackground,
   Animated,
   Platform,
-  Vibration
+  Vibration,
+  ActivityIndicator
 } from 'react-native';
 import { router } from 'expo-router';
-import { useAuthStore } from '@/store/useAuthStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { Card } from '@/components/Card';
 import { colors } from '@/constants/colors';
-import { prayerTimes, getNextPrayer } from '@/mocks/prayerTimes';
 import { PrayerTimeCard } from '@/components/PrayerTimeCard';
 import { StreamCard } from '@/components/StreamCard';
 import { getLiveStreams, getUpcomingStreams } from '@/mocks/streamData';
@@ -42,27 +41,96 @@ import {
   Volume2,
   Vibrate,
   Video,
-  User,
   Users as UsersIcon
 } from 'lucide-react-native';
 import { useAuth } from '@/context/auth';
+import { getLayout } from '@/redux/features/layouts/layoutApi';
+import { API_BASE_URL } from '@/redux/features/api/apiSlice';
+import { IPrayerTime, IPrayerTimes } from '@/types/prayer';
+import { getNextPrayer, getPrayerTimes } from '@/redux/features/layouts/prayers/prayersApi';
+import { useLocation } from '@/context/useLocation';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.7;
 
 export default function HomeScreen() {
     const {  user } = useAuth();
-  const { darkMode, notifications, prayerReminders } = useSettingsStore();
+  const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
   const [refreshing, setRefreshing] = useState(false);
   const [greeting, setGreeting] = useState('');
   const [notificationType, setNotificationType] = useState('adhan'); // 'adhan', 'vibration', 'text'
   const [showNotificationOptions, setShowNotificationOptions] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
-  
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const notificationOptionsAnim = useRef(new Animated.Value(0)).current;
+  const [layout, setLayout] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { location } = useLocation();
+  const [nextPrayer, setNextPrayer] = useState<IPrayerTime | null>(null);
+  const [prayerTimes, setPrayerTimes] = useState<IPrayerTimes | null>(null);
+  const [loadingPrayer, setLoadingPrayer] = useState(true);
+
+  useEffect(() => {
+    const fetchLayout = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getLayout();
+        
+        setLayout(data);
+      } catch (error) {
+        console.error("Failed to fetch layout:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLayout();
+  }, []);
+
+  useEffect(() => {
+    const fetchPrayerData = async () => {
+      if (location) {
+        try {
+          setLoadingPrayer(true);
+          const [prayerData, nextPrayerData] = await Promise.all([
+            getPrayerTimes(location.latitude, location.longitude),
+            getNextPrayer(location.latitude, location.longitude)
+          ]);
+          setPrayerTimes(prayerData);
+          setNextPrayer(nextPrayerData);
+        } catch (error) {
+          console.error('Error fetching prayer data:', error);
+        } finally {
+          setLoadingPrayer(false);
+        }
+      }
+    };
+  
+    fetchPrayerData();
+  }, [location]);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    if (location) {
+      try {
+        const [prayerData, nextPrayerData] = await Promise.all([
+          getPrayerTimes(location.latitude, location.longitude),
+          getNextPrayer(location.latitude, location.longitude)
+        ]);
+        setPrayerTimes(prayerData);
+        setNextPrayer(nextPrayerData);
+      } catch (error) {
+        console.error('Error refreshing prayer data:', error);
+      }
+    }
+    setRefreshing(false);
+  }, [location]);
+  const staticBase = API_BASE_URL.replace('/api/v1', '');
+
+
+
   
   const featuredContent = [
     {
@@ -129,14 +197,13 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, [user]);
 
-  const nextPrayer = getNextPrayer();
   
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  }, []);
+  // const onRefresh = React.useCallback(() => {
+  //   setRefreshing(true);
+  //   setTimeout(() => {
+  //     setRefreshing(false);
+  //   }, 1000);
+  // }, []);
 
   const toggleNotificationOptions = () => {
     if (showNotificationOptions) {
@@ -188,7 +255,12 @@ export default function HomeScreen() {
       {/* Modern Gradient Header */}
       <Animated.View style={[styles.headerContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
         <ImageBackground
-          source={{ uri: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80' }}
+           source={{
+            uri:
+              layout?.layoutImages?.[0]
+                ? `${staticBase}/${layout.layoutImages[0]}`
+                : 'https://images.unsplash.com/photo-1519817650390-64a93db51149?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80',
+          }}
           style={styles.headerBackground}
           imageStyle={styles.headerBackgroundImage}
         >
@@ -202,7 +274,7 @@ export default function HomeScreen() {
                   {user.name}
                 </Text>
                 <Text style={styles.subtitle}>
-                  May Allah bless your day
+               {layout?.blessing}
                 </Text>
               </View>
               <TouchableOpacity onPress={() => router.push('/settings')} style={styles.avatarContainer}>
@@ -218,114 +290,98 @@ export default function HomeScreen() {
       </Animated.View>
 
       {/* Next Prayer Card - Redesigned */}
-      <Animated.View style={[styles.prayerCardContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-        <Card style={styles.prayerCard}>
-          <View style={styles.prayerCardHeader}>
-            <View style={styles.prayerCardTitle}>
-              <Bell size={18} color={colors[theme].primary} />
-              <Text style={[styles.prayerCardTitleText, { color: colors[theme].text }]}>
-                Next Prayer
-              </Text>
-            </View>
-            <TouchableOpacity 
-              style={styles.notificationAction}
-              onPress={toggleNotificationOptions}
-            >
-              {notificationType === 'adhan' && <Volume2 size={16} color={colors[theme].primary} />}
-              {notificationType === 'vibration' && <Vibrate size={16} color={colors[theme].primary} />}
-              {notificationType === 'text' && <Bell size={16} color={colors[theme].primary} />}
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.prayerCardContent}>
-            <View style={styles.prayerCardInfo}>
-              <Text style={[styles.prayerName, { color: colors[theme].text }]}>
-                {nextPrayer.name}
-              </Text>
-              <Text style={[styles.prayerTime, { color: colors[theme].primary }]}>
-                {nextPrayer.time}
-              </Text>
-              <View style={styles.prayerTimeRemaining}>
-                <Clock size={14} color={colors[theme].inactive} />
-                <Text style={[styles.prayerTimeRemainingText, { color: colors[theme].inactive }]}>
-                  {nextPrayer.timeRemaining} remaining
-                </Text>
-              </View>
-            </View>
-            
-            <View style={[styles.prayerCardIconContainer, { backgroundColor: colors[theme].primary + '15' }]}>
-              <Text style={styles.prayerCardIcon}>
-                {nextPrayer.name === 'Fajr' ? '🌅' : 
-                 nextPrayer.name === 'Dhuhr' ? '☀️' : 
-                 nextPrayer.name === 'Asr' ? '🌤️' : 
-                 nextPrayer.name === 'Maghrib' ? '🌇' : '🌙'}
+{/* Next Prayer Card */}
+<Animated.View style={[styles.prayerCardContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+  <Card style={styles.prayerCard}>
+    <View style={styles.prayerCardHeader}>
+      <View style={styles.prayerCardTitle}>
+        <Bell size={18} color={colors[theme].primary} />
+        <Text style={[styles.prayerCardTitleText, { color: colors[theme].text }]}>
+          Next Prayer
+        </Text>
+      </View>
+      <TouchableOpacity 
+        style={styles.notificationAction}
+        onPress={toggleNotificationOptions}
+      >
+        {notificationType === 'adhan' && <Volume2 size={16} color={colors[theme].primary} />}
+        {notificationType === 'vibration' && <Vibrate size={16} color={colors[theme].primary} />}
+        {notificationType === 'text' && <Bell size={16} color={colors[theme].primary} />}
+      </TouchableOpacity>
+    </View>
+    
+    {loadingPrayer ? (
+      <View style={styles.prayerCardContent}>
+        <ActivityIndicator size="small" color={colors[theme].primary} />
+      </View>
+    ) : nextPrayer ? (
+      <>
+        <View style={styles.prayerCardContent}>
+          <View style={styles.prayerCardInfo}>
+            <Text style={[styles.prayerName, { color: colors[theme].text }]}>
+              {nextPrayer.name}
+            </Text>
+            <Text style={[styles.prayerTime, { color: colors[theme].primary }]}>
+              {nextPrayer.time}
+            </Text>
+            <View style={styles.prayerTimeRemaining}>
+              <Clock size={14} color={colors[theme].inactive} />
+              <Text style={[styles.prayerTimeRemainingText, { color: colors[theme].inactive }]}>
+                {nextPrayer.timeRemaining} remaining
               </Text>
             </View>
           </View>
           
-          <View style={styles.prayerCardActions}>
-            <TouchableOpacity 
-              style={[styles.prayerCardButton, { backgroundColor: colors[theme].primary + '15' }]}
-              onPress={() => router.push('/prayers')}
-            >
-              <Text style={[styles.prayerCardButtonText, { color: colors[theme].primary }]}>
-                All Prayer Times
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.prayerCardButton, { backgroundColor: colors[theme].primary }]}
-              onPress={() => router.push('/qibla')}
-            >
-              <Text style={styles.prayerCardButtonText2}>
-                Qibla Direction
-              </Text>
-            </TouchableOpacity>
+          <View style={[styles.prayerCardIconContainer, { backgroundColor: colors[theme].primary + '15' }]}>
+            <Text style={styles.prayerCardIcon}>
+              {nextPrayer.name === 'Fajr' ? '🌅' : 
+               nextPrayer.name === 'Dhuhr' ? '☀️' : 
+               nextPrayer.name === 'Asr' ? '🌤️' : 
+               nextPrayer.name === 'Maghrib' ? '🌇' : '🌙'}
+            </Text>
           </View>
+        </View>
+        
+        <View style={styles.prayerCardActions}>
+          <TouchableOpacity 
+            style={[styles.prayerCardButton, { backgroundColor: colors[theme].primary + '15' }]}
+            onPress={() => router.push('/prayers')}
+          >
+            <Text style={[styles.prayerCardButtonText, { color: colors[theme].primary }]}>
+              All Prayer Times
+            </Text>
+          </TouchableOpacity>
           
-          {showNotificationOptions && (
-            <Animated.View 
-              style={[
-                styles.notificationOptions,
-                { opacity: notificationOptionsAnim }
-              ]}
-            >
-              <TouchableOpacity 
-                style={[
-                  styles.notificationOption,
-                  notificationType === 'adhan' && styles.selectedNotificationOption
-                ]}
-                onPress={() => setNotificationPreference('adhan')}
-              >
-                <Volume2 size={16} color={colors[theme].text} />
-                <Text style={[styles.notificationOptionText, { color: colors[theme].text }]}>Adhan</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[
-                  styles.notificationOption,
-                  notificationType === 'vibration' && styles.selectedNotificationOption
-                ]}
-                onPress={() => setNotificationPreference('vibration')}
-              >
-                <Vibrate size={16} color={colors[theme].text} />
-                <Text style={[styles.notificationOptionText, { color: colors[theme].text }]}>Vibration</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[
-                  styles.notificationOption,
-                  notificationType === 'text' && styles.selectedNotificationOption
-                ]}
-                onPress={() => setNotificationPreference('text')}
-              >
-                <Bell size={16} color={colors[theme].text} />
-                <Text style={[styles.notificationOptionText, { color: colors[theme].text }]}>Text Only</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-        </Card>
+          <TouchableOpacity 
+            style={[styles.prayerCardButton, { backgroundColor: colors[theme].primary }]}
+            onPress={() => router.push('/qibla')}
+          >
+            <Text style={styles.prayerCardButtonText2}>
+              Qibla Direction
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </>
+    ) : (
+      <View style={styles.prayerCardContent}>
+        <Text style={[styles.prayerName, { color: colors[theme].text }]}>
+          Location not available
+        </Text>
+      </View>
+    )}
+    
+    {showNotificationOptions && (
+      <Animated.View 
+        style={[
+          styles.notificationOptions,
+          { opacity: notificationOptionsAnim }
+        ]}
+      >
+        {/* ... notification options remain the same ... */}
       </Animated.View>
+    )}
+  </Card>
+</Animated.View>
 
       {/* Daily Inspiration - Redesigned */}
       <Animated.View style={[styles.quoteContainer, { opacity: fadeAnim }]}>

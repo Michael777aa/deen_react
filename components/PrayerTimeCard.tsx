@@ -1,9 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Card } from './Card';
-import { PrayerTime } from '@/types';
+import { Card } from '@/components/Card';
 import { colors } from '@/constants/colors';
 import { useSettingsStore } from '@/store/useSettingsStore';
+
+interface PrayerTime {
+  name: string;
+  time: string;
+  arabicName: string;
+}
 
 interface PrayerTimeCardProps {
   prayerTime: PrayerTime;
@@ -16,14 +21,16 @@ export const PrayerTimeCard: React.FC<PrayerTimeCardProps> = ({
 }) => {
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
-
+  const cardStyle = {
+    ...styles.card,
+    ...(isNext && { 
+      borderLeftWidth: 4, 
+      borderLeftColor: colors[theme].primary 
+    })
+  };
+  
   return (
-    <Card
-      style={[
-        styles.card,
-        isNext && { borderLeftWidth: 4, borderLeftColor: colors[theme].primary }
-      ]}
-    >
+    <Card style={cardStyle}>
       <View style={styles.content}>
         <View>
           <Text style={[styles.name, { color: colors[theme].text }]}>
