@@ -1,29 +1,15 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity,
-  FlatList,
-  RefreshControl
-} from 'react-native';
+import { View, StyleSheet } from "react-native";
 
-import { Video, Calendar, Clock, Filter } from 'lucide-react-native';
-import { StreamTabs } from '@/components/StreamTabs';
+import { StreamTabs } from "@/components/StreamTabs";
 
 export default function StreamsScreen() {
-
-
-
-
   return (
-   <>
-    <StreamTabs /></>
-
+    <>
+      <View style={{ flex: 1 }}>
+        <StreamTabs />
+      </View>
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  
-});
+const styles = StyleSheet.create({});

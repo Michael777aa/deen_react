@@ -8,21 +8,21 @@
     "scheme": "modernwash",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.odette.carwash"
+      "bundleIdentifier": "com.odette.carwash",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs camera access to stream live video.",
+        "NSMicrophoneUsageDescription": "This app needs microphone access to stream live audio.",
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby prayer times.",
+        "NSLocationAlwaysUsageDescription": "This app uses your location to provide accurate reminders even in the background."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-
       "edgeToEdgeEnabled": true,
       "package": "com.odette.carwash"
     },
@@ -48,8 +48,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "203087cc-a677-4ca2-8e8b-f106778dce89"
+        "projectId": "dddc2bc3-855a-43e9-a63b-4697894eb276"
       }
-    }
+    },
+    "owner": "mikee27a"
   }
 }

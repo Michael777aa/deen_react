@@ -1,6 +1,5 @@
-// src/app/streams/broadcast.tsx
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Platform, PermissionsAndroid } from 'react-native';
+import { View, Text } from 'react-native';
 import {
   createAgoraRtcEngine,
   ChannelProfileType,
@@ -8,28 +7,22 @@ import {
   RtcSurfaceView,
   RenderModeType,
 } from 'react-native-agora';
-import { useLocalSearchParams } from 'expo-router';
+import { Camera } from 'expo-camera';
+import { Audio } from 'expo-av';
 
 const APP_ID = '813a6d4def9b4ed090e62592497f2cc7';
-const TOKEN = ''; // Empty token works only if project uses "App ID" authentication mode
-
-const requestPermissions = async () => {
-  if (Platform.OS === 'android') {
-    await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-    ]);
-  }
-};
+const TOKEN = '';
+const CHANNEL_NAME = 'test';
+const UID = 1234;
 
 export default function BroadcastScreen() {
-  const { streamKey } = useLocalSearchParams<{ streamKey: string }>();
-  const CHANNEL_NAME = `${streamKey}`;
   const engineRef = useRef(createAgoraRtcEngine());
 
   useEffect(() => {
-    const initAgora = async () => {
-      await requestPermissions(); // 👈 Request permissions before engine init
+    (async () => {
+      const { status: camStatus } = await Camera.requestCameraPermissionsAsync();
+      const { status: micStatus } = await Audio.requestPermissionsAsync();
+      console.log('📷 Camera:', camStatus, '🎙️ Mic:', micStatus);
 
       const engine = engineRef.current;
 
@@ -42,72 +35,36 @@ export default function BroadcastScreen() {
       engine.enableVideo();
 
       engine.setupLocalVideo({
-        uid: 0,
-        renderMode: RenderModeType.RenderModeHidden,
+        uid: UID,
+        renderMode: RenderModeType.RenderModeFit,
       });
 
       engine.startPreview();
 
-      engine.startRtmpStreamWithTranscoding(
-        `rtmps://global-live.mux.com/app/${streamKey}`,
-        {
-          width: 640,
-          height: 360,
-          videoBitrate: 400,
-          videoFramerate: 15,
-          videoGop: 30,
-          audioSampleRate: 44100,
-          audioBitrate: 48,
-          audioChannels: 1,
-          transcodingUsers: [
-            {
-              uid: 0,
-              x: 0,
-              y: 0,
-              width: 640,
-              height: 360,
-              zOrder: 1,
-            },
-          ],
-        }
-      );
+      engine.registerEventHandler({
+        onJoinChannelSuccess: () => console.log('✅ Joined channel'),
+        onError: (err) => console.error('❌ Agora Error:', err),
+      });
 
-      engine.joinChannel(TOKEN, CHANNEL_NAME, 0, {
+      engine.joinChannel(TOKEN, CHANNEL_NAME, UID, {
         clientRoleType: ClientRoleType.ClientRoleBroadcaster,
       });
-    };
-
-    initAgora();
+    })();
 
     return () => {
       const engine = engineRef.current;
       engine.leaveChannel();
-      engine.stopRtmpStream(`rtmps://global-live.mux.com/app/${streamKey}`);
       engine.release();
     };
-  }, [streamKey]);
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🔴 Broadcasting Live to Mux</Text>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}>
+      <Text style={{ color: '#fff', marginBottom: 10 }}>🎥 Preview</Text>
       <RtcSurfaceView
-        style={styles.preview}
-        canvas={{ uid: 0, renderMode: RenderModeType.RenderModeHidden }}
+        style={{ width: 320, height: 240, backgroundColor: 'black' }}
+        canvas={{ uid: UID, renderMode: RenderModeType.RenderModeFit }}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
-  title: {
-    color: '#fff',
-    fontSize: 18,
-    textAlign: 'center',
-    marginVertical: 10,
-  },
-  preview: {
-    flex: 1,
-    backgroundColor: 'black',
-  },
-});

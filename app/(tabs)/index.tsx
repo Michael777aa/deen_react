@@ -413,7 +413,10 @@ export default function HomeScreen() {
       </Animated.View>
 
       {/* Live Streams Section - Redesigned */}
-   <StreamTabs />
+      <View style={{ flex: 1 }}>
+  <StreamTabs />
+</View>
+
 
       {/* Quick Actions - Redesigned */}
       <Text style={[styles.sectionTitle, { color: colors[theme].text, marginTop: 24 }]}>

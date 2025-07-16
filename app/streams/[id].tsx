@@ -9,7 +9,8 @@ import {
   Image,
   ActivityIndicator,
   Dimensions,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native';
 import { Stack, useLocalSearchParams, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -28,12 +29,13 @@ import {
   Users, 
   Video as VideoIcon,
   ChevronLeft,
-  Send
+  Send,
 } from 'lucide-react-native';
 import { useAuth } from '@/context/auth';
 import StreamCard from '@/components/StreamCard';
 import { StreamStatus } from '@/types/stream.enum';
 import { StreamService } from '@/redux/features/streams/streamApi';
+import Broadcast from './broadcast';
 
 const { width } = Dimensions.get('window');
 
@@ -51,6 +53,7 @@ const StreamDetailScreen = () => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [isLiked, setIsLiked] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   
   const fetchStream = useCallback(async () => {
     try {
@@ -61,6 +64,7 @@ const StreamDetailScreen = () => {
       const related = await StreamService.getStreamsByType(fetchedStream.type);
       setRelatedStreams(related.filter((s:any) => s._id !== id).slice(0, 3));
       setIsLiked(false);
+      setIsStreaming(fetchedStream.status === StreamStatus.LIVE);
     } catch (error) {
       console.error('Error fetching stream:', error);
     } finally {
@@ -93,6 +97,40 @@ const StreamDetailScreen = () => {
       setCommentText('');
     } catch (error) {
       console.error('Error adding comment:', error);
+    }
+  };
+
+  const handleStartStreaming = async () => {
+    if (!stream) return;
+    
+    try {
+      setIsLoading(true);
+      const updatedStream = await StreamService.startStream(stream._id);
+      setStream(updatedStream);
+      setIsStreaming(true);
+      Alert.alert('Stream Started', 'You are now live streaming!');
+    } catch (error) {
+      console.error('Error starting stream:', error);
+      Alert.alert('Error', 'Failed to start the stream');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStopStreaming = async () => {
+    if (!stream) return;
+    
+    try {
+      setIsLoading(true);
+      const updatedStream = await StreamService.endStream(stream._id);
+      setStream(updatedStream);
+      setIsStreaming(false);
+      Alert.alert('Stream Ended', 'Your stream has been successfully ended');
+    } catch (error) {
+      console.error('Error stopping stream:', error);
+      Alert.alert('Error', 'Failed to stop the stream');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -133,12 +171,17 @@ const StreamDetailScreen = () => {
   if (!stream) {
     return (
       <View style={[styles.container, { backgroundColor: colors[theme].background }]}>
-        <Text >
+        <Text style={{ color: colors[theme].text }}>
           Stream not found
         </Text>
       </View>
     );
   }
+
+  const isOwner = user?.email ;
+  const isUpcoming = stream.status === StreamStatus.UPCOMING;
+  const isLive = stream.status === StreamStatus.LIVE;
+  const isEnded = stream.status === StreamStatus.RECORDED;
 
   return (
     <>
@@ -157,47 +200,80 @@ const StreamDetailScreen = () => {
             source={{ uri: stream.thumbnailUrl || 'https://via.placeholder.com/300' }} 
             style={styles.videoPlaceholder}
           />
-          <View style={styles.videoControls}>
-            <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-              <ChevronLeft size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-            
-            <View style={styles.centerControls}>
-              <TouchableOpacity style={styles.playButton} onPress={togglePlayPause}>
-                {isPlaying ? (
-                  <Pause size={32} color="#FFFFFF" />
-                ) : (
-                  <Play size={32} color="#FFFFFF" fill="#FFFFFF" />
-                )}
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.bottomControls}>
-              <TouchableOpacity style={styles.controlButton} onPress={toggleMute}>
-                {isMuted ? (
-                  <VolumeX size={20} color="#FFFFFF" />
-                ) : (
-                  <Volume2 size={20} color="#FFFFFF" />
-                )}
+          
+          {isLive ? (
+            <View style={styles.videoControls}>
+              <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+                <ChevronLeft size={24} color="#FFFFFF" />
               </TouchableOpacity>
               
-              <View style={styles.progressContainer}>
-                <View style={styles.progressBar}>
-                  <View style={[styles.progress, { width: '30%' }]} />
-                </View>
-                <Text style={styles.timeText}>00:00 / {stream.isPrivate || '--:--'}</Text>
+              <View style={styles.centerControls}>
+                <TouchableOpacity style={styles.playButton} onPress={togglePlayPause}>
+                  {isPlaying ? (
+                    <Pause size={32} color="#FFFFFF" />
+                  ) : (
+                    <Play size={32} color="#FFFFFF" fill="#FFFFFF" />
+                  )}
+                </TouchableOpacity>
               </View>
               
-              <TouchableOpacity style={styles.controlButton}>
-                <Maximize size={20} color="#FFFFFF" />
-              </TouchableOpacity>
+              <View style={styles.bottomControls}>
+                <TouchableOpacity style={styles.controlButton} onPress={toggleMute}>
+                  {isMuted ? (
+                    <VolumeX size={20} color="#FFFFFF" />
+                  ) : (
+                    <Volume2 size={20} color="#FFFFFF" />
+                  )}
+                </TouchableOpacity>
+                
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBar}>
+                    <View style={[styles.progress, { width: '30%' }]} />
+                  </View>
+                  <Text style={styles.timeText}>00:00 / --:--</Text>
+                </View>
+                
+                <TouchableOpacity style={styles.controlButton}>
+                  <Maximize size={20} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          ) : (
+            <View style={styles.upcomingOverlay}>
+              <Text style={styles.upcomingText}>
+                {isUpcoming ? 'Stream starts soon' : 'Stream has ended'}
+              </Text>
+              {isUpcoming && (
+                <Text style={styles.scheduledTime}>
+                  {formatDate(stream.scheduledStartTime)}
+                </Text>
+              )}
+            </View>
+          )}
           
-          {stream.status === StreamStatus.LIVE  && (
+          {isLive && (
             <View style={styles.liveIndicator}>
               <Text style={styles.liveText}>LIVE</Text>
             </View>
+          )}
+          
+          {isOwner && isUpcoming && (
+            <TouchableOpacity 
+              style={styles.startStreamButton}
+              onPress={handleStartStreaming}
+            >
+              <Broadcast />
+              <Text style={styles.startStreamText}>Start Streaming</Text>
+            </TouchableOpacity>
+          )}
+          
+          {isOwner && isLive && (
+            <TouchableOpacity 
+              style={styles.stopStreamButton}
+              onPress={handleStopStreaming}
+            >
+              <Text style={styles.stopStreamText}>End Stream</Text>
+            </TouchableOpacity>
           )}
         </View>
         
@@ -207,7 +283,7 @@ const StreamDetailScreen = () => {
           </Text>
           
           <View style={styles.metaRow}>
-            {stream.status === StreamStatus.LIVE ? (
+            {isLive ? (
               <View style={styles.metaItem}>
                 <Users size={16} color={colors[theme].inactive} />
                 <Text style={[styles.metaText, { color: colors[theme].inactive }]}>
@@ -407,11 +483,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     position: 'relative',
   },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   videoPlaceholder: {
     width: '100%',
     height: '100%',
@@ -468,7 +539,6 @@ const styles = StyleSheet.create({
   },
   progress: {
     height: '100%',
-  
   },
   timeText: {
     color: '#FFF',
@@ -486,6 +556,49 @@ const styles = StyleSheet.create({
   liveText: {
     color: '#FFF',
     fontSize: 12,
+    fontWeight: 'bold',
+  },
+  upcomingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  upcomingText: {
+    color: '#FFF',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  scheduledTime: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  startStreamButton: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  startStreamText: {
+    color: '#FFF',
+    marginLeft: 8,
+    fontWeight: 'bold',
+  },
+  stopStreamButton: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  stopStreamText: {
+    color: '#FFF',
     fontWeight: 'bold',
   },
   streamInfo: {
