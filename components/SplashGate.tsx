@@ -9,7 +9,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 
 // ✅ Only call this once and outside the component
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 export default function SplashGate({ children }: { children: React.ReactNode }) {
   const colorScheme = useColorScheme();
@@ -26,41 +26,43 @@ export default function SplashGate({ children }: { children: React.ReactNode }) 
   }, [colorScheme]);
 
   useEffect(() => {
-    async function prepare() {
-      await new Promise(resolve => setTimeout(resolve, 1500)); // optional delay
-    }
-
     async function runAnimation() {
-      await prepare();
-
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 1.2,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ]).start(async () => {
-        // ✅ Hide native splash screen after animation
+      try {
+        await SplashScreen.preventAutoHideAsync(); // ✅ Move it here
+        await new Promise(resolve => setTimeout(resolve, 1500));
+  
+        await new Promise<void>((resolve) => {
+          Animated.sequence([
+            Animated.timing(scaleAnim, {
+              toValue: 1.2,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+            Animated.timing(scaleAnim, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+            Animated.timing(fadeAnim, {
+              toValue: 0,
+              duration: 800,
+              useNativeDriver: true,
+            }),
+          ]).start(() => resolve());
+        });
+  
         await SplashScreen.hideAsync();
         setIsReady(true);
-      });
+      } catch (e) {
+        console.warn(e);
+      }
     }
-
+  
     if (fontsLoaded) {
       runAnimation();
     }
   }, [fontsLoaded]);
-
+  
   if (!isReady) {
     const bgColor = darkMode ? colors.dark.background : colors.light.background;
     const textColor = darkMode ? colors.dark.text : colors.light.text;

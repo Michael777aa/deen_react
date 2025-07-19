@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/redux/features/api/apiSlice";
+
 export type AuthUser = {
   sub: string;
   email: string;
@@ -6,3 +8,4 @@ export type AuthUser = {
   provider?: string;
   exp?: number;
 };
+export const staticBase = API_BASE_URL.replace("/api/v1", "");

@@ -12,10 +12,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.odette.carwash",
       "infoPlist": {
-        "NSCameraUsageDescription": "This app needs camera access to stream live video.",
-        "NSMicrophoneUsageDescription": "This app needs microphone access to stream live audio.",
         "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby prayer times.",
-        "NSLocationAlwaysUsageDescription": "This app uses your location to provide accurate reminders even in the background."
+        "NSLocationAlwaysUsageDescription": "This app uses your location to provide accurate reminders even in the background.",
+             "NSCameraUsageDescription": "We need access to your camera to scan products."
       }
     },
     "android": {

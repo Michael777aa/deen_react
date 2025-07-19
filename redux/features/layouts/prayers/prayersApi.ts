@@ -29,6 +29,7 @@ export const getNextPrayer = async (
         params: { latitude, longitude },
       }
     );
+
     return response.data;
   } catch (error) {
     console.error("Error fetching next prayer:", error);
@@ -43,7 +44,6 @@ export const getQiblaDirection = async (
     const response = await axios.get(`${API_BASE_URL}/qibla/direction`, {
       params: { latitude, longitude },
     });
-    console.log("GET QIBLA", response.data);
 
     return response.data;
   } catch (error) {

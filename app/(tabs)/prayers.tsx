@@ -15,13 +15,14 @@ import { PrayerTimeCard } from "@/components/PrayerTimeCard";
 import { colors } from "@/constants/colors";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card } from "@/components/Card";
-import { Bell, BellOff } from "lucide-react-native";
+import { ArrowLeft, Bell, BellOff } from "lucide-react-native";
 import { useLocation } from "@/context/useLocation";
 import { IPrayerTime, IPrayerTimes } from "@/types/prayer";
 import {
   getNextPrayer,
   getPrayerTimes,
 } from "@/redux/features/layouts/prayers/prayersApi";
+import { router } from "expo-router";
 
 export default function PrayersScreen() {
   const { darkMode } = useSettingsStore();
@@ -136,7 +137,11 @@ export default function PrayersScreen() {
         />
       }
     >
+ 
       <View style={styles.headerRow}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+          <ArrowLeft size={24} color={colors[theme].text} />
+        </TouchableOpacity>
         <Text style={[styles.screenTitle, { color: colors[theme].text }]}>
           Prayer Times
         </Text>
@@ -346,5 +351,8 @@ const styles = StyleSheet.create({
   refreshButtonText: {
     color: "#FFFFFF",
     fontWeight: "bold",
+  },
+  headerButton: {
+    padding: 8,
   },
 });

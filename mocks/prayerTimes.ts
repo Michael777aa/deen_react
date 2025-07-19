@@ -63,3 +63,30 @@ export const getNextPrayer = (): PrayerTime => {
     timeRemaining,
   };
 };
+export const featuredContent = [
+  {
+    id: "1",
+    title: "Complete Umrah Guide",
+    description:
+      "Step-by-step guide for performing Umrah with duas and rituals",
+    image:
+      "https://images.unsplash.com/photo-1604480132736-44c188fe4d20?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    route: "/umrah",
+  },
+  {
+    id: "2",
+    title: "Ramadan Preparation",
+    description: "Get ready for the blessed month with these essential tips",
+    image:
+      "https://images.unsplash.com/photo-1532635241-17e820acc59f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    route: "/ramadan",
+  },
+  {
+    id: "3",
+    title: "Islamic Finance Basics",
+    description: "Learn about halal investments and financial planning",
+    image:
+      "https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    route: "/finance",
+  },
+];
