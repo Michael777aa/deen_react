@@ -1,3 +1,5 @@
+// IslamicAssistantScreen.tsx
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
@@ -16,7 +18,7 @@ import {
 import { ChatMessage } from '@/components/ChatMessage';
 import { colors } from '@/constants/colors';
 import { useSettingsStore } from '@/store/useSettingsStore';
-import { Send, Mic, Link as LinkIcon } from 'lucide-react-native';
+import { Send, Mic, Link as LinkIcon, RefreshCw } from 'lucide-react-native';
 import { Audio } from 'expo-av';
 import { ErrorToast } from '@/components/ErrorToast';
 import { SuggestedQuestions } from '@/components/SuggestedQuestions';
@@ -37,18 +39,16 @@ export default function IslamicAssistantScreen() {
     sendMessage,
     sendVoiceMessage,
     isLoading,
-    sessionId,
-    blockchainHash,
     relatedLinks,
     startNewSession,
     error,
     clearError,
   } = useChatStore();
 
-  const { user } = useAuth(); // ✅ VALID HOOK USAGE
-
+  const { user } = useAuth();
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
+
   const [input, setInput] = useState('');
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -57,7 +57,7 @@ export default function IslamicAssistantScreen() {
   const handleSend = useCallback(async () => {
     if (input.trim() === '' || isLoading || !user?.email) return;
     Keyboard.dismiss();
-    await sendMessage(input.trim(), user.email); // ✅ PASS EMAIL
+    await sendMessage(input.trim(), user.email);
     setInput('');
   }, [input, isLoading, sendMessage, user?.email]);
 
@@ -100,14 +100,14 @@ export default function IslamicAssistantScreen() {
 
     try {
       await recording.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync({ 
-        allowsRecordingIOS: false, 
-        playsInSilentModeIOS: true 
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
       });
 
       const uri = recording.getURI();
       if (uri && user?.email) {
-        await sendVoiceMessage(uri, user.email); // ✅ PASS EMAIL
+        await sendVoiceMessage(uri, user.email);
       }
     } catch (err) {
       console.error('Recording error:', err);
@@ -149,14 +149,9 @@ export default function IslamicAssistantScreen() {
             </Text>
           </TouchableOpacity>
         ))}
-        {blockchainHash && (
-          <Text style={[styles.blockchainText, { color: colors[theme].text }]}>
-            Session verified on blockchain: {blockchainHash.slice(0, 16)}...
-          </Text>
-        )}
       </View>
     );
-  }, [relatedLinks, blockchainHash, theme]);
+  }, [relatedLinks, theme]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -173,15 +168,11 @@ export default function IslamicAssistantScreen() {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       {error && (
-        <ErrorToast 
-          message={error} 
-          onDismiss={clearError} 
-          theme={theme}
-        />
+        <ErrorToast message={error} onDismiss={clearError} theme={theme} />
       )}
 
       {messages.length <= 2 && (
-        <SuggestedQuestions 
+        <SuggestedQuestions
           questions={SUGGESTED_QUESTIONS}
           onSelect={handleQuestionSelect}
           theme={theme}
@@ -197,8 +188,6 @@ export default function IslamicAssistantScreen() {
         ListFooterComponent={renderFooter}
         keyboardDismissMode="on-drag"
         initialNumToRender={10}
-        maxToRenderPerBatch={5}
-        windowSize={7}
       />
 
       {isLoading && (
@@ -214,8 +203,8 @@ export default function IslamicAssistantScreen() {
         backgroundColor: colors[theme].card,
         borderTopColor: colors[theme].border,
       }]}>
-        <TouchableOpacity 
-          style={styles.voiceButton} 
+        <TouchableOpacity
+          style={styles.voiceButton}
           onPress={toggleRecording}
           disabled={isLoading}
         >
@@ -264,22 +253,21 @@ export default function IslamicAssistantScreen() {
         </TouchableOpacity>
       </View>
 
-      {messages.length > 2 && (
-        <TouchableOpacity
-          style={[styles.newSessionButton, { backgroundColor: colors[theme].primary }]}
-          onPress={startNewSession}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.newSessionButtonText}>Start New Session</Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity
+        style={[styles.floatingNewSession, { backgroundColor: colors[theme].primary }]}
+        onPress={startNewSession}
+        activeOpacity={0.8}
+      >
+        <RefreshCw size={16} color="#FFF" style={{ marginRight: 6 }} />
+        <Text style={styles.newSessionButtonText}>Start New Session</Text>
+      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  messageList: { padding: 16, paddingBottom: 20 },
+  messageList: { padding: 16, paddingBottom: 40 },
   loadingContainer: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 8,
   },
@@ -300,7 +288,7 @@ const styles = StyleSheet.create({
     width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center',
   },
   linksContainer: {
-    padding: 16, borderRadius: 12, margin: 16, marginTop: 8,
+    padding: 16, borderRadius: 12, marginHorizontal: 16, marginVertical: 10,
   },
   linksTitle: {
     fontSize: 16, fontWeight: '600', marginBottom: 12,
@@ -310,11 +298,22 @@ const styles = StyleSheet.create({
   },
   linkIcon: { marginRight: 8 },
   linkText: { flex: 1, fontSize: 14 },
-  blockchainText: { fontSize: 12, marginTop: 12, fontStyle: 'italic' },
-  newSessionButton: {
-    margin: 16, padding: 12, borderRadius: 8, alignItems: 'center',
+  floatingNewSession: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 16,
+    bottom: 90,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 30,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
   newSessionButtonText: {
-    color: '#FFFFFF', fontWeight: 'bold',
+    color: '#FFFFFF', fontWeight: 'bold', fontSize: 14,
   },
 });

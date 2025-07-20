@@ -99,8 +99,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
             timestamp: Date.now(),
           },
         ],
-        sessionId: response.sessionId,
-        blockchainHash: response.blockchainHash,
+
         relatedLinks: response.links,
         isLoading: false,
       });

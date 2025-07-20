@@ -16,7 +16,6 @@ export const analyzeText = async (
       sessionId,
     }
   );
-  console.log("ANALYZE TEXT", response);
 
   return response.data;
 };
