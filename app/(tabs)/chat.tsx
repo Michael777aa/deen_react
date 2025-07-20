@@ -1,6 +1,6 @@
 // IslamicAssistantScreen.tsx
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -14,23 +14,23 @@ import {
   Alert,
   Linking,
   Keyboard,
-} from 'react-native';
-import { ChatMessage } from '@/components/ChatMessage';
-import { colors } from '@/constants/colors';
-import { useSettingsStore } from '@/store/useSettingsStore';
-import { Send, Mic, Link as LinkIcon, RefreshCw } from 'lucide-react-native';
-import { Audio } from 'expo-av';
-import { ErrorToast } from '@/components/ErrorToast';
-import { SuggestedQuestions } from '@/components/SuggestedQuestions';
-import { useChatStore } from '@/hooks/useChatgpt';
-import { useAuth } from '@/context/auth';
+} from "react-native";
+import { ChatMessage } from "@/components/ChatMessage";
+import { colors } from "@/constants/colors";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { Send, Mic, Link as LinkIcon, RefreshCw } from "lucide-react-native";
+import { Audio } from "expo-av";
+import { ErrorToast } from "@/components/ErrorToast";
+import { SuggestedQuestions } from "@/components/SuggestedQuestions";
+import { useChatStore } from "@/hooks/useChatgpt";
+import { useAuth } from "@/context/auth";
 
 const SUGGESTED_QUESTIONS = [
-  'What are the five pillars of Islam?',
-  'How to perform Tayammum?',
-  'Explain Surah Al-Kahf benefits',
+  "What are the five pillars of Islam?",
+  "How to perform Tayammum?",
+  "Explain Surah Al-Kahf benefits",
   "Authentic du'a for anxiety",
-  'Rules of inheritance in Islam',
+  "Rules of inheritance in Islam",
 ];
 
 export default function IslamicAssistantScreen() {
@@ -47,18 +47,18 @@ export default function IslamicAssistantScreen() {
 
   const { user } = useAuth();
   const { darkMode } = useSettingsStore();
-  const theme = darkMode ? 'dark' : 'light';
+  const theme = darkMode ? "dark" : "light";
 
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   const handleSend = useCallback(async () => {
-    if (input.trim() === '' || isLoading || !user?.email) return;
+    if (input.trim() === "" || isLoading || !user?.email) return;
     Keyboard.dismiss();
     await sendMessage(input.trim(), user.email);
-    setInput('');
+    setInput("");
   }, [input, isLoading, sendMessage, user?.email]);
 
   const toggleRecording = useCallback(async () => {
@@ -72,7 +72,7 @@ export default function IslamicAssistantScreen() {
   const startRecording = useCallback(async () => {
     try {
       const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
+      if (status !== "granted") {
         Alert.alert("Permission Denied", "Microphone access is required.");
         return;
       }
@@ -89,8 +89,8 @@ export default function IslamicAssistantScreen() {
       setRecording(recording);
       setIsRecording(true);
     } catch (err) {
-      console.error('Recording error:', err);
-      Alert.alert('Error', 'Could not start recording');
+      console.error("Recording error:", err);
+      Alert.alert("Error", "Could not start recording");
     }
   }, []);
 
@@ -110,7 +110,7 @@ export default function IslamicAssistantScreen() {
         await sendVoiceMessage(uri, user.email);
       }
     } catch (err) {
-      console.error('Recording error:', err);
+      console.error("Recording error:", err);
     } finally {
       setRecording(null);
     }
@@ -120,38 +120,12 @@ export default function IslamicAssistantScreen() {
     setInput(question);
   }, []);
 
-  const renderItem = useCallback(({ item }: { item: any }) => (
-    <ChatMessage message={item} />
-  ), []);
+  const renderItem = useCallback(
+    ({ item }: { item: any }) => <ChatMessage message={item} />,
+    []
+  );
 
-  const renderFooter = useCallback(() => {
-    if (!relatedLinks?.length) return null;
 
-    return (
-      <View style={[styles.linksContainer, { backgroundColor: colors[theme].card }]}>
-        <Text style={[styles.linksTitle, { color: colors[theme].text }]}>
-          Related Islamic Resources
-        </Text>
-        {relatedLinks.map((link: string, index: number) => (
-          <TouchableOpacity
-            key={`link-${index}`}
-            style={styles.linkItem}
-            onPress={() => Linking.openURL(link)}
-            activeOpacity={0.7}
-          >
-            <LinkIcon size={16} color={colors[theme].primary} style={styles.linkIcon} />
-            <Text
-              style={[styles.linkText, { color: colors[theme].primary }]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {link.replace(/^https?:\/\/(www\.)?/, '')}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    );
-  }, [relatedLinks, theme]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -164,8 +138,8 @@ export default function IslamicAssistantScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors[theme].background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
       {error && (
         <ErrorToast message={error} onDismiss={clearError} theme={theme} />
@@ -185,7 +159,6 @@ export default function IslamicAssistantScreen() {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.messageList}
-        ListFooterComponent={renderFooter}
         keyboardDismissMode="on-drag"
         initialNumToRender={10}
       />
@@ -199,10 +172,15 @@ export default function IslamicAssistantScreen() {
         </View>
       )}
 
-      <View style={[styles.inputContainer, {
-        backgroundColor: colors[theme].card,
-        borderTopColor: colors[theme].border,
-      }]}>
+      <View
+        style={[
+          styles.inputContainer,
+          {
+            backgroundColor: colors[theme].card,
+            borderTopColor: colors[theme].border,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.voiceButton}
           onPress={toggleRecording}
@@ -211,10 +189,15 @@ export default function IslamicAssistantScreen() {
           <Mic
             size={24}
             color={isRecording ? colors[theme].error : colors[theme].primary}
-            fill={isRecording ? colors[theme].error : 'none'}
+            fill={isRecording ? colors[theme].error : "none"}
           />
           {isRecording && (
-            <View style={[styles.recordingIndicator, { backgroundColor: colors[theme].error }]} />
+            <View
+              style={[
+                styles.recordingIndicator,
+                { backgroundColor: colors[theme].error },
+              ]}
+            />
           )}
         </TouchableOpacity>
 
@@ -233,9 +216,14 @@ export default function IslamicAssistantScreen() {
           onChangeText={setInput}
           multiline
           maxLength={500}
-          onSubmitEditing={handleSend}
           editable={!isLoading}
           returnKeyType="send"
+          blurOnSubmit={false}
+          onKeyPress={({ nativeEvent }) => {
+            if (nativeEvent.key === "Enter") {
+              handleSend();
+            }
+          }}
         />
 
         <TouchableOpacity
@@ -243,18 +231,21 @@ export default function IslamicAssistantScreen() {
             styles.sendButton,
             {
               backgroundColor: colors[theme].primary,
-              opacity: input.trim() === '' || isLoading ? 0.5 : 1,
+              opacity: input.trim() === "" || isLoading ? 0.5 : 1,
             },
           ]}
           onPress={handleSend}
-          disabled={input.trim() === '' || isLoading}
+          disabled={input.trim() === "" || isLoading}
         >
           <Send size={20} color="#FFF" />
         </TouchableOpacity>
       </View>
 
       <TouchableOpacity
-        style={[styles.floatingNewSession, { backgroundColor: colors[theme].primary }]}
+        style={[
+          styles.floatingNewSession,
+          { backgroundColor: colors[theme].primary },
+        ]}
         onPress={startNewSession}
         activeOpacity={0.8}
       >
@@ -269,51 +260,80 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   messageList: { padding: 16, paddingBottom: 40 },
   loadingContainer: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 8,
   },
   loadingText: { marginLeft: 8, fontSize: 14 },
   inputContainer: {
-    flexDirection: 'row', alignItems: 'center', padding: 12, borderTopWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderTopWidth: 1,
   },
-  voiceButton: { padding: 8, position: 'relative' },
+  voiceButton: { padding: 8, position: "relative" },
   recordingIndicator: {
-    position: 'absolute', top: 4, right: 4, width: 8, height: 8, borderRadius: 4,
+    position: "absolute",
+    top: 4,
+    right: 4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   input: {
-    flex: 1, borderRadius: 20, borderWidth: 1,
-    paddingHorizontal: 16, paddingVertical: 10,
-    maxHeight: 100, fontSize: 16, marginHorizontal: 8,
+    flex: 1,
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    maxHeight: 100,
+    fontSize: 16,
+    marginHorizontal: 8,
   },
   sendButton: {
-    width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
   },
   linksContainer: {
-    padding: 16, borderRadius: 12, marginHorizontal: 16, marginVertical: 10,
+    padding: 16,
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginVertical: 10,
   },
   linksTitle: {
-    fontSize: 16, fontWeight: '600', marginBottom: 12,
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 12,
   },
   linkItem: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
   },
   linkIcon: { marginRight: 8 },
   linkText: { flex: 1, fontSize: 14 },
   floatingNewSession: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'absolute',
+    flexDirection: "row",
+    alignItems: "center",
+    position: "absolute",
     right: 16,
     bottom: 90,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 30,
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
   },
   newSessionButtonText: {
-    color: '#FFFFFF', fontWeight: 'bold', fontSize: 14,
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 14,
   },
 });

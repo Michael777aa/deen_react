@@ -5,7 +5,7 @@ import * as jose from "jose";
 import { AuthUser } from "@/lib/utils/member";
 import { tokenCache } from "@/lib/utils/cache";
 
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
+const BASE_URL = "https://821a5e1d4274.ngrok-free.app";
 
 // 웹 브라우저 인증 세션 완료 처리
 // Complete web browser authentication session
