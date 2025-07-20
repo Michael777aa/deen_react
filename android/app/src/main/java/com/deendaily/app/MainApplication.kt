@@ -1,4 +1,4 @@
-package com.odette.carwash
+package com.deendaily.app
 
 import android.app.Application
 import android.content.res.Configuration

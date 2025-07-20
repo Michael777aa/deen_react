@@ -5,10 +5,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
+  ScrollView,
   RefreshControl,
   ActivityIndicator,
-  ScrollView
 } from 'react-native';
 import { router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -48,17 +47,10 @@ export const StreamTabs = () => {
         data = await StreamService.getStreamsByType(selectedCategory);
       } else {
         switch (activeTab) {
-          case 'live':
-            data = await StreamService.getLiveStreams();
-            break;
-          case 'upcoming':
-            data = await StreamService.getUpcomingStreams();
-            break;
-          case 'recorded':
-            data = await StreamService.getRecordedStreams();
-            break;
-          default:
-            data = await StreamService.getAllStreams();
+          case 'live': data = await StreamService.getLiveStreams(); break;
+          case 'upcoming': data = await StreamService.getUpcomingStreams(); break;
+          case 'recorded': data = await StreamService.getRecordedStreams(); break;
+          default: data = await StreamService.getAllStreams();
         }
       }
 
@@ -71,9 +63,7 @@ export const StreamTabs = () => {
     }
   }, [activeTab, selectedCategory]);
 
-  useEffect(() => {
-    fetchStreams();
-  }, [fetchStreams]);
+  useEffect(() => { fetchStreams(); }, [fetchStreams]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -88,13 +78,13 @@ export const StreamTabs = () => {
     return (
       <TouchableOpacity
         key={tab}
-        style={[styles.tab, isActive && { borderBottomColor: colors[theme].primary }]}
+        style={[styles.tabItem, isActive && { borderBottomColor: colors[theme].primary }]}
         onPress={() => {
           setActiveTab(tab);
-          setSelectedCategory(null); // reset category filter
+          setSelectedCategory(null);
         }}
       >
-        <Icon size={18} color={isActive ? colors[theme].primary : colors[theme].inactive} />
+        <Icon size={16} color={isActive ? colors[theme].primary : colors[theme].inactive} />
         <Text style={[styles.tabText, { color: isActive ? colors[theme].primary : colors[theme].inactive }]}>
           {tab.charAt(0).toUpperCase() + tab.slice(1)}
         </Text>
@@ -114,7 +104,7 @@ export const StreamTabs = () => {
       >
         <Text style={[
           styles.categoryChipText,
-          isSelected && { color: '#FFFFFF' }
+          isSelected && { color: '#FFF' }
         ]}>
           {item.charAt(0).toUpperCase() + item.slice(1)}
         </Text>
@@ -132,7 +122,7 @@ export const StreamTabs = () => {
           style={[styles.createButton, { backgroundColor: colors[theme].primary }]}
           onPress={() => router.push('/streams/create')}
         >
-          <Plus size={18} color="#FFFFFF" />
+          <Plus size={18} color="#FFF" />
           <Text style={styles.createButtonText}>Create Stream</Text>
         </TouchableOpacity>
       )}
@@ -149,133 +139,153 @@ export const StreamTabs = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors[theme].background }]}>
-    {/* Top Tabs */}
-    <View style={styles.tabContainer}>
-      {(['live', 'upcoming', 'recorded'] as const).map(renderTabItem)}
-    </View>
-  
-    {/* Horizontal Category Filter */}
-    <ScrollView
-      horizontal
-      contentContainerStyle={styles.categoryFilters}
-      showsHorizontalScrollIndicator={false}
-    >
+      <View style={styles.tabsRow}>
+        {(['live', 'upcoming', 'recorded'] as const).map(renderTabItem)}
+      </View>
+
+      <ScrollView
+  horizontal
+  contentContainerStyle={styles.categoriesRow}
+  showsHorizontalScrollIndicator={false}
+>
+  {[null, ...CATEGORIES].map((item) => {
+    const isSelected = selectedCategory === item;
+    const label = item ? item.charAt(0).toUpperCase() + item.slice(1) : 'All';
+
+    return (
       <TouchableOpacity
+        key={item ?? 'all'}
+        onPress={() => setSelectedCategory(item)}
         style={[
           styles.categoryChip,
-          !selectedCategory && { backgroundColor: colors[theme].primary },
+          isSelected && styles.categoryChipSelected,
         ]}
-        onPress={() => setSelectedCategory(null)}
       >
-        <Text style={[
-          styles.categoryChipText,
-          !selectedCategory && { color: '#FFFFFF' }
-        ]}>
-          All
+        <Text
+          style={[
+            styles.categoryChipText,
+            isSelected && styles.categoryChipTextSelected,
+          ]}
+        >
+          {label}
         </Text>
       </TouchableOpacity>
-  
-      {CATEGORIES.map((item) => (
-  <View key={item}>{renderCategoryItem({ item })}</View>
-))}
+    );
+  })}
+</ScrollView>
 
-    </ScrollView>
-  
-    {/* Stream List */}
-    <ScrollView
-      contentContainerStyle={styles.streamsList}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={[colors[theme].primary]}
-          tintColor={colors[theme].primary}
-        />
-      }
-      showsVerticalScrollIndicator={false}
-    >
-      {streams.length === 0 ? (
-        renderEmptyState()
-      ) : (
-        streams.map((stream) => (
+
+      <ScrollView
+        contentContainerStyle={styles.streamsList}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[colors[theme].primary]}
+            tintColor={colors[theme].primary}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {streams.length === 0 ? renderEmptyState() : streams.map((stream) => (
           <StreamCard key={stream._id} stream={stream} />
-        ))
-      )}
-    </ScrollView>
-  </View>
-  
+        ))}
+      </ScrollView>
+    </View>
   );
 };
 
+// styles update only; rest of your component logic remains the same
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    paddingTop: 8,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-    backgroundColor: '#fff'
-  },
-  tab: {
-    flexDirection: 'row',
     alignItems: 'center',
+  },
+  tabsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     paddingVertical: 12,
-    marginRight: 24,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent'
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#f9f9f9',
+  },
+  tabItem: {
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderBottomWidth: 3,
+    borderBottomColor: 'transparent',
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    marginLeft: 6
+    marginTop: 4,
   },
-  categoryFilters: {
-    paddingHorizontal: 16,
-    paddingVertical: 12
-  },
-  categoryChip: {
+  categoriesRow: {
+    flexDirection: 'row',
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#F0F0F0',
-    marginRight: 8
+    paddingVertical: 10,
   },
-  categoryChipText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666666'
-  },
+
+
   streamsList: {
-    padding: 16
+    paddingHorizontal: 16,
+    paddingBottom: 30,
   },
   emptyContainer: {
-    padding: 24,
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'center'
+    paddingVertical: 50,
   },
   emptyText: {
     fontSize: 16,
-    marginBottom: 16
+    marginBottom: 16,
+    color: '#999',
   },
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 18,
     paddingVertical: 10,
-    borderRadius: 8
+    borderRadius: 10,
+    elevation: 2,
   },
   createButtonText: {
-    color: '#FFFFFF',
+    color: '#FFF',
     marginLeft: 8,
-    fontWeight: '600'
-  }
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  categoryChip: {
+    backgroundColor: '#F2F2F2',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    marginRight: 8,
+    minHeight: 34,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  categoryChipSelected: {
+    backgroundColor: '#22C55E', // Tailwind green-500 like style (or colors[theme].primary)
+  },
+  categoryChipText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#444',
+  },
+  categoryChipTextSelected: {
+    color: '#FFF',
+  },
+  
 });
+
 
 export default StreamTabs;

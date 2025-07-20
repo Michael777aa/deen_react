@@ -36,6 +36,7 @@ const configs = {
     redirectUri: makeRedirectUri(),
   },
 
+
   
   kakao: {
     clientId: "kakao",

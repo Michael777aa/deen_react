@@ -30,11 +30,11 @@ import {
 import { useAuth } from "@/context/auth";
 import { getLayout } from "@/redux/features/layouts/layoutApi";
 import { IPrayerTime } from "@/types/prayer";
-import { getNextPrayer } from "@/redux/features/layouts/prayers/prayersApi";
 import { useLocation } from "@/context/useLocation";
 import { staticBase } from "@/lib/utils/member";
 import { featuredContent } from "@/mocks/prayerTimes";
 import { Share } from "react-native";
+import { getNextPrayer } from "@/redux/features/prayers/prayersApi";
 
 const { width } = Dimensions.get("window");
 export default function HomeScreen() {
@@ -128,7 +128,7 @@ export default function HomeScreen() {
   const shareInspiration = useCallback(async () => {
     try {
       const message = `"The best among you are those who have the best character."\n\n- Prophet Muhammad (peace be upon him)\n\nShared via IslamicConnect App`;
-  
+
       await Share.share({
         message,
         title: "Daily Islamic Inspiration",
@@ -157,9 +157,6 @@ export default function HomeScreen() {
   if (isLoading) return <ActivityIndicator />;
   if (!user) return null;
 
-
-
-  
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors[theme].background }]}
@@ -199,7 +196,7 @@ export default function HomeScreen() {
                 <Image
                   source={{
                     uri:
-                      user.picture ||
+                      user.picture?.replace("http://", "https://") ||
                       "https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
                   }}
                   style={styles.avatar}
@@ -211,8 +208,7 @@ export default function HomeScreen() {
         </ImageBackground>
       </Animated.View>
 
-      {/* Next Prayer Card - Redesigned */}
-      {/* Next Prayer Card */}
+     
       <Animated.View
         style={[
           styles.prayerCardContainer,
@@ -234,98 +230,34 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {loadingPrayer ? (
-            <View style={styles.prayerCardContent}>
-              <ActivityIndicator size="small" color={colors[theme].primary} />
-            </View>
-          ) : nextPrayer ? (
-            <>
-              <View style={styles.prayerCardContent}>
-                <View style={styles.prayerCardInfo}>
-                  <Text
-                    style={[styles.prayerName, { color: colors[theme].text }]}
-                  >
-                    {nextPrayer.name}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.prayerTime,
-                      { color: colors[theme].primary },
-                    ]}
-                  >
-                    {nextPrayer.time}
-                  </Text>
-                  <View style={styles.prayerTimeRemaining}>
-                    <Clock size={14} color={colors[theme].inactive} />
-                    <Text
-                      style={[
-                        styles.prayerTimeRemainingText,
-                        { color: colors[theme].inactive },
-                      ]}
-                    >
-                      {nextPrayer.timeRemaining} remaining
-                    </Text>
-                  </View>
-                </View>
-
-                <View
-                  style={[
-                    styles.prayerCardIconContainer,
-                    { backgroundColor: colors[theme].primary + "15" },
-                  ]}
-                >
-                  <Text style={styles.prayerCardIcon}>
-                    {nextPrayer.name === "Fajr"
-                      ? "🌅"
-                      : nextPrayer.name === "Dhuhr"
-                      ? "☀️"
-                      : nextPrayer.name === "Asr"
-                      ? "🌤️"
-                      : nextPrayer.name === "Maghrib"
-                      ? "🌇"
-                      : "🌙"}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.prayerCardActions}>
-                <TouchableOpacity
-                  style={[
-                    styles.prayerCardButton,
-                    { backgroundColor: colors[theme].primary + "15" },
-                  ]}
-                  onPress={() => router.push("/prayers")}
-                >
-                  <Text
-                    style={[
-                      styles.prayerCardButtonText,
-                      { color: colors[theme].primary },
-                    ]}
-                  >
-                    All Prayer Times
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[
-                    styles.prayerCardButton,
-                    { backgroundColor: colors[theme].primary },
-                  ]}
-                  onPress={() => router.push("/qibla")}
-                >
-                  <Text style={styles.prayerCardButtonText2}>
-                    Qibla Direction
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          ) : (
-            <View style={styles.prayerCardContent}>
-              <Text style={[styles.prayerName, { color: colors[theme].text }]}>
-                Location not available
+          <View style={styles.prayerCardActions}>
+            <TouchableOpacity
+              style={[
+                styles.prayerCardButton,
+                { backgroundColor: colors[theme].primary + "15" },
+              ]}
+              onPress={() => router.push("/prayers")}
+            >
+              <Text
+                style={[
+                  styles.prayerCardButtonText,
+                  { color: colors[theme].primary },
+                ]}
+              >
+                All Prayer Times
               </Text>
-            </View>
-          )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.prayerCardButton,
+                { backgroundColor: colors[theme].primary },
+              ]}
+              onPress={() => router.push("/qibla")}
+            >
+              <Text style={styles.prayerCardButtonText2}>Qibla Direction</Text>
+            </TouchableOpacity>
+          </View>
         </Card>
       </Animated.View>
 
@@ -356,18 +288,20 @@ export default function HomeScreen() {
                 Save
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.quoteAction} onPress={shareInspiration}>
-  <MessageCircle size={16} color={colors[theme].inactive} />
-  <Text
-    style={[
-      styles.quoteActionText,
-      { color: colors[theme].inactive },
-    ]}
-  >
-    Share
-  </Text>
-</TouchableOpacity>
-
+            <TouchableOpacity
+              style={styles.quoteAction}
+              onPress={shareInspiration}
+            >
+              <MessageCircle size={16} color={colors[theme].inactive} />
+              <Text
+                style={[
+                  styles.quoteActionText,
+                  { color: colors[theme].inactive },
+                ]}
+              >
+                Share
+              </Text>
+            </TouchableOpacity>
           </View>
         </Card>
       </Animated.View>

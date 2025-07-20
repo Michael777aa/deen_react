@@ -12,7 +12,7 @@ import * as Device from 'expo-device'; // use full import for Device
 import { Camera } from 'expo-camera';
 
 const APP_ID = '3cfb0c62ce814dcabcf95a3a16aaffb7';
-const TOKEN = '007eJxTYFhc7ufc6upyTOf2+vicP68ckrhZXIrOCKmcfnGp++5i3jYFBuPktCSDZDOj5FQLQ5OU5MSk5DRL00TjREOzxMS0tCRzxb7yjIZARoZzCsEMjFAI4rMwlKQWlzAwAABfzR/w'; // Use empty token if you're using "App ID only" mode
+const TOKEN = ''; // Use empty token if you're using "App ID only" mode
 
 const requestPermissions = async () => {
   if (Platform.OS === 'android') {

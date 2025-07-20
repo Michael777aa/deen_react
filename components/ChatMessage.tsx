@@ -1,96 +1,137 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
-import { ChatMessage as ChatMessageType } from '@/types';
+// components/ChatMessage.tsx
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native';
 import { colors } from '@/constants/colors';
 import { useSettingsStore } from '@/store/useSettingsStore';
-
-const { width } = Dimensions.get('window');
-const MAX_IMAGE_WIDTH = width * 0.6;
+import { Link } from 'lucide-react-native';
 
 interface ChatMessageProps {
-  message: ChatMessageType;
+  message: {
+    id: string;
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+    timestamp?: number;
+  };
 }
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+const URL_REGEX = /(https?:\/\/[^\s]+)/g;
+
+export const ChatMessage: React.FC<ChatMessageProps> = React.memo(({ message }) => {
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
+  
+  const isAssistant = message.role === 'assistant';
   const isUser = message.role === 'user';
+  
+  // Skip system messages
+  if (!isAssistant && !isUser) return null;
+
+  const messageParts = useMemo(() => {
+    return message.content.split(URL_REGEX).map((part, index) => {
+      if (part.match(URL_REGEX)) {
+        const displayUrl = part.replace(/^https?:\/\/(www\.)?/, '');
+        
+        return (
+          <TouchableOpacity 
+            key={index} 
+            style={styles.linkContainer}
+            onPress={() => Linking.openURL(part)}
+            activeOpacity={0.7}
+          >
+            <Link size={14} color={isUser ? '#FFFFFF' : colors[theme].primary} />
+            <Text 
+              style={[
+                styles.linkText,
+                isUser ? styles.userLinkText : styles.assistantLinkText
+              ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {displayUrl}
+            </Text>
+          </TouchableOpacity>
+        );
+      }
+      
+      return (
+        <Text 
+          key={index} 
+          style={[
+            styles.text,
+            isUser ? styles.userText : styles.assistantText
+          ]}
+        >
+          {part}
+        </Text>
+      );
+    });
+  }, [message.content, theme, isUser]);
 
   return (
     <View style={[
       styles.container,
-      isUser ? styles.userContainer : styles.assistantContainer,
+      isUser ? styles.userContainer : styles.assistantContainer
     ]}>
       <View style={[
         styles.bubble,
-        isUser 
-          ? [styles.userBubble, { backgroundColor: colors[theme].primary }] 
-          : [styles.assistantBubble, { backgroundColor: colors[theme].card }],
+        isUser ? styles.userBubble : styles.assistantBubble
       ]}>
-        {message.imageUri && (
-          <Image 
-            source={{ uri: message.imageUri }} 
-            style={styles.messageImage}
-            resizeMode="cover"
-          />
-        )}
-        
-        {message.content && (
-          <Text style={[
-            styles.text,
-            isUser 
-              ? { color: '#FFFFFF' } 
-              : { color: colors[theme].text },
-          ]}>
-            {message.content}
-          </Text>
-        )}
+        {messageParts}
       </View>
-      <Text style={[
-        styles.timestamp,
-        { color: colors[theme].inactive }
-      ]}>
-        {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-      </Text>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 8,
-    maxWidth: '80%',
-  },
-  userContainer: {
-    alignSelf: 'flex-end',
+    flexDirection: 'row',
+    marginVertical: 4,
+    paddingHorizontal: 16,
   },
   assistantContainer: {
-    alignSelf: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  userContainer: {
+    justifyContent: 'flex-end',
   },
   bubble: {
-    borderRadius: 16,
+    maxWidth: '80%',
     padding: 12,
-    overflow: 'hidden',
-  },
-  userBubble: {
-    borderBottomRightRadius: 4,
+    borderRadius: 16,
   },
   assistantBubble: {
+    backgroundColor: colors.light.card,
     borderBottomLeftRadius: 4,
+  },
+  userBubble: {
+    backgroundColor: colors.light.primary,
+    borderBottomRightRadius: 4,
   },
   text: {
     fontSize: 16,
     lineHeight: 22,
   },
-  messageImage: {
-    width: MAX_IMAGE_WIDTH,
-    height: MAX_IMAGE_WIDTH * 0.75,
-    borderRadius: 8,
-    marginBottom: 8,
+  assistantText: {
+    color: colors.dark.text,
   },
-  timestamp: {
-    fontSize: 12,
-    marginTop: 4,
-    alignSelf: 'flex-end',
+  userText: {
+    color: '#FFFFFF',
+  },
+  linkContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 4,
+  },
+  linkText: {
+    marginLeft: 6,
+    fontSize: 14,
+    textDecorationLine: 'underline',
+    flexShrink: 1,
+  },
+  assistantLinkText: {
+    color: colors.light.primary,
+  },
+  userLinkText: {
+    color: '#FFFFFF',
   },
 });

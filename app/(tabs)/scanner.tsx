@@ -288,7 +288,7 @@ export default function ProductsScreen() {
     <>
       <Stack.Screen 
         options={{
-          title: "Halal Scanner",
+          title: "Products",
           headerRight: () => (
             <TouchableOpacity 
               style={styles.scanButton}

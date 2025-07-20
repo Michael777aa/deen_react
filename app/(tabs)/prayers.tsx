@@ -18,11 +18,9 @@ import { Card } from "@/components/Card";
 import { ArrowLeft, Bell, BellOff } from "lucide-react-native";
 import { useLocation } from "@/context/useLocation";
 import { IPrayerTime, IPrayerTimes } from "@/types/prayer";
-import {
-  getNextPrayer,
-  getPrayerTimes,
-} from "@/redux/features/layouts/prayers/prayersApi";
+
 import { router } from "expo-router";
+import { getNextPrayer, getPrayerTimes } from "@/redux/features/prayers/prayersApi";
 
 export default function PrayersScreen() {
   const { darkMode } = useSettingsStore();

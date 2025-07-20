@@ -1,4 +1,4 @@
-package com.odette.carwash
+package com.deendaily.app
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

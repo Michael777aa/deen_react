@@ -31,9 +31,9 @@ import {
   Check
 } from 'lucide-react-native';
 import * as Location from 'expo-location';
-import { getQiblaDirection } from '@/redux/features/layouts/prayers/prayersApi';
 import { IQiblaDirection } from '@/types/prayer';
 import { useLocation } from '@/context/useLocation';
+import { getQiblaDirection } from '@/redux/features/prayers/prayersApi';
 
 const { width } = Dimensions.get('window');
 const COMPASS_SIZE = Math.min(width * 0.85, 320);

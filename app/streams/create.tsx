@@ -17,7 +17,7 @@ import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
 import { StreamStatus, StreamType } from '@/types/stream.enum';
 import { Picker } from '@react-native-picker/picker';
-import { Video, Calendar, Clock } from 'lucide-react-native';
+import {  Calendar, Clock } from 'lucide-react-native';
 import { useAuth } from '@/context/auth';
 import { StreamService } from '@/redux/features/streams/streamApi';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -26,27 +26,13 @@ const CreateStreamScreen = () => {
   const { darkMode } = useSettingsStore();
   const { user } = useAuth();
   const theme = darkMode ? 'dark' : 'light';
-  
-  // Set initial date to next hour (rounded to nearest 15 minutes)
-  const getInitialDate = () => {
-    const now = new Date();
-    const minutes = now.getMinutes();
-    const roundedMinutes = Math.ceil(minutes / 15) * 15;
-    const date = new Date(now);
-    date.setMinutes(roundedMinutes, 0, 0);
-    if (roundedMinutes >= 60) {
-      date.setHours(date.getHours() + 1);
-      date.setMinutes(0);
-    }
-    return date;
-  };
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     type: StreamType.KHUTBAH,
     status: StreamStatus.UPCOMING,
-    scheduledStartTime: getInitialDate(),
+    scheduledStartTime: new Date,
     chatEnabled: true,
     isPrivate: false,
     tags: [] as string[],
@@ -108,8 +94,6 @@ const CreateStreamScreen = () => {
         ...formData,
         center: user?.email || 'My Mosque',
         imam: user?.name || 'Host',
-        status: StreamStatus.LIVE,
-        scheduledStartTime: currentDate,
       });
       
       router.push(`/streams/broadcast?streamKey=${newStream.streamKey}`);
