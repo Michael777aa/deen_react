@@ -8,7 +8,6 @@ const screenList = [
 ];
 
 const dynamicScreens = [
-  { name: "chat/[id]", title: "AI Assistant" },
   { name: "quran/[surah]", title: "Quran" },
   { name: "product/[id]", title: "Product Details" },
   { name: "streams/[id]", title: "Live Stream" },

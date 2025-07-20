@@ -24,6 +24,7 @@
     "@types/uuid": "^9.0.8",
     "axios": "^1.10.0",
     "expo": "^53.0.11",
+    "expo-audio": "^0.4.8",
     "expo-auth-session": "^6.2.1",
     "expo-av": "^15.1.7",
     "expo-blur": "~14.1.4",

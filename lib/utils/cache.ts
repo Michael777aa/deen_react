@@ -3,7 +3,7 @@ import { Platform } from "react-native";
 
 const createTokenCache = (): {
   getToken: (key: string) => Promise<string | null>;
-  saveToken: (key: string, token: string) => Promise<void>;
+  saveToken: (key: string, token: any) => Promise<void>; // changed here
   deleteToken: (key: string) => Promise<void>;
 } => {
   return {
@@ -24,8 +24,10 @@ const createTokenCache = (): {
       }
     },
 
-    saveToken: (key: string, token: string) => {
-      return SecureStore.setItemAsync(key, token);
+    saveToken: (key: string, token: any) => {
+      const stringToken =
+        typeof token === "string" ? token : JSON.stringify(token);
+      return SecureStore.setItemAsync(key, stringToken);
     },
 
     deleteToken: (key: string) => {

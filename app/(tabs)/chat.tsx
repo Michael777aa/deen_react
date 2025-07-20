@@ -39,7 +39,6 @@ export default function IslamicAssistantScreen() {
     sendMessage,
     sendVoiceMessage,
     isLoading,
-    relatedLinks,
     startNewSession,
     error,
     clearError,
