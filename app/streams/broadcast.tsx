@@ -10,9 +10,9 @@ import {
 import { useLocalSearchParams } from 'expo-router';
 import * as Device from 'expo-device'; // use full import for Device
 import { Camera } from 'expo-camera';
-
+import AgoraUIKit from "agora-rn-uikit";
 const APP_ID = '3cfb0c62ce814dcabcf95a3a16aaffb7';
-const TOKEN = ''; // Use empty token if you're using "App ID only" mode
+const TOKEN = '007eJxTYDCqZWmY0M52x5IlJFG59PFfIZVnGXae1bcCH/Bu7IxZKqfAYJyclmSQbGaUnGphaJKSnJiUnGZpmmicaGiWmJiWlmSe3zkjoyGQkcH/RDMDIxSC+CwMJanFJQwMANJIHs4='; // Use empty token if you're using "App ID only" mode
 
 const requestPermissions = async () => {
   if (Platform.OS === 'android') {

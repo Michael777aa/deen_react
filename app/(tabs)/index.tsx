@@ -23,7 +23,6 @@ import {
   Moon,
   Bell,
   Star,
-  Clock,
   Heart,
   Video,
 } from "lucide-react-native";
@@ -35,6 +34,8 @@ import { staticBase } from "@/lib/utils/member";
 import { featuredContent } from "@/mocks/prayerTimes";
 import { Share } from "react-native";
 import { getNextPrayer } from "@/redux/features/prayers/prayersApi";
+import StreamsScreen from "../streams";
+
 
 const { width } = Dimensions.get("window");
 export default function HomeScreen() {
@@ -307,6 +308,8 @@ export default function HomeScreen() {
       </Animated.View>
 
       {/* Live Streams Section - Redesigned */}
+
+      {/* <StreamsScreen/> */}
 
       {/* Quick Actions - Redesigned */}
       <Text

@@ -28,7 +28,7 @@ export default function RestaurantDetailScreen() {
   const theme = darkMode ? 'dark' : 'light';
   const { getRestaurantById } = useRestaurantStore();
   
-  const restaurant = getRestaurantById(id as string);
+  const restaurant:any = getRestaurantById(id as string);
   const scrollY = new Animated.Value(0);
   
   const headerHeight = scrollY.interpolate({
@@ -230,7 +230,7 @@ export default function RestaurantDetailScreen() {
               <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
                 Menu Highlights
               </Text>
-              {restaurant.menuHighlights.map((item, index) => (
+              {restaurant.menuHighlights.map((item:any, index:any) => (
                 <View key={index} style={styles.menuItem}>
                   <Text style={[styles.menuItemName, { color: colors[theme].text }]}>
                     {item.name}

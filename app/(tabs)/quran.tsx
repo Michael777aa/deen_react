@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
@@ -22,7 +21,6 @@ import {
   Search,
   BookOpen,
   Bookmark,
-  Star,
   Clock,
   Play,
   Download,
@@ -36,7 +34,6 @@ import {
 } from "lucide-react-native";
 import { quranSurahs } from "@/mocks/quranData";
 
-const { width } = Dimensions.get("window");
 
 export default function QuranScreen() {
   const { darkMode } = useSettingsStore();
@@ -335,79 +332,7 @@ export default function QuranScreen() {
         </View>
       </Animated.View>
 
-      {/* Daily Verse Card - Redesigned */}
-      <Animated.View
-        style={[
-          styles.dailyVerseContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
-      >
-        <Card style={styles.dailyVerseCard}>
-          <View style={styles.dailyVerseHeader}>
-            <View style={styles.dailyVerseTitle}>
-              <Bell size={16} color={colors[theme].primary} />
-              <Text
-                style={[
-                  styles.dailyVerseTitleText,
-                  { color: colors[theme].primary },
-                ]}
-              >
-                Verse of the Day
-              </Text>
-            </View>
-            <TouchableOpacity style={styles.dailyVerseShare}>
-              <Text
-                style={[
-                  styles.dailyVerseShareText,
-                  { color: colors[theme].primary },
-                ]}
-              >
-                Share
-              </Text>
-            </TouchableOpacity>
-          </View>
 
-          <Text
-            style={[styles.dailyVerseArabic, { color: colors[theme].text }]}
-          >
-            وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ ۖ أُجِيبُ دَعْوَةَ
-            الدَّاعِ إِذَا دَعَانِ
-          </Text>
-
-          <Text
-            style={[
-              styles.dailyVerseTranslation,
-              { color: colors[theme].inactive },
-            ]}
-          >
-            "And when My servants ask you concerning Me - indeed I am near. I
-            respond to the invocation of the supplicant when he calls upon Me."
-          </Text>
-
-          <View style={styles.dailyVerseFooter}>
-            <Text
-              style={[
-                styles.dailyVerseReference,
-                { color: colors[theme].primary },
-              ]}
-            >
-              Surah Al-Baqarah (2:186)
-            </Text>
-            <TouchableOpacity
-              style={[
-                styles.dailyVerseButton,
-                { backgroundColor: colors[theme].primary },
-              ]}
-              onPress={() => navigateToSurah(2)}
-            >
-              <Text style={styles.dailyVerseButtonText}>Read Surah</Text>
-            </TouchableOpacity>
-          </View>
-        </Card>
-      </Animated.View>
 
       {/* Search Container */}
       <View style={styles.searchContainer}>

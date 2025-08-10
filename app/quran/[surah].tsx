@@ -16,7 +16,6 @@ import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
 import { Card } from '@/components/Card';
 import { 
-  BookOpen, 
   Bookmark, 
   Share2, 
   Settings, 
@@ -36,7 +35,6 @@ export default function SurahDetailScreen() {
   const surahNumber = parseInt(params.surah as string || "1");
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? 'dark' : 'light';
-  
   const [isLoading, setIsLoading] = useState(true);
   const [verses, setVerses] = useState<any[]>([]);
   const [surahInfo, setSurahInfo] = useState<any>(null);
