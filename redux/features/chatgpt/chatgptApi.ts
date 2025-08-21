@@ -1,30 +1,17 @@
 // services/api.ts
 import * as FileSystem from "expo-file-system";
 import api from "../api/apiSlice";
-import axios from "axios";
 
-export const analyzeText = async (
-  userEmail: string,
-  text: string,
-  sessionId?: string
-) => {
-  const response = await axios.post(
-    "http://localhost:4330/api/v1/chatgpt/analyze",
-    {
-      userEmail,
-      text,
-      sessionId,
-    }
-  );
+export const analyzeText = async (text: string, sessionId?: string) => {
+  const response = await api.post("/chatgpt/analyze", {
+    text,
+    sessionId,
+  });
 
   return response.data;
 };
 
-export const analyzeVoice = async (
-  audioUri: string,
-  userEmail: string,
-  sessionId?: string
-) => {
+export const analyzeVoice = async (audioUri: string, sessionId?: string) => {
   const fileInfo = await FileSystem.getInfoAsync(audioUri);
 
   if (!fileInfo.exists) {
@@ -37,20 +24,15 @@ export const analyzeVoice = async (
     name: "recording.wav",
     type: "audio/wav",
   } as any);
-  formData.append("userEmail", userEmail);
   if (sessionId) {
     formData.append("sessionId", sessionId);
   }
 
-  const response = await axios.post(
-    "http://localhost:4330/api/v1/chatgpt/analyze/voice",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
+  const response = await api.post("/chatgpt/analyze/voice", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   return response.data;
 };

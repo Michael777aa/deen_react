@@ -27,7 +27,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isLoading: false,
   error: null,
 
-  sendMessage: async (text, userEmail) => {
+  sendMessage: async (text: string) => {
     try {
       set({ isLoading: true });
       const { messages, sessionId } = get();
@@ -44,11 +44,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         ],
       });
 
-      const response = await analyzeText(
-        userEmail,
-        text,
-        sessionId || undefined
-      );
+      const response = await analyzeText(text, sessionId || undefined);
 
       set({
         messages: [
@@ -72,16 +68,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  sendVoiceMessage: async (audioUri, userEmail) => {
+  sendVoiceMessage: async (audioUri) => {
     try {
       set({ isLoading: true });
       const { messages, sessionId } = get();
 
-      const response = await analyzeVoice(
-        audioUri,
-        userEmail,
-        sessionId || undefined
-      );
+      const response = await analyzeVoice(audioUri, sessionId || undefined);
 
       set({
         messages: [

@@ -11,7 +11,8 @@ interface ErrorToastProps {
 }
 
 export const ErrorToast: React.FC<ErrorToastProps> = ({ message, onDismiss, theme }) => {
-  const opacity = new Animated.Value(0);
+  const opacity = React.useRef(new Animated.Value(0)).current;
+
 
   useEffect(() => {
     Animated.sequence([

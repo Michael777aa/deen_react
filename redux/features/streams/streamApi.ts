@@ -5,37 +5,37 @@ import { StreamType } from "@/types/stream.enum";
 
 export const StreamService = {
   async getAllStreams(): Promise<Stream[]> {
-    const response = await api.get("/str/streams");
+    const response = await api.get("/str/streams", {});
     return response.data;
   },
 
   async getLiveStreams(): Promise<Stream[]> {
-    const response = await api.get("/str/streams/live");
+    const response = await api.get("/str/streams/live", {});
     return response.data;
   },
 
   async getUpcomingStreams(): Promise<Stream[]> {
-    const response = await api.get("/str/streams/upcoming");
+    const response = await api.get("/str/streams/upcoming", {});
     return response.data;
   },
 
   async getRecordedStreams(): Promise<Stream[]> {
-    const response = await api.get("/str/streams/recorded");
+    const response = await api.get("/str/streams/recorded", {});
     return response.data;
   },
 
   async getStreamsByType(type: StreamType): Promise<Stream[]> {
-    const response = await api.get(`/str/streams/type/${type}`);
+    const response = await api.get(`/str/streams/type/${type}`, {});
     return response.data;
   },
 
   async getStreamById(id: string): Promise<Stream> {
-    const response = await api.get(`/str/streams/${id}`);
+    const response = await api.get(`/str/streams/${id}`, {});
     return response.data;
   },
 
   async createNewStream(input: StreamInput): Promise<Stream> {
-    const response = await api.post("/str/streams/create", input);
+    const response = await api.post("/str/streams/create", input, {});
     return response.data;
   },
 
@@ -43,26 +43,26 @@ export const StreamService = {
     id: string,
     input: StreamUpdateInput
   ): Promise<Stream> {
-    const response = await api.post(`/str/streams/update/${id}`, input);
+    const response = await api.post(`/str/streams/update/${id}`, input, {});
     return response.data;
   },
 
   async deleteChosenStream(id: string): Promise<void> {
-    await api.post(`/str/streams/delete/${id}`);
+    await api.post(`/str/streams/delete/${id}`, {});
   },
 
   async startStream(id: string): Promise<Stream> {
-    const response = await api.post(`/str/streams/${id}/start`);
+    const response = await api.post(`/str/streams/${id}/start`, {});
     return response.data;
   },
 
   async endStream(id: string): Promise<Stream> {
-    const response = await api.post(`/str/streams/${id}/end`);
+    const response = await api.post(`/str/streams/${id}/end`, {});
     return response.data;
   },
 
   async likeStream(id: string): Promise<Stream> {
-    const response = await api.post(`/str/streams/${id}/like`);
+    const response = await api.post(`/str/streams/${id}/like`, {});
     return response.data;
   },
 
@@ -75,7 +75,7 @@ export const StreamService = {
   },
 
   async quickStartStream(input: StreamInput): Promise<Stream> {
-    const response = await api.post("/str/streams/quick-start", input);
+    const response = await api.post("/str/streams/quick-start", input, {});
     return response.data;
   },
 };

@@ -34,7 +34,6 @@ export default function BroadcastScreen() {
     Device.getDeviceTypeAsync().then((name) => {
       console.log("📱 Running on device:", name);
     });
-    console.log("📱 Platform OS:", Platform.OS);
   }, []);
 
 
