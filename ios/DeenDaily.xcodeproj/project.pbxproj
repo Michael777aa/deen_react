@@ -8,28 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		2373C1F17D76C37BD7C05A89 /* libPods-DeenDaily.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA4ABB81B0B50B06354FC657 /* libPods-DeenDaily.a */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		AFA7D7396270DCECC1C6D405 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8EDEC9D79C161552FBC94AE9 /* PrivacyInfo.xcprivacy */; };
-		BB202378B84B3F9DBE79086F /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B48336FE0BE2D841ACD540F /* ExpoModulesProvider.swift */; };
+		B36B038C73FFC558C7B13CE5 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62EB4D633312DDEFA7677D9C /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		DFBD36E160EBC6120C2D6293 /* libPods-DeenDaily.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 456A734F368A30952CD53E11 /* libPods-DeenDaily.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		F5F12322829637F8BE80A63D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1D7514AC8B1CAE8356F12A12 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0B48336FE0BE2D841ACD540F /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-DeenDaily/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		0713A8F3C13B0FC6874E25E4 /* Pods-DeenDaily.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeenDaily.debug.xcconfig"; path = "Target Support Files/Pods-DeenDaily/Pods-DeenDaily.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* DeenDaily.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeenDaily.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DeenDaily/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = DeenDaily/Info.plist; sourceTree = "<group>"; };
-		3590E18E33BF5D1C644D2487 /* Pods-DeenDaily.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeenDaily.debug.xcconfig"; path = "Target Support Files/Pods-DeenDaily/Pods-DeenDaily.debug.xcconfig"; sourceTree = "<group>"; };
-		456A734F368A30952CD53E11 /* libPods-DeenDaily.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DeenDaily.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8EDEC9D79C161552FBC94AE9 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = DeenDaily/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1D7514AC8B1CAE8356F12A12 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = DeenDaily/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		62EB4D633312DDEFA7677D9C /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-DeenDaily/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = DeenDaily/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		D4B5C7FC33907980E24077DA /* Pods-DeenDaily.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeenDaily.release.xcconfig"; path = "Target Support Files/Pods-DeenDaily/Pods-DeenDaily.release.xcconfig"; sourceTree = "<group>"; };
+		C53FFF146D3F8BDB848C70B8 /* Pods-DeenDaily.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DeenDaily.release.xcconfig"; path = "Target Support Files/Pods-DeenDaily/Pods-DeenDaily.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = DeenDaily/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* DeenDaily-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "DeenDaily-Bridging-Header.h"; path = "DeenDaily/DeenDaily-Bridging-Header.h"; sourceTree = "<group>"; };
+		FA4ABB81B0B50B06354FC657 /* libPods-DeenDaily.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DeenDaily.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DFBD36E160EBC6120C2D6293 /* libPods-DeenDaily.a in Frameworks */,
+				2373C1F17D76C37BD7C05A89 /* libPods-DeenDaily.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,16 +53,24 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				8EDEC9D79C161552FBC94AE9 /* PrivacyInfo.xcprivacy */,
+				1D7514AC8B1CAE8356F12A12 /* PrivacyInfo.xcprivacy */,
 			);
 			name = DeenDaily;
+			sourceTree = "<group>";
+		};
+		1ABF1B2C98F59DAECF822D51 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				E2B297C063E63597AD873140 /* DeenDaily */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				456A734F368A30952CD53E11 /* libPods-DeenDaily.a */,
+				FA4ABB81B0B50B06354FC657 /* libPods-DeenDaily.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -81,8 +89,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				CA4CFE226618B622119E7B40 /* Pods */,
-				A469283A99674B81C709E9AD /* ExpoModulesProviders */,
+				9F3A2CD1747D5EB9734811F6 /* Pods */,
+				1ABF1B2C98F59DAECF822D51 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -97,12 +105,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A469283A99674B81C709E9AD /* ExpoModulesProviders */ = {
+		9F3A2CD1747D5EB9734811F6 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				BBEE42275DDF44E34B955E77 /* DeenDaily */,
+				0713A8F3C13B0FC6874E25E4 /* Pods-DeenDaily.debug.xcconfig */,
+				C53FFF146D3F8BDB848C70B8 /* Pods-DeenDaily.release.xcconfig */,
 			);
-			name = ExpoModulesProviders;
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -114,22 +124,12 @@
 			path = DeenDaily/Supporting;
 			sourceTree = "<group>";
 		};
-		BBEE42275DDF44E34B955E77 /* DeenDaily */ = {
+		E2B297C063E63597AD873140 /* DeenDaily */ = {
 			isa = PBXGroup;
 			children = (
-				0B48336FE0BE2D841ACD540F /* ExpoModulesProvider.swift */,
+				62EB4D633312DDEFA7677D9C /* ExpoModulesProvider.swift */,
 			);
 			name = DeenDaily;
-			sourceTree = "<group>";
-		};
-		CA4CFE226618B622119E7B40 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				3590E18E33BF5D1C644D2487 /* Pods-DeenDaily.debug.xcconfig */,
-				D4B5C7FC33907980E24077DA /* Pods-DeenDaily.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "DeenDaily" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				429B02B88F60415599DBEE32 /* [Expo] Configure project */,
+				89285B8E75D3EF7FDC0BF479 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				A789489397E2F8C1DD1D6612 /* [CP] Embed Pods Frameworks */,
+				948F10C4675FD90D54F5EB9E /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -196,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				AFA7D7396270DCECC1C6D405 /* PrivacyInfo.xcprivacy in Resources */,
+				F5F12322829637F8BE80A63D /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,25 +239,6 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
-		};
-		429B02B88F60415599DBEE32 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-DeenDaily/expo-configure-project.sh\"\n";
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -307,7 +288,26 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DeenDaily/Pods-DeenDaily-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A789489397E2F8C1DD1D6612 /* [CP] Embed Pods Frameworks */ = {
+		89285B8E75D3EF7FDC0BF479 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-DeenDaily/expo-configure-project.sh\"\n";
+		};
+		948F10C4675FD90D54F5EB9E /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -387,7 +387,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				BB202378B84B3F9DBE79086F /* ExpoModulesProvider.swift in Sources */,
+				B36B038C73FFC558C7B13CE5 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,7 +396,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3590E18E33BF5D1C644D2487 /* Pods-DeenDaily.debug.xcconfig */;
+			baseConfigurationReference = 0713A8F3C13B0FC6874E25E4 /* Pods-DeenDaily.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -432,7 +432,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D4B5C7FC33907980E24077DA /* Pods-DeenDaily.release.xcconfig */;
+			baseConfigurationReference = C53FFF146D3F8BDB848C70B8 /* Pods-DeenDaily.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

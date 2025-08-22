@@ -5,7 +5,7 @@ import * as jose from "jose";
 import { AuthUser } from "@/lib/utils/member";
 import { tokenCache } from "@/lib/utils/cache";
 
-const BASE_URL = "https://821a5e1d4274.ngrok-free.app";
+const BASE_URL = "https://den-auth.onrender.com";
 
 // 웹 브라우저 인증 세션 완료 처리
 // Complete web browser authentication session

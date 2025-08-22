@@ -1,7 +1,6 @@
-import { tokenCache } from "@/lib/utils/cache";
 import axios from "axios";
 
-export const API_BASE_URL = "http://195.35.9.39:4330/api/v1";
+export const API_BASE_URL = "https://ab1ca3a9955e.ngrok-free.app/api/v1";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -10,12 +9,12 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-api.interceptors.request.use(async (config) => {
-  const token = await tokenCache?.getToken("accessToken");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// api.interceptors.request.use(async (config) => {
+//   const token = await tokenCache?.getToken("accessToken");
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+//   return config;
+// });
 
 export default api;
