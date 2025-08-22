@@ -1,15 +1,15 @@
 {
   "expo": {
     "name": "Deen Daily",
-    "slug": "Deen Dailey",
+    "slug": "deen-daily",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/download.png",
+    "icon": "./assets/images/splash-icon.png",
     "scheme": "deendaily",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/download.png",
+      "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -28,7 +28,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/download.png",
+        "foregroundImage": "./assets/images/splash-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -40,19 +40,20 @@
         "android.permission.CAMERA",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.FOREGROUND_SERVICE"
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
       "versionCode": 1
     },
     "web": {
-      "favicon": "./assets/images/download.png"
+      "favicon": "./assets/images/splash-icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/download.png",
+          "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -90,11 +91,13 @@
       "tsconfigPaths": true
     },
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "9f36b273-83b4-4baa-a7a9-8e733f9902db"
+      }
     },
     "runtimeVersion": {
       "policy": "sdkVersion"
     }
-    
   }
 }
