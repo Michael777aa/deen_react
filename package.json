@@ -52,11 +52,11 @@
     "expo-web-browser": "~14.2.0",
     "hono": "^4.7.10",
     "jose": "^6.0.11",
-    "lucide-react-native": "^0.475.0",
+    "lucide-react-native": "^0.541.0",
     "nativewind": "^4.1.23",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "react-native": "0.79.5",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "react-native": "0.79.6",
     "react-native-agora": "^4.5.3",
     "react-native-animatable": "^1.4.0",
     "react-native-gesture-handler": "~2.24.0",
@@ -84,11 +84,18 @@
   "overrides": {
     "metro": "0.82.0",
     "metro-resolver": "0.82.0",
-    "metro-config": "0.82.0"
+    "metro-config": "0.82.0",
+    "lucide-react-native": {
+    "react": "$react"
+  }
   },
   "expo": {
     "doctor": {
-      "skipPackages": ["react", "react-dom", "react-native"],
+      "skipPackages": [
+        "react",
+        "react-dom",
+        "react-native"
+      ],
       "reactNativeDirectoryCheck": {
         "listUnknownPackages": false
       }
