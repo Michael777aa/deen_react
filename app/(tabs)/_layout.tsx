@@ -35,6 +35,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          headerShown: false,
           title: 'Home',
           tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
         }}
@@ -71,6 +72,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="map"
         options={{
+          headerShown: false,
+
           href: null, // This hides it from the tab bar
         }}
       />
@@ -82,7 +85,10 @@ export default function TabLayout() {
       />
           <Tabs.Screen
         name="prayers"
-        options={{ href: null }} 
+        options={{ href: null,
+          headerShown: false,
+
+         }} 
       />
     </Tabs>
   );

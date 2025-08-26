@@ -30,12 +30,11 @@ import { useAuth } from "@/context/auth";
 import { getLayout } from "@/redux/features/layouts/layoutApi";
 import { IPrayerTime } from "@/types/prayer";
 import { useLocation } from "@/context/useLocation";
-import { staticBase } from "@/lib/utils/member";
 import { featuredContent } from "@/mocks/prayerTimes";
 import { Share } from "react-native";
 import { getNextPrayer } from "@/redux/features/prayers/prayersApi";
-import StreamsScreen from "../streams";
-
+import { HomeHeader } from "@/pages/HomeHeader";
+import { DailyInspiration } from "@/pages/DailyInspiration";
 
 const { width } = Dimensions.get("window");
 export default function HomeScreen() {
@@ -167,49 +166,12 @@ export default function HomeScreen() {
       }
       showsVerticalScrollIndicator={false}
     >
-      {/* Modern Gradient Header */}
-      <Animated.View
-        style={[
-          styles.headerContainer,
-          { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-        ]}
-      >
-        <ImageBackground
-          source={{
-            uri: layout?.layoutImages?.[0]
-              ? `${staticBase}/${layout.layoutImages[0]}`
-              : "https://images.unsplash.com/photo-1519817650390-64a93db51149?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
-          }}
-          style={styles.headerBackground}
-          imageStyle={styles.headerBackgroundImage}
-        >
-          <View style={styles.headerOverlay}>
-            <View style={styles.header}>
-              <View style={styles.headerLeft}>
-                <Text style={styles.greeting}>{greeting},</Text>
-                <Text style={styles.name}>{user.name}</Text>
-                <Text style={styles.subtitle}>{layout?.blessing}</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => router.push("/settings")}
-                style={styles.avatarContainer}
-              >
-                <Image
-                  source={{
-                    uri:
-                      user.picture?.replace("http://", "https://") ||
-                      "https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-                  }}
-                  style={styles.avatar}
-                />
-                <View style={styles.onlineIndicator} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </ImageBackground>
-      </Animated.View>
+      {/* HEADER */}
+  
+    <HomeHeader user={user} greeting={greeting} layout={layout} theme={theme}/>
 
-     
+      {/* PRAYER & QIBLA */}
+
       <Animated.View
         style={[
           styles.prayerCardContainer,
@@ -263,53 +225,11 @@ export default function HomeScreen() {
       </Animated.View>
 
       {/* Daily Inspiration - Redesigned */}
-      <Animated.View style={[styles.quoteContainer, { opacity: fadeAnim }]}>
-        <Card style={styles.quoteCard}>
-          <View style={styles.quoteHeader}>
-            <Heart size={20} color={colors[theme].primary} />
-            <Text style={[styles.quoteLabel, { color: colors[theme].primary }]}>
-              Daily Inspiration
-            </Text>
-          </View>
-          <Text style={[styles.quoteText, { color: colors[theme].text }]}>
-            "The best among you are those who have the best character."
-          </Text>
-          <Text style={[styles.quoteSource, { color: colors[theme].inactive }]}>
-            - Prophet Muhammad (peace be upon him)
-          </Text>
-          <View style={styles.quoteActions}>
-            <TouchableOpacity style={styles.quoteAction}>
-              <Heart size={16} color={colors[theme].primary} />
-              <Text
-                style={[
-                  styles.quoteActionText,
-                  { color: colors[theme].primary },
-                ]}
-              >
-                Save
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.quoteAction}
-              onPress={shareInspiration}
-            >
-              <MessageCircle size={16} color={colors[theme].inactive} />
-              <Text
-                style={[
-                  styles.quoteActionText,
-                  { color: colors[theme].inactive },
-                ]}
-              >
-                Share
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Card>
-      </Animated.View>
+      <DailyInspiration/>
 
-      {/* Live Streams Section - Redesigned */}
 
-      {/* <StreamsScreen/> */}
+
+
 
       {/* Quick Actions - Redesigned */}
       <Text

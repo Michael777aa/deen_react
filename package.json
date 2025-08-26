@@ -44,7 +44,9 @@
     "expo-notifications": "~0.31.3",
     "expo-router": "~5.1.5",
     "expo-secure-store": "~14.2.4",
+    "expo-sensors": "^14.1.4",
     "expo-sharing": "^13.1.5",
+    "expo-speech": "~13.1.7",
     "expo-splash-screen": "~0.30.7",
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.4",
@@ -54,12 +56,13 @@
     "jose": "^6.0.11",
     "lucide-react-native": "^0.541.0",
     "nativewind": "^4.1.23",
-    "react": "19.1.1",
+    "react": "19.0.0",
     "react-dom": "19.1.1",
     "react-native": "0.79.6",
     "react-native-agora": "^4.5.3",
     "react-native-animatable": "^1.4.0",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-maps": "^1.25.3",
     "react-native-markdown-display": "^7.0.2",
     "react-native-permissions": "^5.4.1",
     "react-native-reanimated": "~3.17.4",
@@ -71,7 +74,6 @@
     "react-native-web": "^0.20.0",
     "superjson": "^2.2.2",
     "uuid": "^8.3.2",
-    "zego-express-engine-reactnative": "^3.21.0-private.38",
     "zod": "^3.25.42",
     "zustand": "^5.0.2"
   },
@@ -85,9 +87,9 @@
     "metro": "0.82.0",
     "metro-resolver": "0.82.0",
     "metro-config": "0.82.0",
-    "lucide-react-native": {
-    "react": "$react"
-  }
+    "react-native-renderer": "19.1.1",
+    "react": "19.0.0",
+    "react-dom": "19.1.1"
   },
   "expo": {
     "doctor": {

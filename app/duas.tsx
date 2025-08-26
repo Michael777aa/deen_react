@@ -30,7 +30,10 @@ import {
   Meh
 } from 'lucide-react-native';
 import { duaCategories, duas } from '@/mocks/duaData';
-
+import * as Speech from "expo-speech";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import { Share, Alert } from "react-native";
 const { width } = Dimensions.get('window');
 
 export default function DuasScreen() {
@@ -102,6 +105,63 @@ export default function DuasScreen() {
     });
   };
 
+  const handleListen = (dua: typeof duas[0]) => {
+    Speech.speak(dua.arabic, {
+      language: "ar", // Arabic pronunciation
+      pitch: 1,
+      rate: 1,
+    });
+  };
+  const handleSave = async (dua: typeof duas[0]) => {
+  try {
+    const fileUri = FileSystem.documentDirectory + `${dua.title}.txt`;
+
+    const content = `
+Title: ${dua.title}
+Arabic: ${dua.arabic}
+Transliteration: ${dua.transliteration}
+Translation: ${dua.translation}
+Reference: ${dua.reference}
+    `;
+
+    await FileSystem.writeAsStringAsync(fileUri, content, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+
+    Alert.alert("Saved ✅", `Dua saved to your files: ${fileUri}`);
+  } catch (error) {
+    console.log("Save error", error);
+    Alert.alert("Error", "Could not save dua");
+  }
+};
+
+// 📤 Share Dua
+const handleShare = async (dua: typeof duas[0]) => {
+  try {
+    const message = `
+📖 ${dua.title}
+
+🕌 Arabic:
+${dua.arabic}
+
+🔊 Transliteration:
+${dua.transliteration}
+
+🌍 Translation:
+${dua.translation}
+
+📚 Reference: ${dua.reference}
+    `;
+
+    await Share.share({
+      message,
+    });
+  } catch (error) {
+    console.log("Share error", error);
+    Alert.alert("Error", "Could not share dua");
+  }
+};
+
   const selectEmotion = (emotion: string) => {
     setSelectedEmotion(emotion);
     
@@ -150,27 +210,37 @@ export default function DuasScreen() {
       )}
       
       <View style={styles.duaActions}>
-        <TouchableOpacity style={[styles.duaActionButton, { backgroundColor: colors[theme].card }]}>
-          <Volume2 size={16} color={colors[theme].text} />
-          <Text style={[styles.duaActionText, { color: colors[theme].text }]}>
-            Listen
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.duaActionButton, { backgroundColor: colors[theme].card }]}>
-          <Download size={16} color={colors[theme].text} />
-          <Text style={[styles.duaActionText, { color: colors[theme].text }]}>
-            Save
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.duaActionButton, { backgroundColor: colors[theme].card }]}>
-          <Share2 size={16} color={colors[theme].text} />
-          <Text style={[styles.duaActionText, { color: colors[theme].text }]}>
-            Share
-          </Text>
-        </TouchableOpacity>
-      </View>
+  <TouchableOpacity 
+    style={[styles.duaActionButton, { backgroundColor: colors[theme].card }]}
+    onPress={() => handleListen(item)}
+  >
+    <Volume2 size={16} color={colors[theme].text} />
+    <Text style={[styles.duaActionText, { color: colors[theme].text }]}>
+      Listen
+    </Text>
+  </TouchableOpacity>
+  
+  <TouchableOpacity 
+    style={[styles.duaActionButton, { backgroundColor: colors[theme].card }]}
+    onPress={() => handleSave(item)}
+  >
+    <Download size={16} color={colors[theme].text} />
+    <Text style={[styles.duaActionText, { color: colors[theme].text }]}>
+      Save
+    </Text>
+  </TouchableOpacity>
+  
+  <TouchableOpacity 
+    style={[styles.duaActionButton, { backgroundColor: colors[theme].card }]}
+    onPress={() => handleShare(item)}
+  >
+    <Share2 size={16} color={colors[theme].text} />
+    <Text style={[styles.duaActionText, { color: colors[theme].text }]}>
+      Share
+    </Text>
+  </TouchableOpacity>
+</View>
+
     </Card>
   );
 

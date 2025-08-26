@@ -1,316 +1,231 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-  Platform,
-  Image
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Platform, Linking 
 } from 'react-native';
-import { useSettingsStore } from '@/store/useSettingsStore';
+import * as Location from 'expo-location';
 import { colors } from '@/constants/colors';
 import { Card } from '@/components/Card';
-import { Search, MapPin, Navigation, Clock, Star } from 'lucide-react-native';
-import { mosques } from '@/mocks/mosqueData';
-import { Stack } from 'expo-router';
+import { Search, MapPin, ArrowLeft } from 'lucide-react-native';
+import { router } from 'expo-router';
+
+interface Mosque {
+  name: string;
+  address: string;
+  rating: number;
+  location: { lat: number; lng: number };
+}
 
 export default function MapScreen() {
-  const { darkMode } = useSettingsStore();
-  const theme = darkMode ? 'dark' : 'light';
   const [searchQuery, setSearchQuery] = useState('');
+  const [mosques, setMosques] = useState<Mosque[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [nearbyMosques, setNearbyMosques] = useState(mosques);
-  const [userLocation, setUserLocation] = useState('New York, NY');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const [locationName, setLocationName] = useState("");
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  const filteredMosques = mosques.filter(mosque => 
-    mosque.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    mosque.address.toLowerCase().includes(searchQuery.toLowerCase())
+  const getNearbyMosques = async (lat: number, lng: number) => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(`http://localhost:4335/api/v1/prayer/mosques?lat=${lat}&lng=${lng}`);
+      const data = await res.json();
+      setMosques(data || []); // adjust depending on your API response
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getUserLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') return alert('Location permission denied');
+    
+    const location = await Location.getCurrentPositionAsync({});
+ 
+    const coords = { lat: location.coords.latitude, lng: location.coords.longitude };
+    const address = await Location.reverseGeocodeAsync({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    });
+    setLocationName(address[0]?.city || "NOT FOUND ");
+    getNearbyMosques(coords.lat, coords.lng);
+  };
+
+  useEffect(() => { getUserLocation(); }, []);
+
+  const filteredMosques = mosques.filter(m =>
+    m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    m.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
+  // Open navigation
+  const openDirections = (lat: number, lng: number) => {
+    const url = Platform.select({
+      ios: `maps://?daddr=${lat},${lng}`,
+      android: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+    });
+    if (url) Linking.openURL(url);
   };
-
-  const requestLocationPermission = async () => {
-    setIsLoading(true);
-    // Simulate location permission request
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  useEffect(() => {
-    requestLocationPermission();
-  }, []);
 
   return (
-    <>
-      <Stack.Screen 
-        options={{
-          title: "Nearby Mosques",
-        }}
-      />
-      <View style={[styles.container, { backgroundColor: colors[theme].background }]}>
-        <View style={styles.searchContainer}>
-          <View style={[
-            styles.searchInputContainer,
-            { backgroundColor: colors[theme].card, borderColor: colors[theme].border }
-          ]}>
-            <Search size={20} color={colors[theme].inactive} />
-            <TextInput
-              style={[styles.searchInput, { color: colors[theme].text }]}
-              placeholder="Search mosques..."
-              placeholderTextColor={colors[theme].inactive}
-              value={searchQuery}
-              onChangeText={handleSearch}
-            />
-          </View>
-        </View>
-
-        <View style={styles.locationContainer}>
-          <MapPin size={20} color={colors[theme].primary} />
-          <Text style={[styles.locationText, { color: colors[theme].text }]}>
-            {userLocation}
-          </Text>
-          <TouchableOpacity 
-            style={[styles.changeLocationButton, { backgroundColor: colors[theme].primary + '20' }]}
-            onPress={requestLocationPermission}
-          >
-            <Text style={[styles.changeLocationText, { color: colors[theme].primary }]}>
-              Change
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {Platform.OS !== 'web' ? (
-          <View style={styles.mapContainer}>
-            <Image 
-              source={{ uri: 'https://images.unsplash.com/photo-1569336415962-a4bd9f69c07a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80' }} 
-              style={styles.mapImage}
-              resizeMode="cover"
-            />
-            <Text style={[styles.mapPlaceholder, { color: colors[theme].text }]}>
-              Map View
-            </Text>
-          </View>
-        ) : (
-          <Text style={[styles.webMapMessage, { color: colors[theme].text }]}>
-            Map view is not available on web. Please use the list below.
-          </Text>
-        )}
-
-        <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
-          Nearby Mosques
-        </Text>
-
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors[theme].primary} />
-          </View>
-        ) : (
-          <ScrollView showsVerticalScrollIndicator={false} style={styles.mosqueList}>
-            {filteredMosques.map((mosque, index) => (
-              <Card key={index} style={styles.mosqueCard}>
-                <View style={styles.mosqueHeader}>
-                  <Text style={[styles.mosqueName, { color: colors[theme].text }]}>
-                    {mosque.name}
-                  </Text>
-                  <View style={styles.ratingContainer}>
-                    <Star size={16} color="#FFD700" fill="#FFD700" />
-                    <Text style={[styles.ratingText, { color: colors[theme].text }]}>
-                      {mosque.rating}
-                    </Text>
-                  </View>
-                </View>
-                
-                <Text style={[styles.mosqueAddress, { color: colors[theme].inactive }]}>
-                  {mosque.address}
-                </Text>
-                
-                <View style={styles.mosqueDetails}>
-                  <View style={styles.mosqueDetailItem}>
-                    <Clock size={16} color={colors[theme].primary} />
-                    <Text style={[styles.mosqueDetailText, { color: colors[theme].text }]}>
-                      {mosque.prayerTimes.fajr} • {mosque.prayerTimes.isha}
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.mosqueDetailItem}>
-                    <Navigation size={16} color={colors[theme].primary} />
-                    <Text style={[styles.mosqueDetailText, { color: colors[theme].text }]}>
-                      {mosque.distance} away
-                    </Text>
-                  </View>
-                </View>
-                
-                <View style={styles.mosqueActions}>
-                  <TouchableOpacity 
-                    style={[styles.mosqueActionButton, { backgroundColor: colors[theme].primary }]}
-                  >
-                    <Text style={styles.mosqueActionButtonText}>
-                      Directions
-                    </Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={[
-                      styles.mosqueActionButton, 
-                      { backgroundColor: 'transparent', borderColor: colors[theme].primary, borderWidth: 1 }
-                    ]}
-                  >
-                    <Text style={[styles.mosqueActionButtonText, { color: colors[theme].primary }]}>
-                      Details
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </Card>
-            ))}
-          </ScrollView>
-        )}
+    <View style={[styles.container, { backgroundColor: colors[theme].background }]}>
+      <View style={[styles.header, { backgroundColor: colors[theme].card }]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+          <ArrowLeft size={24} color={colors[theme].text} />
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors[theme].text }]}>Mosques Near You</Text>
       </View>
-    </>
+
+      <View style={styles.searchContainer}>
+        <View style={[styles.searchInputContainer, { backgroundColor: colors[theme].card }]}>
+          <Search size={20} color={colors[theme].inactive} />
+          <TextInput
+            style={[styles.searchInput, { color: colors[theme].text }]}
+            placeholder="Search mosques..."
+            placeholderTextColor={colors[theme].inactive}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      </View>
+
+      <View style={styles.locationContainer}>
+        <MapPin size={20} color={colors[theme].primary} />
+        <Text style={[styles.locationText, { color: colors[theme].text }]}>
+         {locationName}
+        </Text>
+        <TouchableOpacity style={[styles.changeLocationButton, { backgroundColor: colors[theme].primary + '20' }]} onPress={getUserLocation}>
+          <Text style={[styles.changeLocationText, { color: colors[theme].primary }]}>Refresh</Text>
+        </TouchableOpacity>
+      </View>
+
+      {isLoading ? (
+        <ActivityIndicator size="large" color={colors[theme].primary} style={{ marginTop: 20 }} />
+      ) : (
+        <ScrollView style={styles.mosqueList} showsVerticalScrollIndicator={false}>
+          {filteredMosques.map((mosque, index) => (
+            <Card key={index} style={styles.mosqueCard}>
+              <Text style={{ color: colors[theme].text, fontWeight: 'bold' }}>{mosque.name}</Text>
+              <Text style={{ color: colors[theme].inactive }}>{mosque.address}</Text>
+              <Text style={{ color: colors[theme].text }}>Rating: {mosque.rating || 'N/A'}</Text>
+
+              <TouchableOpacity
+                style={[styles.directionButton, { backgroundColor: colors[theme].primary }]}
+                onPress={() => openDirections(mosque.location.lat, mosque.location.lng)}
+              >
+                <Text style={styles.directionButtonText}>Get Directions</Text>
+              </TouchableOpacity>
+            </Card>
+          ))}
+        </ScrollView>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
+  container: { 
+    flex: 1, 
+    padding: 16, 
+    marginTop:20
   },
-  searchContainer: {
-    marginBottom: 16,
-  },
-  searchInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 8,
+
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between', 
+    paddingVertical: 14, 
     paddingHorizontal: 12,
-    height: 48,
+    borderBottomWidth: StyleSheet.hairlineWidth, 
+    borderColor: '#ddd',
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
-  searchInput: {
+  headerButton: { 
+    padding: 8, 
+    borderRadius: 50, 
+  },
+  headerTitle: { 
+    fontSize: 20, 
+    fontWeight: '700',
+    textAlign: 'center',
     flex: 1,
-    marginLeft: 8,
+  },
+
+  searchContainer: { 
+    marginVertical: 16, 
+  },
+  searchInputContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: 12, 
+    borderRadius: 12, 
+    height: 50,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+  },
+  searchInput: { 
+    flex: 1, 
+    marginLeft: 8, 
     fontSize: 16,
   },
-  locationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
+
+  locationContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 16, 
+    backgroundColor: 'rgba(0,0,0,0.03)',
+    padding: 10,
+    borderRadius: 10,
   },
-  locationText: {
-    fontSize: 16,
-    marginLeft: 8,
+  locationText: { 
+    fontSize: 16, 
+    marginLeft: 8, 
     flex: 1,
-  },
-  changeLocationButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-  },
-  changeLocationText: {
-    fontSize: 14,
     fontWeight: '500',
   },
-  mapContainer: {
-    height: 200,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    overflow: 'hidden',
-    position: 'relative',
+  changeLocationButton: { 
+    paddingVertical: 6, 
+    paddingHorizontal: 14, 
+    borderRadius: 20, 
   },
-  mapImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-  },
-  mapPlaceholder: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    padding: 8,
-    borderRadius: 4,
-    color: '#FFFFFF',
-  },
-  webMapMessage: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 16,
-    padding: 12,
-    backgroundColor: '#FFF3CD',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  mosqueList: {
-    flex: 1,
-  },
-  mosqueCard: {
-    marginBottom: 12,
-  },
-  mosqueHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  mosqueName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginLeft: 4,
-  },
-  mosqueAddress: {
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  mosqueDetails: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-  mosqueDetailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  mosqueDetailText: {
-    fontSize: 14,
-    marginLeft: 4,
-  },
-  mosqueActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  mosqueActionButton: {
-    flex: 0.48,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  mosqueActionButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
+  changeLocationText: { 
+    fontSize: 14, 
     fontWeight: '600',
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+
+  mosqueList: { 
+    flex: 1, 
+  },
+  mosqueCard: { 
+    padding: 16, 
+    marginBottom: 14, 
+    borderRadius: 14, 
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+
+  directionButton: { 
+    marginTop: 12, 
+    paddingVertical: 12, 
+    borderRadius: 10, 
+    alignItems: 'center', 
+  },
+  directionButtonText: { 
+    color: '#fff', 
+    fontWeight: '700',
+    fontSize: 15,
+    letterSpacing: 0.3,
   },
 });

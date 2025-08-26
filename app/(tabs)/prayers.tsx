@@ -143,15 +143,7 @@ export default function PrayersScreen() {
         <Text style={[styles.screenTitle, { color: colors[theme].text }]}>
           Prayer Times
         </Text>
-        <TouchableOpacity onPress={handleRefresh} disabled={isRefreshing}>
-          <MaterialIcons
-            name="refresh"
-            size={24}
-            color={
-              isRefreshing ? colors[theme].inactive : colors[theme].primary
-            }
-          />
-        </TouchableOpacity>
+       
       </View>
 
       <Card style={styles.headerCard}>
@@ -250,7 +242,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: 16,
+    marginTop:40,
+    padding: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -260,8 +253,9 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
+    gap: 65,
     marginBottom: 16,
   },
   screenTitle: {
@@ -352,5 +346,6 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     padding: 8,
+
   },
 });

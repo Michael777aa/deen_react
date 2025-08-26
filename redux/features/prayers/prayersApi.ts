@@ -32,18 +32,3 @@ export const getNextPrayer = async (
     throw error;
   }
 };
-export const getQiblaDirection = async (
-  latitude: number,
-  longitude: number
-): Promise<IQiblaDirection> => {
-  try {
-    const response = await api.get(`/qibla/direction`, {
-      params: { latitude, longitude },
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching qibla direction:", error);
-    throw error;
-  }
-};
