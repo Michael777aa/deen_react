@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
-  Image,
   Animated,
-  SafeAreaView
+  SafeAreaView,
+  Share,
+  Alert
 } from 'react-native';
 import { Stack, useLocalSearchParams, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
@@ -24,11 +25,12 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
-  Heart,
-  Volume2,
   Download
 } from 'lucide-react-native';
 import { quranSurahs, getQuranVerses } from '@/mocks/quranData';
+import * as FileSystem from 'expo-file-system';
+import { Audio } from 'expo-av';
+import * as MediaLibrary from 'expo-media-library';
 
 export default function SurahDetailScreen() {
   const params = useLocalSearchParams();
@@ -45,7 +47,148 @@ export default function SurahDetailScreen() {
   const [bookmarkedVerses, setBookmarkedVerses] = useState<number[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [currentVerse, setCurrentVerse] = useState<number | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  // Audio playback functions
+  const loadAudio = async (verseNumber?: number) => {
+    try {
+      // Stop current playback if any
+      if (sound) {
+        await sound.unloadAsync();
+      }
+
+      // In a real app, you would use actual audio URLs
+      // For demo purposes, we'll use a placeholder
+      const audioUri = verseNumber 
+        ? `https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/113.mp3`
+        : `https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/113.mp3`;
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: audioUri },
+        { shouldPlay: true }
+      );
+
+      setSound(newSound);
+      setIsPlaying(true);
+      if (verseNumber) setCurrentVerse(verseNumber);
+      
+      newSound.setOnPlaybackStatusUpdate((status: any) => {
+        if (status.didJustFinish) {
+          setIsPlaying(false);
+          setCurrentVerse(null);
+        }
+      });
+    } catch (error) {
+      console.error('Error loading audio:', error);
+      Alert.alert('Error', 'Could not play audio. Please try again.');
+    }
+  };
+
+  const togglePlayPause = async () => {
+    if (isPlaying) {
+      await sound?.pauseAsync();
+      setIsPlaying(false);
+    } else {
+      if (sound) {
+        await sound.playAsync();
+        setIsPlaying(true);
+      } else {
+        // If no sound is loaded, load the full surah audio
+        await loadAudio();
+      }
+    }
+  };
+
+  const playVerse = async (verseNumber: number) => {
+    // If the same verse is already playing, toggle pause/play
+    if (currentVerse === verseNumber && sound) {
+      await togglePlayPause();
+    } else {
+      // Otherwise load and play the new verse
+      await loadAudio(verseNumber);
+    }
+  };
+
+  // Download functions
+  const downloadAudio = async () => {
+    if (Platform.OS === 'web') {
+      alert('Download not available on web');
+      return;
+    }
+    
+    // Request permissions first
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'Please grant media library permissions to download audio.');
+      return;
+    }
+
+    setIsDownloading(true);
+    
+    try {
+      // In a real app, you would use actual audio URLs
+      const audioUri = `https://download.quranicaudio.com/quran/mishary_rashid_alafasy/001.mp3`;
+      
+      const downloadResumable:any = FileSystem.createDownloadResumable(
+        audioUri,
+        FileSystem.documentDirectory + `surah_${surahNumber}.mp3`,
+        {},
+        (downloadProgress) => {
+          const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+          setDownloadProgress(progress);
+        }
+      );
+
+      const { uri } = await downloadResumable.downloadAsync();
+      
+      // Save to media library
+      const asset = await MediaLibrary.createAssetAsync(uri);
+      await MediaLibrary.createAlbumAsync('Quran Audio', asset, false);
+      
+      Alert.alert('Success', 'Surah downloaded successfully for offline listening');
+    } catch (error) {
+      console.error('Download error:', error);
+      Alert.alert('Error', 'Failed to download surah. Please try again.');
+    } finally {
+      setIsDownloading(false);
+      setDownloadProgress(0);
+    }
+  };
+
+  // Share functions
+  const shareSurah = async () => {
+    try {
+      await Share.share({
+        message: `Check out Surah ${surahInfo.englishName} from the Quran app!`,
+        url: 'http://playspot.uz', // Replace with your app's actual link
+        title: `Surah ${surahInfo.englishName}`
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const shareVerse = async (verse: any) => {
+    try {
+      await Share.share({
+        message: `"${verse.arabic}"\n\n${verse.translation}\n\n- Surah ${surahInfo.englishName}, Verse ${verse.number}`,
+        title: `Quran Verse ${verse.number}`
+      });
+    } catch (error) {
+      console.error('Error sharing verse:', error);
+    }
+  };
+
+  // Clean up audio on unmount
+  useEffect(() => {
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
 
   useEffect(() => {
     const loadSurah = async () => {
@@ -85,10 +228,6 @@ export default function SurahDetailScreen() {
     }
   }, [surahNumber]);
 
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
-
   const toggleBookmark = (verseNumber: number) => {
     if (bookmarkedVerses.includes(verseNumber)) {
       setBookmarkedVerses(bookmarkedVerses.filter(v => v !== verseNumber));
@@ -111,28 +250,6 @@ export default function SurahDetailScreen() {
 
   const goBack = () => {
     router.back();
-  };
-
-  const downloadAudio = () => {
-    if (Platform.OS === 'web') {
-      alert('Download not available on web');
-      return;
-    }
-    
-    setIsDownloading(true);
-    
-    // Simulate download progress
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 0.1;
-      setDownloadProgress(Math.min(progress, 1));
-      
-      if (progress >= 1) {
-        clearInterval(interval);
-        setIsDownloading(false);
-        alert('Surah downloaded successfully for offline listening');
-      }
-    }, 300);
   };
 
   if (isLoading) {
@@ -185,7 +302,7 @@ export default function SurahDetailScreen() {
         <Text style={[styles.headerTitle, { color: colors[theme].text }]}>
           Surah {surahInfo.englishName}
         </Text>
-        <TouchableOpacity style={styles.headerButton}>
+        <TouchableOpacity style={styles.headerButton} onPress={shareSurah}>
           <Share2 size={24} color={colors[theme].text} />
         </TouchableOpacity>
       </View>
@@ -226,7 +343,7 @@ export default function SurahDetailScreen() {
               style={[styles.playButton, { backgroundColor: colors[theme].primary }]}
               onPress={togglePlayPause}
             >
-              {isPlaying ? (
+              {isPlaying && !currentVerse ? (
                 <Pause size={20} color="#FFFFFF" />
               ) : (
                 <Play size={20} color="#FFFFFF" fill="#FFFFFF" />
@@ -362,11 +479,21 @@ export default function SurahDetailScreen() {
                     />
                   </TouchableOpacity>
                   
-                  <TouchableOpacity style={styles.verseActionButton}>
-                    <Play size={16} color={colors[theme].inactive} />
+                  <TouchableOpacity 
+                    style={styles.verseActionButton}
+                    onPress={() => playVerse(verse.number)}
+                  >
+                    {isPlaying && currentVerse === verse.number ? (
+                      <Pause size={16} color={colors[theme].primary} />
+                    ) : (
+                      <Play size={16} color={colors[theme].inactive} />
+                    )}
                   </TouchableOpacity>
                   
-                  <TouchableOpacity style={styles.verseActionButton}>
+                  <TouchableOpacity 
+                    style={styles.verseActionButton}
+                    onPress={() => shareVerse(verse)}
+                  >
                     <Share2 size={16} color={colors[theme].inactive} />
                   </TouchableOpacity>
                 </View>

@@ -14,7 +14,6 @@ import { colors } from "@/constants/colors";
 import { useProductStore } from "@/store/useProductStore";
 import {
   ArrowLeft,
-  Camera,
   X,
   Check,
   AlertTriangle,
@@ -50,6 +49,8 @@ export default function ScanScreen() {
       requestPermission();
     }
   }, [permission]);
+
+ 
 
   const handleScan = () => {
     setIsScanning(true);
@@ -276,7 +277,7 @@ export default function ScanScreen() {
                     {isScanning ? (
                       <ActivityIndicator size="small" color="#FFFFFF" />
                     ) : (
-                      <Camera size={24} color="#FFFFFF" />
+                     <Text>Camera</Text>
                     )}
                   </TouchableOpacity>
 
