@@ -26,7 +26,7 @@ export default function MapScreen() {
   const getNearbyMosques = async (lat: number, lng: number) => {
     try {
       setIsLoading(true);
-      const res = await fetch(`http://localhost:4335/api/v1/prayer/mosques?lat=${lat}&lng=${lng}`);
+      const res = await fetch(`https://c59c89ba29e7.ngrok-free.app/api/v1/prayer/mosques?lat=${lat}&lng=${lng}`);
       const data = await res.json();
       setMosques(data || []); // adjust depending on your API response
 
