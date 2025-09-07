@@ -31,6 +31,7 @@ const SUGGESTED_QUESTIONS = [
   "Explain Surah Al-Kahf benefits",
   "Authentic du'a for anxiety",
   "Rules of inheritance in Islam",
+  "How to keep discipline in life as a Muslim"
 ];
 
 export default function IslamicAssistantScreen() {

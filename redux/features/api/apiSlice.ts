@@ -1,3 +1,4 @@
+import { tokenCache } from "@/lib/utils/cache";
 import axios from "axios";
 
 export const API_BASE_URL = "https://c59c89ba29e7.ngrok-free.app/api/v1";
@@ -9,12 +10,12 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-// api.interceptors.request.use(async (config) => {
-//   const token = await tokenCache?.getToken("accessToken");
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
-
+api.interceptors.request.use(async (config) => {
+  const token = await tokenCache?.getToken("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+4;
 export default api;

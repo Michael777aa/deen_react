@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { colors } from '@/constants/colors';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { Svg, Path, Circle } from 'react-native-svg';
 
 interface BarChartProps {
   data: { name: string; count: number }[];
@@ -89,23 +90,24 @@ export const LineChart: React.FC<LineChartProps> = ({
       
       <View style={styles.lineChartContainer}>
         <View style={styles.chartArea}>
-          <svg height="150" width={width}>
-            <path
-              d={pathD}
-              fill="none"
-              stroke={colors[theme].primary}
-              strokeWidth="3"
-            />
-            {points.map((point, index) => (
-              <circle
-                key={index}
-                cx={point.x}
-                cy={point.y}
-                r="4"
-                fill={colors[theme].primary}
-              />
-            ))}
-          </svg>
+        <Svg height="150" width={width}>
+  <Path
+    d={pathD}
+    fill="none"
+    stroke={colors[theme].primary}
+    strokeWidth={3} // number, not string
+  />
+  {points.map((point, index) => (
+    <Circle
+      key={index}
+      cx={point.x}
+      cy={point.y}
+      r={4} // number
+      fill={colors[theme].primary}
+    />
+  ))}
+</Svg>
+
         </View>
         
         <View style={styles.labelsContainer}>

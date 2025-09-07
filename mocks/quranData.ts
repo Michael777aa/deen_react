@@ -5,7 +5,7 @@ export const quranSurahs = [
     englishName: "Al-Fatiha",
     englishNameTranslation: "The Opening",
     numberOfAyahs: 7,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 2,
@@ -13,7 +13,7 @@ export const quranSurahs = [
     englishName: "Al-Baqara",
     englishNameTranslation: "The Cow",
     numberOfAyahs: 286,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 3,
@@ -21,7 +21,7 @@ export const quranSurahs = [
     englishName: "Aal-Imran",
     englishNameTranslation: "The Family of Imran",
     numberOfAyahs: 200,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 4,
@@ -29,7 +29,7 @@ export const quranSurahs = [
     englishName: "An-Nisa",
     englishNameTranslation: "The Women",
     numberOfAyahs: 176,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 5,
@@ -37,7 +37,7 @@ export const quranSurahs = [
     englishName: "Al-Ma'ida",
     englishNameTranslation: "The Table Spread",
     numberOfAyahs: 120,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 6,
@@ -45,7 +45,7 @@ export const quranSurahs = [
     englishName: "Al-An'am",
     englishNameTranslation: "The Cattle",
     numberOfAyahs: 165,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 7,
@@ -53,7 +53,7 @@ export const quranSurahs = [
     englishName: "Al-A'raf",
     englishNameTranslation: "The Heights",
     numberOfAyahs: 206,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 8,
@@ -61,7 +61,7 @@ export const quranSurahs = [
     englishName: "Al-Anfal",
     englishNameTranslation: "The Spoils of War",
     numberOfAyahs: 75,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 9,
@@ -69,7 +69,7 @@ export const quranSurahs = [
     englishName: "At-Tawbah",
     englishNameTranslation: "The Repentance",
     numberOfAyahs: 129,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 10,
@@ -77,7 +77,7 @@ export const quranSurahs = [
     englishName: "Yunus",
     englishNameTranslation: "Jonah",
     numberOfAyahs: 109,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 11,
@@ -85,7 +85,7 @@ export const quranSurahs = [
     englishName: "Hud",
     englishNameTranslation: "Hud",
     numberOfAyahs: 123,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 12,
@@ -93,7 +93,7 @@ export const quranSurahs = [
     englishName: "Yusuf",
     englishNameTranslation: "Joseph",
     numberOfAyahs: 111,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 13,
@@ -101,7 +101,7 @@ export const quranSurahs = [
     englishName: "Ar-Ra'd",
     englishNameTranslation: "The Thunder",
     numberOfAyahs: 43,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 14,
@@ -109,7 +109,7 @@ export const quranSurahs = [
     englishName: "Ibrahim",
     englishNameTranslation: "Abraham",
     numberOfAyahs: 52,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 15,
@@ -117,7 +117,7 @@ export const quranSurahs = [
     englishName: "Al-Hijr",
     englishNameTranslation: "The Rocky Tract",
     numberOfAyahs: 99,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 16,
@@ -125,7 +125,7 @@ export const quranSurahs = [
     englishName: "An-Nahl",
     englishNameTranslation: "The Bee",
     numberOfAyahs: 128,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 17,
@@ -133,7 +133,7 @@ export const quranSurahs = [
     englishName: "Al-Isra",
     englishNameTranslation: "The Night Journey",
     numberOfAyahs: 111,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 18,
@@ -141,7 +141,7 @@ export const quranSurahs = [
     englishName: "Al-Kahf",
     englishNameTranslation: "The Cave",
     numberOfAyahs: 110,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 19,
@@ -149,7 +149,7 @@ export const quranSurahs = [
     englishName: "Maryam",
     englishNameTranslation: "Mary",
     numberOfAyahs: 98,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 20,
@@ -157,7 +157,7 @@ export const quranSurahs = [
     englishName: "Taha",
     englishNameTranslation: "Ta-Ha",
     numberOfAyahs: 135,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 21,
@@ -165,7 +165,7 @@ export const quranSurahs = [
     englishName: "Al-Anbya",
     englishNameTranslation: "The Prophets",
     numberOfAyahs: 112,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 22,
@@ -173,7 +173,7 @@ export const quranSurahs = [
     englishName: "Al-Hajj",
     englishNameTranslation: "The Pilgrimage",
     numberOfAyahs: 78,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 23,
@@ -181,7 +181,7 @@ export const quranSurahs = [
     englishName: "Al-Mu'minun",
     englishNameTranslation: "The Believers",
     numberOfAyahs: 118,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 24,
@@ -189,7 +189,7 @@ export const quranSurahs = [
     englishName: "An-Nur",
     englishNameTranslation: "The Light",
     numberOfAyahs: 64,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 25,
@@ -197,7 +197,7 @@ export const quranSurahs = [
     englishName: "Al-Furqan",
     englishNameTranslation: "The Criterion",
     numberOfAyahs: 77,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 26,
@@ -205,7 +205,7 @@ export const quranSurahs = [
     englishName: "Ash-Shu'ara",
     englishNameTranslation: "The Poets",
     numberOfAyahs: 227,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 27,
@@ -213,7 +213,7 @@ export const quranSurahs = [
     englishName: "An-Naml",
     englishNameTranslation: "The Ant",
     numberOfAyahs: 93,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 28,
@@ -221,7 +221,7 @@ export const quranSurahs = [
     englishName: "Al-Qasas",
     englishNameTranslation: "The Stories",
     numberOfAyahs: 88,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 29,
@@ -229,7 +229,7 @@ export const quranSurahs = [
     englishName: "Al-'Ankabut",
     englishNameTranslation: "The Spider",
     numberOfAyahs: 69,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 30,
@@ -237,7 +237,7 @@ export const quranSurahs = [
     englishName: "Ar-Rum",
     englishNameTranslation: "The Romans",
     numberOfAyahs: 60,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 31,
@@ -245,7 +245,7 @@ export const quranSurahs = [
     englishName: "Luqman",
     englishNameTranslation: "Luqman",
     numberOfAyahs: 34,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 32,
@@ -253,7 +253,7 @@ export const quranSurahs = [
     englishName: "As-Sajdah",
     englishNameTranslation: "The Prostration",
     numberOfAyahs: 30,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 33,
@@ -261,7 +261,7 @@ export const quranSurahs = [
     englishName: "Al-Ahzab",
     englishNameTranslation: "The Clans",
     numberOfAyahs: 73,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 34,
@@ -269,7 +269,7 @@ export const quranSurahs = [
     englishName: "Saba",
     englishNameTranslation: "Sheba",
     numberOfAyahs: 54,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 35,
@@ -277,7 +277,7 @@ export const quranSurahs = [
     englishName: "Fatir",
     englishNameTranslation: "Originator",
     numberOfAyahs: 45,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 36,
@@ -285,7 +285,7 @@ export const quranSurahs = [
     englishName: "Ya-Sin",
     englishNameTranslation: "Ya Sin",
     numberOfAyahs: 83,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 37,
@@ -293,7 +293,7 @@ export const quranSurahs = [
     englishName: "As-Saffat",
     englishNameTranslation: "Those who set the Ranks",
     numberOfAyahs: 182,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 38,
@@ -301,7 +301,7 @@ export const quranSurahs = [
     englishName: "Sad",
     englishNameTranslation: "The Letter Sad",
     numberOfAyahs: 88,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 39,
@@ -309,7 +309,7 @@ export const quranSurahs = [
     englishName: "Az-Zumar",
     englishNameTranslation: "The Troops",
     numberOfAyahs: 75,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 40,
@@ -317,7 +317,7 @@ export const quranSurahs = [
     englishName: "Ghafir",
     englishNameTranslation: "The Forgiver",
     numberOfAyahs: 85,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 41,
@@ -325,7 +325,7 @@ export const quranSurahs = [
     englishName: "Fussilat",
     englishNameTranslation: "Explained in Detail",
     numberOfAyahs: 54,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 42,
@@ -333,7 +333,7 @@ export const quranSurahs = [
     englishName: "Ash-Shuraa",
     englishNameTranslation: "The Consultation",
     numberOfAyahs: 53,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 43,
@@ -341,7 +341,7 @@ export const quranSurahs = [
     englishName: "Az-Zukhruf",
     englishNameTranslation: "The Ornaments of Gold",
     numberOfAyahs: 89,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 44,
@@ -349,7 +349,7 @@ export const quranSurahs = [
     englishName: "Ad-Dukhan",
     englishNameTranslation: "The Smoke",
     numberOfAyahs: 59,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 45,
@@ -357,7 +357,7 @@ export const quranSurahs = [
     englishName: "Al-Jathiyah",
     englishNameTranslation: "The Crouching",
     numberOfAyahs: 37,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 46,
@@ -365,7 +365,7 @@ export const quranSurahs = [
     englishName: "Al-Ahqaf",
     englishNameTranslation: "The Wind-Curved Sandhills",
     numberOfAyahs: 35,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 47,
@@ -373,7 +373,7 @@ export const quranSurahs = [
     englishName: "Muhammad",
     englishNameTranslation: "Muhammad",
     numberOfAyahs: 38,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 48,
@@ -381,7 +381,7 @@ export const quranSurahs = [
     englishName: "Al-Fath",
     englishNameTranslation: "The Victory",
     numberOfAyahs: 29,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 49,
@@ -389,7 +389,7 @@ export const quranSurahs = [
     englishName: "Al-Hujurat",
     englishNameTranslation: "The Rooms",
     numberOfAyahs: 18,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 50,
@@ -397,7 +397,7 @@ export const quranSurahs = [
     englishName: "Qaf",
     englishNameTranslation: "The Letter Qaf",
     numberOfAyahs: 45,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 51,
@@ -405,7 +405,7 @@ export const quranSurahs = [
     englishName: "Adh-Dhariyat",
     englishNameTranslation: "The Winnowing Winds",
     numberOfAyahs: 60,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 52,
@@ -413,7 +413,7 @@ export const quranSurahs = [
     englishName: "At-Tur",
     englishNameTranslation: "The Mount",
     numberOfAyahs: 49,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 53,
@@ -421,7 +421,7 @@ export const quranSurahs = [
     englishName: "An-Najm",
     englishNameTranslation: "The Star",
     numberOfAyahs: 62,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 54,
@@ -429,7 +429,7 @@ export const quranSurahs = [
     englishName: "Al-Qamar",
     englishNameTranslation: "The Moon",
     numberOfAyahs: 55,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 55,
@@ -437,7 +437,7 @@ export const quranSurahs = [
     englishName: "Ar-Rahman",
     englishNameTranslation: "The Beneficent",
     numberOfAyahs: 78,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 56,
@@ -445,7 +445,7 @@ export const quranSurahs = [
     englishName: "Al-Waqi'ah",
     englishNameTranslation: "The Inevitable",
     numberOfAyahs: 96,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 57,
@@ -453,7 +453,7 @@ export const quranSurahs = [
     englishName: "Al-Hadid",
     englishNameTranslation: "The Iron",
     numberOfAyahs: 29,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 58,
@@ -461,7 +461,7 @@ export const quranSurahs = [
     englishName: "Al-Mujadila",
     englishNameTranslation: "The Pleading Woman",
     numberOfAyahs: 22,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 59,
@@ -469,7 +469,7 @@ export const quranSurahs = [
     englishName: "Al-Hashr",
     englishNameTranslation: "The Exile",
     numberOfAyahs: 24,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 60,
@@ -477,7 +477,7 @@ export const quranSurahs = [
     englishName: "Al-Mumtahanah",
     englishNameTranslation: "She that is to be examined",
     numberOfAyahs: 13,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 61,
@@ -485,7 +485,7 @@ export const quranSurahs = [
     englishName: "As-Saff",
     englishNameTranslation: "The Ranks",
     numberOfAyahs: 14,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 62,
@@ -493,7 +493,7 @@ export const quranSurahs = [
     englishName: "Al-Jumu'ah",
     englishNameTranslation: "The Congregation, Friday",
     numberOfAyahs: 11,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 63,
@@ -501,7 +501,7 @@ export const quranSurahs = [
     englishName: "Al-Munafiqun",
     englishNameTranslation: "The Hypocrites",
     numberOfAyahs: 11,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 64,
@@ -509,7 +509,7 @@ export const quranSurahs = [
     englishName: "At-Taghabun",
     englishNameTranslation: "The Mutual Disillusion",
     numberOfAyahs: 18,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 65,
@@ -517,7 +517,7 @@ export const quranSurahs = [
     englishName: "At-Talaq",
     englishNameTranslation: "The Divorce",
     numberOfAyahs: 12,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 66,
@@ -525,7 +525,7 @@ export const quranSurahs = [
     englishName: "At-Tahrim",
     englishNameTranslation: "The Prohibition",
     numberOfAyahs: 12,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 67,
@@ -533,7 +533,7 @@ export const quranSurahs = [
     englishName: "Al-Mulk",
     englishNameTranslation: "The Sovereignty",
     numberOfAyahs: 30,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 68,
@@ -541,7 +541,7 @@ export const quranSurahs = [
     englishName: "Al-Qalam",
     englishNameTranslation: "The Pen",
     numberOfAyahs: 52,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 69,
@@ -549,7 +549,7 @@ export const quranSurahs = [
     englishName: "Al-Haqqah",
     englishNameTranslation: "The Reality",
     numberOfAyahs: 52,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 70,
@@ -557,7 +557,7 @@ export const quranSurahs = [
     englishName: "Al-Ma'arij",
     englishNameTranslation: "The Ascending Stairways",
     numberOfAyahs: 44,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 71,
@@ -565,7 +565,7 @@ export const quranSurahs = [
     englishName: "Nuh",
     englishNameTranslation: "Noah",
     numberOfAyahs: 28,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 72,
@@ -573,7 +573,7 @@ export const quranSurahs = [
     englishName: "Al-Jinn",
     englishNameTranslation: "The Jinn",
     numberOfAyahs: 28,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 73,
@@ -581,7 +581,7 @@ export const quranSurahs = [
     englishName: "Al-Muzzammil",
     englishNameTranslation: "The Enshrouded One",
     numberOfAyahs: 20,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 74,
@@ -589,7 +589,7 @@ export const quranSurahs = [
     englishName: "Al-Muddaththir",
     englishNameTranslation: "The Cloaked One",
     numberOfAyahs: 56,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 75,
@@ -597,7 +597,7 @@ export const quranSurahs = [
     englishName: "Al-Qiyamah",
     englishNameTranslation: "The Resurrection",
     numberOfAyahs: 40,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 76,
@@ -605,7 +605,7 @@ export const quranSurahs = [
     englishName: "Al-Insan",
     englishNameTranslation: "The Man",
     numberOfAyahs: 31,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 77,
@@ -613,7 +613,7 @@ export const quranSurahs = [
     englishName: "Al-Mursalat",
     englishNameTranslation: "The Emissaries",
     numberOfAyahs: 50,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 78,
@@ -621,7 +621,7 @@ export const quranSurahs = [
     englishName: "An-Naba",
     englishNameTranslation: "The Tidings",
     numberOfAyahs: 40,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 79,
@@ -629,7 +629,7 @@ export const quranSurahs = [
     englishName: "An-Nazi'at",
     englishNameTranslation: "Those who drag forth",
     numberOfAyahs: 46,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 80,
@@ -637,7 +637,7 @@ export const quranSurahs = [
     englishName: "Abasa",
     englishNameTranslation: "He Frowned",
     numberOfAyahs: 42,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 81,
@@ -645,7 +645,7 @@ export const quranSurahs = [
     englishName: "At-Takwir",
     englishNameTranslation: "The Overthrowing",
     numberOfAyahs: 29,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 82,
@@ -653,7 +653,7 @@ export const quranSurahs = [
     englishName: "Al-Infitar",
     englishNameTranslation: "The Cleaving",
     numberOfAyahs: 19,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 83,
@@ -661,7 +661,7 @@ export const quranSurahs = [
     englishName: "Al-Mutaffifin",
     englishNameTranslation: "The Defrauding",
     numberOfAyahs: 36,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 84,
@@ -669,7 +669,7 @@ export const quranSurahs = [
     englishName: "Al-Inshiqaq",
     englishNameTranslation: "The Splitting Open",
     numberOfAyahs: 25,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 85,
@@ -677,7 +677,7 @@ export const quranSurahs = [
     englishName: "Al-Buruj",
     englishNameTranslation: "The Mansions of the Stars",
     numberOfAyahs: 22,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 86,
@@ -685,7 +685,7 @@ export const quranSurahs = [
     englishName: "At-Tariq",
     englishNameTranslation: "The Morning Star",
     numberOfAyahs: 17,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 87,
@@ -693,7 +693,7 @@ export const quranSurahs = [
     englishName: "Al-A'la",
     englishNameTranslation: "The Most High",
     numberOfAyahs: 19,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 88,
@@ -701,7 +701,7 @@ export const quranSurahs = [
     englishName: "Al-Ghashiyah",
     englishNameTranslation: "The Overwhelming",
     numberOfAyahs: 26,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 89,
@@ -709,7 +709,7 @@ export const quranSurahs = [
     englishName: "Al-Fajr",
     englishNameTranslation: "The Dawn",
     numberOfAyahs: 30,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 90,
@@ -717,7 +717,7 @@ export const quranSurahs = [
     englishName: "Al-Balad",
     englishNameTranslation: "The City",
     numberOfAyahs: 20,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 91,
@@ -725,7 +725,7 @@ export const quranSurahs = [
     englishName: "Ash-Shams",
     englishNameTranslation: "The Sun",
     numberOfAyahs: 15,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 92,
@@ -733,7 +733,7 @@ export const quranSurahs = [
     englishName: "Al-Layl",
     englishNameTranslation: "The Night",
     numberOfAyahs: 21,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 93,
@@ -741,7 +741,7 @@ export const quranSurahs = [
     englishName: "Ad-Duhaa",
     englishNameTranslation: "The Morning Hours",
     numberOfAyahs: 11,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 94,
@@ -749,7 +749,7 @@ export const quranSurahs = [
     englishName: "Ash-Sharh",
     englishNameTranslation: "The Relief",
     numberOfAyahs: 8,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 95,
@@ -757,7 +757,7 @@ export const quranSurahs = [
     englishName: "At-Tin",
     englishNameTranslation: "The Fig",
     numberOfAyahs: 8,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 96,
@@ -765,7 +765,7 @@ export const quranSurahs = [
     englishName: "Al-Alaq",
     englishNameTranslation: "The Clot",
     numberOfAyahs: 19,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 97,
@@ -773,7 +773,7 @@ export const quranSurahs = [
     englishName: "Al-Qadr",
     englishNameTranslation: "The Power, Fate",
     numberOfAyahs: 5,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 98,
@@ -781,7 +781,7 @@ export const quranSurahs = [
     englishName: "Al-Bayyinah",
     englishNameTranslation: "The Evidence",
     numberOfAyahs: 8,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 99,
@@ -789,7 +789,7 @@ export const quranSurahs = [
     englishName: "Az-Zalzalah",
     englishNameTranslation: "The Earthquake",
     numberOfAyahs: 8,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 100,
@@ -797,7 +797,7 @@ export const quranSurahs = [
     englishName: "Al-Adiyat",
     englishNameTranslation: "The Courser",
     numberOfAyahs: 11,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 101,
@@ -805,7 +805,7 @@ export const quranSurahs = [
     englishName: "Al-Qari'ah",
     englishNameTranslation: "The Calamity",
     numberOfAyahs: 11,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 102,
@@ -813,7 +813,7 @@ export const quranSurahs = [
     englishName: "At-Takathur",
     englishNameTranslation: "The Rivalry in world increase",
     numberOfAyahs: 8,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 103,
@@ -821,7 +821,7 @@ export const quranSurahs = [
     englishName: "Al-Asr",
     englishNameTranslation: "The Declining Day, Epoch",
     numberOfAyahs: 3,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 104,
@@ -829,7 +829,7 @@ export const quranSurahs = [
     englishName: "Al-Humazah",
     englishNameTranslation: "The Traducer",
     numberOfAyahs: 9,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 105,
@@ -837,7 +837,7 @@ export const quranSurahs = [
     englishName: "Al-Fil",
     englishNameTranslation: "The Elephant",
     numberOfAyahs: 5,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 106,
@@ -845,7 +845,7 @@ export const quranSurahs = [
     englishName: "Quraysh",
     englishNameTranslation: "Quraysh",
     numberOfAyahs: 4,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 107,
@@ -853,7 +853,7 @@ export const quranSurahs = [
     englishName: "Al-Ma'un",
     englishNameTranslation: "The Small kindnesses",
     numberOfAyahs: 7,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 108,
@@ -861,7 +861,7 @@ export const quranSurahs = [
     englishName: "Al-Kawthar",
     englishNameTranslation: "The Abundance",
     numberOfAyahs: 3,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 109,
@@ -869,7 +869,7 @@ export const quranSurahs = [
     englishName: "Al-Kafirun",
     englishNameTranslation: "The Disbelievers",
     numberOfAyahs: 6,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 110,
@@ -877,7 +877,7 @@ export const quranSurahs = [
     englishName: "An-Nasr",
     englishNameTranslation: "The Divine Support",
     numberOfAyahs: 3,
-    revelationType: "Medinan"
+    revelationType: "Medinan",
   },
   {
     number: 111,
@@ -885,7 +885,7 @@ export const quranSurahs = [
     englishName: "Al-Masad",
     englishNameTranslation: "The Palm Fibre",
     numberOfAyahs: 5,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 112,
@@ -893,7 +893,7 @@ export const quranSurahs = [
     englishName: "Al-Ikhlas",
     englishNameTranslation: "The Sincerity",
     numberOfAyahs: 4,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 113,
@@ -901,7 +901,7 @@ export const quranSurahs = [
     englishName: "Al-Falaq",
     englishNameTranslation: "The Daybreak",
     numberOfAyahs: 5,
-    revelationType: "Meccan"
+    revelationType: "Meccan",
   },
   {
     number: 114,
@@ -909,8 +909,8 @@ export const quranSurahs = [
     englishName: "An-Nas",
     englishNameTranslation: "The Mankind",
     numberOfAyahs: 6,
-    revelationType: "Meccan"
-  }
+    revelationType: "Meccan",
+  },
 ];
 
 // Mock function to generate verses for a surah
@@ -922,44 +922,48 @@ export const getQuranVerses = (surahNumber: number) => {
         number: 1,
         arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
         transliteration: "Bismillahir rahmanir raheem",
-        translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful."
+        translation:
+          "In the name of Allah, the Entirely Merciful, the Especially Merciful.",
       },
       {
         number: 2,
         arabic: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
         transliteration: "Alhamdu lillahi rabbil 'alamin",
-        translation: "All praise is due to Allah, Lord of the worlds."
+        translation: "All praise is due to Allah, Lord of the worlds.",
       },
       {
         number: 3,
         arabic: "الرَّحْمَٰنِ الرَّحِيمِ",
         transliteration: "Ar-rahmanir-raheem",
-        translation: "The Entirely Merciful, the Especially Merciful."
+        translation: "The Entirely Merciful, the Especially Merciful.",
       },
       {
         number: 4,
         arabic: "مَالِكِ يَوْمِ الدِّينِ",
         transliteration: "Maliki yawmid-deen",
-        translation: "Sovereign of the Day of Recompense."
+        translation: "Sovereign of the Day of Recompense.",
       },
       {
         number: 5,
         arabic: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
         transliteration: "Iyyaka na'budu wa iyyaka nasta'een",
-        translation: "It is You we worship and You we ask for help."
+        translation: "It is You we worship and You we ask for help.",
       },
       {
         number: 6,
         arabic: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
         transliteration: "Ihdinas-siratal-mustaqeem",
-        translation: "Guide us to the straight path."
+        translation: "Guide us to the straight path.",
       },
       {
         number: 7,
-        arabic: "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
-        transliteration: "Siratal-latheena an'amta 'alayhim, ghayril-maghdubi 'alayhim wa lad-dalleen",
-        translation: "The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray."
-      }
+        arabic:
+          "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+        transliteration:
+          "Siratal-latheena an'amta 'alayhim, ghayril-maghdubi 'alayhim wa lad-dalleen",
+        translation:
+          "The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray.",
+      },
     ];
   } else if (surahNumber === 112) {
     return [
@@ -967,26 +971,26 @@ export const getQuranVerses = (surahNumber: number) => {
         number: 1,
         arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ",
         transliteration: "Qul huwa Allahu ahad",
-        translation: "Say, \"He is Allah, [who is] One.\""
+        translation: 'Say, "He is Allah, [who is] One."',
       },
       {
         number: 2,
         arabic: "اللَّهُ الصَّمَدُ",
         transliteration: "Allahus-samad",
-        translation: "Allah, the Eternal Refuge."
+        translation: "Allah, the Eternal Refuge.",
       },
       {
         number: 3,
         arabic: "لَمْ يَلِدْ وَلَمْ يُولَدْ",
         transliteration: "Lam yalid wa lam yoolad",
-        translation: "He neither begets nor is born."
+        translation: "He neither begets nor is born.",
       },
       {
         number: 4,
         arabic: "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
         transliteration: "Wa lam yakun lahu kufuwan ahad",
-        translation: "Nor is there to Him any equivalent.\""
-      }
+        translation: 'Nor is there to Him any equivalent."',
+      },
     ];
   } else if (surahNumber === 36) {
     return [
@@ -994,58 +998,98 @@ export const getQuranVerses = (surahNumber: number) => {
         number: 1,
         arabic: "يس",
         transliteration: "Ya-Sin",
-        translation: "Ya, Seen."
+        translation: "Ya, Seen.",
       },
       {
         number: 2,
         arabic: "وَالْقُرْآنِ الْحَكِيمِ",
         transliteration: "Wal-Qur'anil-hakeem",
-        translation: "By the wise Qur'an."
+        translation: "By the wise Qur'an.",
       },
       {
         number: 3,
         arabic: "إِنَّكَ لَمِنَ الْمُرْسَلِينَ",
         transliteration: "Innaka laminal-mursaleen",
-        translation: "Indeed you, [O Muhammad], are from among the messengers,"
+        translation: "Indeed you, [O Muhammad], are from among the messengers,",
       },
       {
         number: 4,
         arabic: "عَلَىٰ صِرَاطٍ مُّسْتَقِيمٍ",
         transliteration: "'Alaa siraatim-mustaqeem",
-        translation: "On a straight path."
+        translation: "On a straight path.",
       },
       {
         number: 5,
         arabic: "تَنزِيلَ الْعَزِيزِ الرَّحِيمِ",
         transliteration: "Tanzeelal-'Azeezir-Raheem",
-        translation: "[This is] a revelation of the Exalted in Might, the Merciful,"
-      }
+        translation:
+          "[This is] a revelation of the Exalted in Might, the Merciful,",
+      },
     ];
   } else if (surahNumber === 67) {
     return [
       {
         number: 1,
-        arabic: "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
-        transliteration: "Tabaarakal-lathee biyadihil-mulku wa huwa 'alaa kulli shay'in qadeer",
-        translation: "Blessed is He in whose hand is dominion, and He is over all things competent"
+        arabic:
+          "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+        transliteration:
+          "Tabaarakal-lathee biyadihil-mulku wa huwa 'alaa kulli shay'in qadeer",
+        translation:
+          "Blessed is He in whose hand is dominion, and He is over all things competent",
       },
       {
         number: 2,
-        arabic: "الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ",
-        transliteration: "Allathee khalaqal-mawta wal-hayaata liyabluwakum ayyukum ahsanu 'amalan wa huwal-'Azeezul-Ghafoor",
-        translation: "[He] who created death and life to test you [as to] which of you is best in deed - and He is the Exalted in Might, the Forgiving"
-      }
+        arabic:
+          "الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ",
+        transliteration:
+          "Allathee khalaqal-mawta wal-hayaata liyabluwakum ayyukum ahsanu 'amalan wa huwal-'Azeezul-Ghafoor",
+        translation:
+          "[He] who created death and life to test you [as to] which of you is best in deed - and He is the Exalted in Might, the Forgiving",
+      },
     ];
   } else {
     // Return generic mock data for other surahs
-    const surahInfo = quranSurahs.find(s => s.number === surahNumber);
+    const surahInfo = quranSurahs.find((s) => s.number === surahNumber);
     const numberOfVerses = Math.min(surahInfo?.numberOfAyahs || 10, 10); // Limit to 10 verses for demo
-    
-    return Array(numberOfVerses).fill(0).map((_, index) => ({
-      number: index + 1,
-      arabic: "هَذَا نَصٌّ عَرَبِيٌّ لِلْعَرْضِ فَقَطْ ۚ وَاللَّهُ أَعْلَمُ",
-      transliteration: "Hadha nassun 'arabiyyun lil'ardi faqat, wallahu a'lam",
-      translation: "This is a sample verse for demonstration purposes only. And Allah knows best."
-    }));
+
+    return Array(numberOfVerses)
+      .fill(0)
+      .map((_, index) => ({
+        number: index + 1,
+        arabic: "هَذَا نَصٌّ عَرَبِيٌّ لِلْعَرْضِ فَقَطْ ۚ وَاللَّهُ أَعْلَمُ",
+        transliteration:
+          "Hadha nassun 'arabiyyun lil'ardi faqat, wallahu a'lam",
+        translation:
+          "This is a sample verse for demonstration purposes only. And Allah knows best.",
+      }));
   }
 };
+
+// Update your quranReciters data (in mocks/quranData.ts)
+// quranData.ts
+export const quranReciters = [
+  {
+    id: "mishaari_raashid_al_3afaasee",
+    name: "Mishary Rashid Alafasy",
+    baseUrl: "https://server8.mp3quran.net/afs/",
+    pattern: "surah", // Uses full surah files
+  },
+  {
+    id: "abdurrahmaan_as_sudays",
+    name: "Abdurrahman As-Sudais",
+    baseUrl: "https://download.quranicaudio.com/quran/abdurrahmaan_as-sudays/",
+    pattern: "verse", // Uses individual verse files
+  },
+  {
+    id: "salaah_al_budair",
+    name: "Salah Al-Budair",
+    baseUrl: "https://server8.mp3quran.net/bdr/",
+    pattern: "surah",
+  },
+  {
+    id: "saood_ash_shuraym",
+    name: "Saud Ash-Shuraym",
+    baseUrl: "https://server8.mp3quran.net/ssh/",
+    pattern: "surah",
+  },
+];

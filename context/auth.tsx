@@ -230,7 +230,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         },
         body: JSON.stringify({ email, password, name }),
       });
-      console.log("RESPONSE",response);
+
       
 
       if (!response.ok) {

@@ -7,5 +7,6 @@ export type AuthUser = {
   picture?: string;
   provider?: string;
   exp?: number;
+  userType: string;
 };
 export const staticBase = API_BASE_URL.replace("/api/v1", "");

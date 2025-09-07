@@ -19,17 +19,19 @@ export default function MapScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [mosques, setMosques] = useState<Mosque[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-    const [locationName, setLocationName] = useState("");
+  const [locationName, setLocationName] = useState("");
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  const getNearbyMosques = async (lat: number, lng: number) => {
+  // Fetch mosques by country (and optionally city)
+  const getMosquesByLocation = async (country: string, city?: string) => {
     try {
       setIsLoading(true);
-      const res = await fetch(`https://c59c89ba29e7.ngrok-free.app/api/v1/prayer/mosques?lat=${lat}&lng=${lng}`);
-      const data = await res.json();
-      setMosques(data || []); // adjust depending on your API response
+      let url = `https://c59c89ba29e7.ngrok-free.app/api/v1/prayer/mosques?country=${encodeURIComponent(country)}`;
+      if (city) url += `&city=${encodeURIComponent(city)}`;
 
+      const res = await fetch(url);
+      const data = await res.json();
+      setMosques(data.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -37,19 +39,22 @@ export default function MapScreen() {
     }
   };
 
+  // Get user location & country
   const getUserLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') return alert('Location permission denied');
     
     const location = await Location.getCurrentPositionAsync({});
- 
-    const coords = { lat: location.coords.latitude, lng: location.coords.longitude };
     const address = await Location.reverseGeocodeAsync({
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     });
-    setLocationName(address[0]?.city || "NOT FOUND ");
-    getNearbyMosques(coords.lat, coords.lng);
+
+    const country = address[0]?.country || "South Korea"; // default
+    const city = address[0]?.city || undefined;
+    setLocationName(city || country);
+
+    getMosquesByLocation(country, city);
   };
 
   useEffect(() => { getUserLocation(); }, []);
@@ -59,7 +64,6 @@ export default function MapScreen() {
     m.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Open navigation
   const openDirections = (lat: number, lng: number) => {
     const url = Platform.select({
       ios: `maps://?daddr=${lat},${lng}`,
@@ -70,6 +74,7 @@ export default function MapScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors[theme].background }]}>
+      {/* Header */}
       <View style={[styles.header, { backgroundColor: colors[theme].card }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
           <ArrowLeft size={24} color={colors[theme].text} />
@@ -77,6 +82,7 @@ export default function MapScreen() {
         <Text style={[styles.headerTitle, { color: colors[theme].text }]}>Mosques Near You</Text>
       </View>
 
+      {/* Search */}
       <View style={styles.searchContainer}>
         <View style={[styles.searchInputContainer, { backgroundColor: colors[theme].card }]}>
           <Search size={20} color={colors[theme].inactive} />
@@ -90,16 +96,21 @@ export default function MapScreen() {
         </View>
       </View>
 
+      {/* Location */}
       <View style={styles.locationContainer}>
         <MapPin size={20} color={colors[theme].primary} />
         <Text style={[styles.locationText, { color: colors[theme].text }]}>
          {locationName}
         </Text>
-        <TouchableOpacity style={[styles.changeLocationButton, { backgroundColor: colors[theme].primary + '20' }]} onPress={getUserLocation}>
+        <TouchableOpacity 
+          style={[styles.changeLocationButton, { backgroundColor: colors[theme].primary + '20' }]} 
+          onPress={getUserLocation}
+        >
           <Text style={[styles.changeLocationText, { color: colors[theme].primary }]}>Refresh</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Mosque List */}
       {isLoading ? (
         <ActivityIndicator size="large" color={colors[theme].primary} style={{ marginTop: 20 }} />
       ) : (
@@ -125,107 +136,22 @@ export default function MapScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 16, 
-    marginTop:20
-  },
+  container: { flex: 1, padding: 16, marginTop:20 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, paddingHorizontal: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: '#ddd', borderRadius: 12, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 },
+  headerButton: { padding: 8, borderRadius: 50 },
+  headerTitle: { fontSize: 20, fontWeight: '700', textAlign: 'center', flex: 1 },
 
-  header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between', 
-    paddingVertical: 14, 
-    paddingHorizontal: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth, 
-    borderColor: '#ddd',
-    borderRadius: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-  },
-  headerButton: { 
-    padding: 8, 
-    borderRadius: 50, 
-  },
-  headerTitle: { 
-    fontSize: 20, 
-    fontWeight: '700',
-    textAlign: 'center',
-    flex: 1,
-  },
+  searchContainer: { marginVertical: 16 },
+  searchInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, borderRadius: 12, height: 50, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 3 },
+  searchInput: { flex: 1, marginLeft: 8, fontSize: 16 },
 
-  searchContainer: { 
-    marginVertical: 16, 
-  },
-  searchInputContainer: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    paddingHorizontal: 12, 
-    borderRadius: 12, 
-    height: 50,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-  },
-  searchInput: { 
-    flex: 1, 
-    marginLeft: 8, 
-    fontSize: 16,
-  },
+  locationContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, backgroundColor: 'rgba(0,0,0,0.03)', padding: 10, borderRadius: 10 },
+  locationText: { fontSize: 16, marginLeft: 8, flex: 1, fontWeight: '500' },
+  changeLocationButton: { paddingVertical: 6, paddingHorizontal: 14, borderRadius: 20 },
+  changeLocationText: { fontSize: 14, fontWeight: '600' },
 
-  locationContainer: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 16, 
-    backgroundColor: 'rgba(0,0,0,0.03)',
-    padding: 10,
-    borderRadius: 10,
-  },
-  locationText: { 
-    fontSize: 16, 
-    marginLeft: 8, 
-    flex: 1,
-    fontWeight: '500',
-  },
-  changeLocationButton: { 
-    paddingVertical: 6, 
-    paddingHorizontal: 14, 
-    borderRadius: 20, 
-  },
-  changeLocationText: { 
-    fontSize: 14, 
-    fontWeight: '600',
-  },
-
-  mosqueList: { 
-    flex: 1, 
-  },
-  mosqueCard: { 
-    padding: 16, 
-    marginBottom: 14, 
-    borderRadius: 14, 
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-  },
-
-  directionButton: { 
-    marginTop: 12, 
-    paddingVertical: 12, 
-    borderRadius: 10, 
-    alignItems: 'center', 
-  },
-  directionButtonText: { 
-    color: '#fff', 
-    fontWeight: '700',
-    fontSize: 15,
-    letterSpacing: 0.3,
-  },
+  mosqueList: { flex: 1 },
+  mosqueCard: { padding: 16, marginBottom: 14, borderRadius: 14, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 },
+  directionButton: { marginTop: 12, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
+  directionButtonText: { color: '#fff', fontWeight: '700', fontSize: 15, letterSpacing: 0.3 },
 });
