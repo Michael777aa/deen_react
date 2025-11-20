@@ -1,7 +1,7 @@
 import { tokenCache } from "@/lib/utils/cache";
 import axios from "axios";
 
-export const API_BASE_URL = "https://0110f74597a0.ngrok-free.app/api/v1";
+export const API_BASE_URL = "https://06d849c9f799.ngrok-free.app/api/v1";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -17,5 +17,5 @@ api.interceptors.request.use(async (config) => {
   }
   return config;
 });
-4;
+
 export default api;
