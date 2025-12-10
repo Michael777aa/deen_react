@@ -19,11 +19,10 @@ export default function TabLayout() {
           bottom: 20,
           left: 20,
           right: 20,
-          height: 70,
-          borderRadius: 30,
-          backgroundColor: colors[theme].card,
+          height: 82.5,
+          // backgroundColor: colors[theme].card,
           borderTopWidth: 0,
-          elevation: 10,       // Android shadow
+          elevation: 100,       // Android shadow
           shadowColor: '#000', // iOS shadow
           shadowOpacity: 0.1,
           shadowRadius: 10,

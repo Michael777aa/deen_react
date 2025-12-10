@@ -138,8 +138,8 @@ export default function IslamicAssistantScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors[theme].background }]}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+
     >
       {error && (
         <ErrorToast message={error} onDismiss={clearError} theme={theme} />
@@ -256,7 +256,7 @@ export default function IslamicAssistantScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1,},
   messageList: { padding: 16, paddingBottom: 40 },
   loadingContainer: {
     flexDirection: "row",
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     borderTopWidth: 1,
-    paddingBottom:40
+    paddingBottom:10
   },
   voiceButton: { padding: 8, position: "relative" },
   recordingIndicator: {
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     maxHeight: 100,
-    fontSize: 16,
+    fontSize: 14,
     marginHorizontal: 8,
   },
   sendButton: {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     right: 12,
     width:40,
     height:40,
-    bottom: 125,
+    bottom: 85,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 30,
