@@ -21,12 +21,12 @@ export default function MapScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [locationName, setLocationName] = useState("");
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
+//dsf
   // Fetch mosques by country (and optionally city)
   const getMosquesByLocation = async (country: string, city?: string) => {
     try {
       setIsLoading(true);
-      let url = `https://d2abcd549103.ngrok-free.app/api/v1/prayer/mosques?country=${encodeURIComponent(country)}`;
+      let url = `https://deen-backend-scale-1.onrender.com/api/v1/prayer/mosques?country=${encodeURIComponent(country)}`;
       if (city) url += `&city=${encodeURIComponent(city)}`;
 
       const res = await fetch(url);
