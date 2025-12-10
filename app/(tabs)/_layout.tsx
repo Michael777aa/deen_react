@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
 import { Home, BookOpen, ShoppingBag, MessageCircle, User } from 'lucide-react-native';
+import { Utensils } from 'lucide-react-native';
 
 export default function TabLayout() {
   const { darkMode } = useSettingsStore();
@@ -14,22 +15,22 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors[theme].primary,
         tabBarInactiveTintColor: colors[theme].inactive,
         tabBarStyle: {
+          position: 'absolute',
+          bottom: 20,
+          left: 20,
+          right: 20,
+          height: 70,
+          borderRadius: 30,
           backgroundColor: colors[theme].card,
-          borderTopColor: colors[theme].border,
-          height: 80,
-          paddingBottom: 8,
-          paddingTop: 8,
-          position: "relative",
-          
+          borderTopWidth: 0,
+          elevation: 10,       // Android shadow
+          shadowColor: '#000', // iOS shadow
+          shadowOpacity: 0.1,
+          shadowRadius: 10,
+          paddingBottom: 10,
+          paddingTop: 10,
         },
-        headerStyle: {
-          backgroundColor: colors[theme].card,
-        },
-        headerTintColor: colors[theme].text,
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
-        },
+        
       }}
     >
       <Tabs.Screen
@@ -55,16 +56,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chat"
+        name="restaurants"
         options={{
-          title: 'Chat',
-          tabBarIcon: ({ color, size }) => <MessageCircle size={size} color={color} />,
+          title: 'Restaurant',
+          tabBarIcon: ({ color, size }) => <Utensils size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
+          headerShown: false,
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
         }}
       />
@@ -78,9 +80,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="restaurants"
+        name="chat"
         options={{
-          href: null, // This hides it from the tab bar
+          href: null,
+          headerShown: false,
+          tabBarStyle: { display: "none" }, // 👈 hides bottom tabs
         }}
       />
           <Tabs.Screen

@@ -93,7 +93,7 @@ export default function PremiumScreen() {
         </Text>
         
         <TouchableOpacity>
-          {/* <Card style={[
+          <Card style={[
             styles.planCard, 
             { borderColor: colors[theme].primary, borderWidth: 2 }
           ]}>
@@ -115,7 +115,7 @@ export default function PremiumScreen() {
             <Text style={[styles.planDescription, { color: colors[theme].text }]}>
               Less than $5 per month
             </Text>
-          </Card> */}
+          </Card>
         </TouchableOpacity>
         
         <TouchableOpacity>
@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 24,
+    marginTop: 50
   },
   headerImage: {
     width: '100%',

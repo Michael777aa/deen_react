@@ -300,7 +300,7 @@ export default function SurahDetailScreen() {
         setSurahInfo(info);
         
         // Get verses (mock data)
-        const surahVerses = getQuranVerses(surahNumber);
+        const surahVerses:any = getQuranVerses(surahNumber);
         setVerses(surahVerses);
         
         setTimeout(() => {
@@ -756,6 +756,7 @@ export default function SurahDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+
   },
   content: {
     flex: 1,
@@ -766,7 +767,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingTop: Platform.OS === 'ios' ? 12 : 16,
+    paddingTop:35,
+    
   },
   headerButton: {
     padding: 8,
@@ -806,7 +808,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   surahHeader: {
-    padding: 16,
     alignItems: 'center',
   },
   surahHeaderContent: {
@@ -1054,6 +1055,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
+    borderTopWidth: 0,
+    elevation: 10,       // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOpacity: 0.1,
+    paddingBottom:40
   },
   navigationButton: {
     flexDirection: 'row',

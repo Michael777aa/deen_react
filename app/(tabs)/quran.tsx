@@ -308,9 +308,7 @@ export default function QuranScreen() {
         ]}
       >
         <Image
-          source={{
-            uri: "https://images.unsplash.com/photo-1584286595398-a8c264b1dea4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-          }}
+         source={require("@/assets/images/mosque.jpg")}
           style={styles.headerImage}
         />
         <View style={styles.headerOverlay}>

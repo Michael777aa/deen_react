@@ -26,7 +26,7 @@ export default function MapScreen() {
   const getMosquesByLocation = async (country: string, city?: string) => {
     try {
       setIsLoading(true);
-      let url = `https://c59c89ba29e7.ngrok-free.app/api/v1/prayer/mosques?country=${encodeURIComponent(country)}`;
+      let url = `https://d2abcd549103.ngrok-free.app/api/v1/prayer/mosques?country=${encodeURIComponent(country)}`;
       if (city) url += `&city=${encodeURIComponent(city)}`;
 
       const res = await fetch(url);

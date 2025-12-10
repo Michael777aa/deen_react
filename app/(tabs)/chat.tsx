@@ -249,8 +249,7 @@ export default function IslamicAssistantScreen() {
         onPress={startNewSession}
         activeOpacity={0.8}
       >
-        <RefreshCw size={16} color="#FFF" style={{ marginRight: 6 }} />
-        <Text style={styles.newSessionButtonText}>Start New Session</Text>
+        <RefreshCw size={16} color="#FFF"  />
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
@@ -271,6 +270,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     borderTopWidth: 1,
+    paddingBottom:40
   },
   voiceButton: { padding: 8, position: "relative" },
   recordingIndicator: {
@@ -319,9 +319,12 @@ const styles = StyleSheet.create({
   floatingNewSession: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent:"center",
     position: "absolute",
-    right: 16,
-    bottom: 90,
+    right: 12,
+    width:40,
+    height:40,
+    bottom: 125,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 30,
@@ -334,6 +337,6 @@ const styles = StyleSheet.create({
   newSessionButtonText: {
     color: "#FFFFFF",
     fontWeight: "bold",
-    fontSize: 14,
+    fontSize: 12,
   },
 });

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,19 +13,19 @@ import { router } from "expo-router";
 interface HomeHeaderProps {
   user: any;
   greeting: string;
-  layout: any;
   theme: "light" | "dark";
 }
 
 export const HomeHeader: React.FC<HomeHeaderProps> = ({
   user,
   greeting,
-  layout,
   theme,
 }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
 
+
+  
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -54,7 +54,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
       </View>
 
       <ImageBackground
-        source={require("@/assets/images/header.avif")}
+        source={require("@/assets/images/header.jpg")}
         style={styles.headerBackground}
         imageStyle={styles.headerBackgroundImage}
       >
@@ -63,7 +63,6 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
             <View style={styles.headerLeft}>
               <Text style={styles.greeting}>{greeting},</Text>
               <Text style={styles.name}>{user.name}</Text>
-              <Text style={styles.subtitle}>{layout?.blessing}</Text>
             </View>
             <TouchableOpacity
               onPress={() => router.push("/settings")}
@@ -94,7 +93,7 @@ const styles = StyleSheet.create({
   },
   logoWrapper: {
     position: "absolute",
-    top: -45,
+    top: -55,
     left: 0,
     right: 0,
     alignItems: "center",

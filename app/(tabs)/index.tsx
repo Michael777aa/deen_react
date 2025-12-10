@@ -6,35 +6,26 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  RefreshControl,
   Dimensions,
-  ImageBackground,
   Animated,
-  ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card } from "@/components/Card";
 import { colors } from "@/constants/colors";
 import {
-  MessageCircle,
   MapPin,
   BookMarked,
   Moon,
   Bell,
   Star,
-  Heart,
   Video,
 } from "lucide-react-native";
 import { useAuth } from "@/context/auth";
-import { getLayout } from "@/redux/features/layouts/layoutApi";
-import { IPrayerTime } from "@/types/prayer";
-import { useLocation } from "@/context/useLocation";
 import { featuredContent } from "@/mocks/prayerTimes";
-import { Share } from "react-native";
-import { getNextPrayer } from "@/redux/features/prayers/prayersApi";
 import { HomeHeader } from "@/pages/HomeHeader";
 import { DailyInspiration } from "@/pages/DailyInspiration";
+import { ChatgptHomepage } from "@/pages/Chatgpt";
 
 const { width } = Dimensions.get("window");
 export default function HomeScreen() {
@@ -46,54 +37,6 @@ export default function HomeScreen() {
   const [activeSlide, setActiveSlide] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
-  const [layout, setLayout] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { location } = useLocation();
-  const [nextPrayer, setNextPrayer] = useState<IPrayerTime | null>(null);
-  const [loadingPrayer, setLoadingPrayer] = useState(true);
-
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.replace("/(auth)/login");
-    }
-  }, [isLoading, user]);
-
-  useEffect(() => {
-    const fetchLayout = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getLayout();
-        setLayout(data);
-      } catch (error) {
-        console.error("Failed to fetch layout:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchLayout();
-  }, []);
-
-  useEffect(() => {
-    const fetchPrayerData = async () => {
-      if (location) {
-        try {
-          setLoadingPrayer(true);
-          const nextPrayerData = await getNextPrayer(
-            location.latitude,
-            location.longitude
-          );
-          setNextPrayer(nextPrayerData);
-        } catch (error) {
-          console.error("Error fetching prayer data:", error);
-        } finally {
-          setLoadingPrayer(false);
-        }
-      }
-    };
-
-    fetchPrayerData();
-  }, [location]);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -125,50 +68,19 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, [user]);
 
-  const shareInspiration = useCallback(async () => {
-    try {
-      const message = `"The best among you are those who have the best character."\n\n- Prophet Muhammad (peace be upon him)\n\nShared via IslamicConnect App`;
 
-      await Share.share({
-        message,
-        title: "Daily Islamic Inspiration",
-      });
-    } catch (err) {
-      console.error("Error sharing inspiration:", err);
-    }
-  }, []);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    if (location) {
-      try {
-        const nextPrayerData = await getNextPrayer(
-          location.latitude,
-          location.longitude
-        );
-        setNextPrayer(nextPrayerData);
-      } catch (error) {
-        console.error("Error refreshing prayer data:", error);
-      }
-    }
-    setRefreshing(false);
-  }, [location]);
-
-  if (isLoading) return <ActivityIndicator />;
   if (!user) return null;
 
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors[theme].background }]}
       contentContainerStyle={styles.contentContainer}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
       showsVerticalScrollIndicator={false}
     >
       {/* HEADER */}
-  
-    <HomeHeader user={user} greeting={greeting} layout={layout} theme={theme}/>
+
+      <HomeHeader user={user} greeting={greeting} theme={theme} />
 
       {/* PRAYER & QIBLA */}
 
@@ -225,11 +137,8 @@ export default function HomeScreen() {
       </Animated.View>
 
       {/* Daily Inspiration - Redesigned */}
-      <DailyInspiration/>
-
-
-
-
+      <DailyInspiration />
+      <ChatgptHomepage />
 
       {/* Quick Actions - Redesigned */}
       <Text
@@ -426,6 +335,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginBottom: 60
+
   },
   contentContainer: {
     paddingBottom: 24,

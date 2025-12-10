@@ -8,7 +8,6 @@ import {
   Image
 } from 'react-native';
 import { router } from 'expo-router';
-import { useAuthStore } from '@/store/useAuthStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
 import { Card } from '@/components/Card';
@@ -25,6 +24,7 @@ import {
   Share2 
 } from 'lucide-react-native';
 import { useAuth } from '@/context/auth';
+import { Linking } from "react-native";
 
 export default function ProfileScreen() {
   // const { user, logout } = useAuthStore();
@@ -85,21 +85,21 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* <Card style={styles.subscriptionCard}>
+      <Card style={styles.subscriptionCard}>
         <View style={styles.subscriptionHeader}>
           <Text style={[styles.subscriptionTitle, { color: colors[theme].text }]}>
-            {user.subscription === 'premium' ? 'Premium Subscription' : 'Free Account'}
+            {user.userType === 'MODERATOR' ? 'Premium Subscription' : 'Free Account'}
           </Text>
-          {user.subscription === 'premium' ? (
+          {user.userType === 'MODERATOR' ? (
             <View style={[styles.premiumBadge, { backgroundColor: colors[theme].primary }]}>
               <Text style={styles.premiumBadgeText}>PREMIUM</Text>
             </View>
           ) : null}
         </View>
         
-        {user.subscription === 'premium' ? (
+        {user.userType === 'MODERATOR' ? (
           <Text style={[styles.subscriptionInfo, { color: colors[theme].text }]}>
-            Your premium subscription is active until Dec 31, 2023
+            Your premium subscription is active until Dec 31, 2027
           </Text>
         ) : (
           <Text style={[styles.subscriptionInfo, { color: colors[theme].text }]}>
@@ -111,7 +111,7 @@ export default function ProfileScreen() {
           style={[
             styles.subscriptionButton, 
             { 
-              backgroundColor: user.subscription === 'premium' 
+              backgroundColor: user.userType === 'MODERATOR' 
                 ? colors[theme].card 
                 : colors[theme].primary 
             }
@@ -122,16 +122,16 @@ export default function ProfileScreen() {
             style={[
               styles.subscriptionButtonText, 
               { 
-                color: user.subscription === 'premium' 
+                color: user.userType === 'MODERATOR' 
                   ? colors[theme].text 
                   : '#FFFFFF' 
               }
             ]}
           >
-            {user.subscription === 'premium' ? 'Manage Subscription' : 'Upgrade to Premium'}
+            {user.userType === 'MODERATOR' ? 'Manage Subscription' : 'Upgrade to Premium'}
           </Text>
         </TouchableOpacity>
-      </Card> */}
+      </Card>
 
       <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
         App Settings
@@ -212,15 +212,24 @@ export default function ProfileScreen() {
       </Text>
       
       <Card>
-        <TouchableOpacity style={styles.settingItem}>
-          <View style={styles.settingLabelContainer}>
-            <HelpCircle size={20} color={colors[theme].text} />
-            <Text style={[styles.settingLabel, { color: colors[theme].text, marginLeft: 12 }]}>
-              Help & Support
-            </Text>
-          </View>
-          <ChevronRight size={20} color={colors[theme].inactive} />
-        </TouchableOpacity>
+      <TouchableOpacity 
+  style={styles.settingItem} 
+  onPress={() => Linking.openURL("https://t.me/Michael778a")}
+>
+  <View style={styles.settingLabelContainer}>
+    <HelpCircle size={20} color={colors[theme].text} />
+    <Text 
+      style={[
+        styles.settingLabel, 
+        { color: colors[theme].text, marginLeft: 12 }
+      ]}
+    >
+      Help & Support
+    </Text>
+  </View>
+  <ChevronRight size={20} color={colors[theme].inactive} />
+</TouchableOpacity>
+
         
         <View style={styles.divider} />
         
@@ -256,6 +265,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+paddingTop: 50
   },
   contentContainer: {
     padding: 16,

@@ -792,13 +792,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
   },
   headerBanner: {
-    height: 150,
+    height: 200,
     position: "relative",
   },
   headerImage: {

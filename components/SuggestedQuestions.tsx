@@ -2,6 +2,8 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { colors } from '@/constants/colors';
+import { router } from 'expo-router';
+import { ArrowLeft } from 'lucide-react-native';
 
 interface SuggestedQuestionsProps {
   questions: string[];
@@ -20,9 +22,26 @@ export const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
 
   return (
     <View style={[styles.container, { backgroundColor: colors[theme].background }]}>
-      <Text style={[styles.title, { color: colors[theme].text }]}>
-        Quick Questions
-      </Text>
+      
+      {/* 🔙 Back Button */}
+      <View style={styles.headerRow}>
+      <TouchableOpacity
+  onPress={() => router.back()}
+  style={[
+    styles.backButton,
+    { backgroundColor: colors[theme].card }
+  ]}
+  activeOpacity={0.7}
+>
+  <ArrowLeft size={20} color={colors[theme].text} />
+</TouchableOpacity>
+
+
+        <Text style={[styles.title, { color: colors[theme].text }]}>
+          Quick Questions
+        </Text>
+      </View>
+
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
@@ -57,24 +76,50 @@ export const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    marginTop:30,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.1)',
   },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
+
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 12,
   },
+
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  
+
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+  },
+
   questionsContainer: {
     paddingBottom: 4,
   },
+
   questionButton: {
     padding: 12,
     borderRadius: 12,
     marginRight: 12,
     maxWidth: 200,
   },
+
   questionText: {
     fontSize: 14,
   },
+  
 });

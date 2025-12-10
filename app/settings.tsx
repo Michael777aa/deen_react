@@ -5,7 +5,8 @@ import {
   StyleSheet, 
   ScrollView, 
   Switch,
-  TouchableOpacity
+  TouchableOpacity,
+  Linking
 } from 'react-native';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useStreamStore } from '@/store/useStreamStore';
@@ -365,11 +366,15 @@ export default function SettingsScreen() {
           
           <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
           
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={[styles.settingLabel, { color: colors[theme].text }]}>
-              Contact Us
-            </Text>
-          </TouchableOpacity>
+          <TouchableOpacity 
+  style={styles.settingItem}
+  onPress={() => Linking.openURL("tel:+821095825522")}
+>
+  <Text style={[styles.settingLabel, { color: colors[theme].text }]}>
+    Contact Us
+  </Text>
+</TouchableOpacity>
+
           
           <View style={[styles.divider, { backgroundColor: colors[theme].border }]} />
           
