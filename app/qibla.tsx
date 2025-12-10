@@ -23,7 +23,7 @@ export default function Qibla() {
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+//dsafdsfas
   // Animation values
   const rotationAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
