@@ -1,36 +1,37 @@
-import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
   TouchableOpacity,
-  Image
-} from 'react-native';
-import { router } from 'expo-router';
-import { useSettingsStore } from '@/store/useSettingsStore';
-import { colors } from '@/constants/colors';
-import { Card } from '@/components/Card';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { LanguageSelector } from '@/components/LanguageSelector';
-import { 
-  Settings, 
-  LogOut, 
-  ChevronRight, 
-  Bell, 
-  CreditCard, 
-  HelpCircle, 
-  Shield, 
-  Share2 
-} from 'lucide-react-native';
-import { useAuth } from '@/context/auth';
+  Image,
+} from "react-native";
+import { router } from "expo-router";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { colors } from "@/constants/colors";
+import { Card } from "@/components/Card";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import {
+  Settings,
+  LogOut,
+  ChevronRight,
+  Bell,
+  CreditCard,
+  HelpCircle,
+  Shield,
+  Share2,
+} from "lucide-react-native";
+import { useAuth } from "@/context/auth";
 import { Linking } from "react-native";
+import { Send } from "lucide-react-native";
 
 export default function ProfileScreen() {
   // const { user, logout } = useAuthStore();
-    const { user,signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { darkMode } = useSettingsStore();
-  const theme = darkMode ? 'dark' : 'light';
+  const theme = darkMode ? "dark" : "light";
 
   if (!user) {
     return null;
@@ -38,29 +39,33 @@ export default function ProfileScreen() {
 
   const handleLogout = () => {
     signOut();
-    router.replace('/(auth)/login');
+    router.replace("/(auth)/login");
   };
 
   const navigateToSettings = () => {
-    router.push('/settings');
+    router.push("/settings");
   };
 
   const navigateToAnalytics = () => {
-    router.push('/analytics');
+    router.push("/analytics");
   };
 
   const navigateToPremium = () => {
-    router.push('/premium');
+    router.push("/premium");
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       style={[styles.container, { backgroundColor: colors[theme].background }]}
       contentContainerStyle={styles.contentContainer}
     >
       <View style={styles.profileHeader}>
         <Image
-          source={{ uri: user.picture?.replace("http://", "https://") || 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80' }}
+          source={{
+            uri:
+              user.picture?.replace("http://", "https://") ||
+              "https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
+          }}
           style={styles.profileImage}
         />
         <Text style={[styles.profileName, { color: colors[theme].text }]}>
@@ -69,17 +74,19 @@ export default function ProfileScreen() {
         <Text style={[styles.profileEmail, { color: colors[theme].inactive }]}>
           {user.email}
         </Text>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={[
-            styles.editProfileButton, 
-            { 
-              backgroundColor: 'transparent',
+            styles.editProfileButton,
+            {
+              backgroundColor: "transparent",
               borderColor: colors[theme].primary,
-            }
+            },
           ]}
         >
-          <Text style={[styles.editProfileText, { color: colors[theme].primary }]}>
+          <Text
+            style={[styles.editProfileText, { color: colors[theme].primary }]}
+          >
             Edit Profile
           </Text>
         </TouchableOpacity>
@@ -87,56 +94,106 @@ export default function ProfileScreen() {
 
       <Card style={styles.subscriptionCard}>
         <View style={styles.subscriptionHeader}>
-          <Text style={[styles.subscriptionTitle, { color: colors[theme].text }]}>
-            {user.userType === 'MODERATOR' ? 'Premium Subscription' : 'Free Account'}
+          <Text
+            style={[styles.subscriptionTitle, { color: colors[theme].text }]}
+          >
+            {user.userType === "MODERATOR"
+              ? "Premium Subscription"
+              : "Free Account"}
           </Text>
-          {user.userType === 'MODERATOR' ? (
-            <View style={[styles.premiumBadge, { backgroundColor: colors[theme].primary }]}>
+          {user.userType === "MODERATOR" ? (
+            <View
+              style={[
+                styles.premiumBadge,
+                { backgroundColor: colors[theme].primary },
+              ]}
+            >
               <Text style={styles.premiumBadgeText}>PREMIUM</Text>
             </View>
           ) : null}
         </View>
-        
-        {user.userType === 'MODERATOR' ? (
-          <Text style={[styles.subscriptionInfo, { color: colors[theme].text }]}>
+
+        {user.userType === "MODERATOR" ? (
+          <Text
+            style={[styles.subscriptionInfo, { color: colors[theme].text }]}
+          >
             Your premium subscription is active until Dec 31, 2027
           </Text>
         ) : (
-          <Text style={[styles.subscriptionInfo, { color: colors[theme].text }]}>
+          <Text
+            style={[styles.subscriptionInfo, { color: colors[theme].text }]}
+          >
             Upgrade to premium for exclusive features and content
           </Text>
         )}
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={[
-            styles.subscriptionButton, 
-            { 
-              backgroundColor: user.userType === 'MODERATOR' 
-                ? colors[theme].card 
-                : colors[theme].primary 
-            }
+            styles.subscriptionButton,
+            {
+              backgroundColor:
+                user.userType === "MODERATOR"
+                  ? colors[theme].card
+                  : colors[theme].primary,
+            },
           ]}
           onPress={navigateToPremium}
         >
-          <Text 
+          <Text
             style={[
-              styles.subscriptionButtonText, 
-              { 
-                color: user.userType === 'MODERATOR' 
-                  ? colors[theme].text 
-                  : '#FFFFFF' 
-              }
+              styles.subscriptionButtonText,
+              {
+                color:
+                  user.userType === "MODERATOR"
+                    ? colors[theme].text
+                    : "#FFFFFF",
+              },
             ]}
           >
-            {user.userType === 'MODERATOR' ? 'Manage Subscription' : 'Upgrade to Premium'}
+            {user.userType === "MODERATOR"
+              ? "Manage Subscription"
+              : "Upgrade to Premium"}
           </Text>
         </TouchableOpacity>
       </Card>
+      <TouchableOpacity
+  style={styles.settingItem}
+  onPress={() =>
+    Linking.openURL("https://telegram-clone-inky.vercel.app/")
+  }
+>
+  <View style={styles.settingLabelContainer}>
+    <Send size={20} color={colors[theme].text} />
+    <View style={{ marginLeft: 12 }}>
+      <Text
+        style={[
+          styles.settingLabel,
+          { color: colors[theme].text }
+        ]}
+      >
+        Telegram
+      </Text>
+      <Text
+        style={{
+          fontSize: 12,
+          color: colors[theme].inactive,
+          marginTop: 2,
+        }}
+      >
+        Try my fast and clean Telegram clone
+      </Text>
+    </View>
+  </View>
+
+  <ChevronRight size={20} color={colors[theme].inactive} />
+</TouchableOpacity>
+
+
 
       <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
         App Settings
       </Text>
-      
+
       <Card>
         <View style={styles.settingItem}>
           <Text style={[styles.settingLabel, { color: colors[theme].text }]}>
@@ -144,22 +201,30 @@ export default function ProfileScreen() {
           </Text>
           <ThemeToggle />
         </View>
-        
+
         <View style={styles.divider} />
-        
+
         <View style={styles.settingItem}>
           <Text style={[styles.settingLabel, { color: colors[theme].text }]}>
             Language
           </Text>
           <LanguageSelector />
         </View>
-        
+
         <View style={styles.divider} />
-        
-        <TouchableOpacity style={styles.settingItem} onPress={navigateToSettings}>
+
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={navigateToSettings}
+        >
           <View style={styles.settingLabelContainer}>
             <Settings size={20} color={colors[theme].text} />
-            <Text style={[styles.settingLabel, { color: colors[theme].text, marginLeft: 12 }]}>
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors[theme].text, marginLeft: 12 },
+              ]}
+            >
               All Settings
             </Text>
           </View>
@@ -170,36 +235,54 @@ export default function ProfileScreen() {
       <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
         Account
       </Text>
-      
+
       <Card>
-        <TouchableOpacity style={styles.settingItem} onPress={navigateToAnalytics}>
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={navigateToAnalytics}
+        >
           <View style={styles.settingLabelContainer}>
             <Bell size={20} color={colors[theme].text} />
-            <Text style={[styles.settingLabel, { color: colors[theme].text, marginLeft: 12 }]}>
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors[theme].text, marginLeft: 12 },
+              ]}
+            >
               Notifications
             </Text>
           </View>
           <ChevronRight size={20} color={colors[theme].inactive} />
         </TouchableOpacity>
-        
+
         <View style={styles.divider} />
-        
+
         <TouchableOpacity style={styles.settingItem}>
           <View style={styles.settingLabelContainer}>
             <CreditCard size={20} color={colors[theme].text} />
-            <Text style={[styles.settingLabel, { color: colors[theme].text, marginLeft: 12 }]}>
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors[theme].text, marginLeft: 12 },
+              ]}
+            >
               Payment Methods
             </Text>
           </View>
           <ChevronRight size={20} color={colors[theme].inactive} />
         </TouchableOpacity>
-        
+
         <View style={styles.divider} />
-        
+
         <TouchableOpacity style={styles.settingItem}>
           <View style={styles.settingLabelContainer}>
             <Shield size={20} color={colors[theme].text} />
-            <Text style={[styles.settingLabel, { color: colors[theme].text, marginLeft: 12 }]}>
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors[theme].text, marginLeft: 12 },
+              ]}
+            >
               Privacy & Security
             </Text>
           </View>
@@ -210,45 +293,54 @@ export default function ProfileScreen() {
       <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
         Other
       </Text>
-      
-      <Card>
-      <TouchableOpacity 
-  style={styles.settingItem} 
-  onPress={() => Linking.openURL("https://t.me/Michael778a")}
->
-  <View style={styles.settingLabelContainer}>
-    <HelpCircle size={20} color={colors[theme].text} />
-    <Text 
-      style={[
-        styles.settingLabel, 
-        { color: colors[theme].text, marginLeft: 12 }
-      ]}
-    >
-      Help & Support
-    </Text>
-  </View>
-  <ChevronRight size={20} color={colors[theme].inactive} />
-</TouchableOpacity>
 
-        
+      <Card>
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={() => Linking.openURL("https://t.me/Michael778a")}
+        >
+          <View style={styles.settingLabelContainer}>
+            <HelpCircle size={20} color={colors[theme].text} />
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors[theme].text, marginLeft: 12 },
+              ]}
+            >
+              Help & Support
+            </Text>
+          </View>
+          <ChevronRight size={20} color={colors[theme].inactive} />
+        </TouchableOpacity>
+
         <View style={styles.divider} />
-        
+
         <TouchableOpacity style={styles.settingItem}>
           <View style={styles.settingLabelContainer}>
             <Share2 size={20} color={colors[theme].text} />
-            <Text style={[styles.settingLabel, { color: colors[theme].text, marginLeft: 12 }]}>
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: colors[theme].text, marginLeft: 12 },
+              ]}
+            >
               Invite Friends
             </Text>
           </View>
           <ChevronRight size={20} color={colors[theme].inactive} />
         </TouchableOpacity>
-        
+
         <View style={styles.divider} />
-        
+
         <TouchableOpacity style={styles.settingItem} onPress={handleLogout}>
           <View style={styles.settingLabelContainer}>
             <LogOut size={20} color="#F44336" />
-            <Text style={[styles.settingLabel, { color: "#F44336", marginLeft: 12 }]}>
+            <Text
+              style={[
+                styles.settingLabel,
+                { color: "#F44336", marginLeft: 12 },
+              ]}
+            >
               Logout
             </Text>
           </View>
@@ -265,13 +357,14 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-paddingTop: 50
+    paddingTop: 50,
+    marginBottom: 100,
   },
   contentContainer: {
     padding: 16,
   },
   profileHeader: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 24,
   },
   profileImage: {
@@ -282,7 +375,7 @@ paddingTop: 50
   },
   profileName: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   profileEmail: {
     fontSize: 16,
@@ -297,19 +390,19 @@ paddingTop: 50
   },
   editProfileText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   subscriptionCard: {
     marginBottom: 24,
   },
   subscriptionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   subscriptionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   premiumBadge: {
     marginLeft: 12,
@@ -318,9 +411,9 @@ paddingTop: 50
     borderRadius: 4,
   },
   premiumBadgeText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   subscriptionInfo: {
     fontSize: 14,
@@ -329,38 +422,38 @@ paddingTop: 50
   subscriptionButton: {
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   subscriptionButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 8,
     marginBottom: 12,
   },
   settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 12,
   },
   settingLabelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   settingLabel: {
     fontSize: 16,
   },
   divider: {
     height: 1,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: "#E0E0E0",
     marginVertical: 4,
   },
   versionText: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 24,
     marginBottom: 16,
     fontSize: 14,

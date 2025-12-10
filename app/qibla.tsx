@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0A0A0F',
+    paddingTop:30
   },
   loadingContainer: {
     flex: 1,

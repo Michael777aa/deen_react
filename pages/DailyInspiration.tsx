@@ -88,13 +88,30 @@ export const DailyInspiration: React.FC = () => {
 
   if (!inspiration) {
     return (
-      <View style={styles.quoteContainer}>
-        <Text style={{ color: colors[theme].text }}>
+      <View style={[styles.quoteContainer, { alignItems: "center" }]}>
+        <Text style={{ color: colors[theme].text, marginBottom: 12 }}>
           No inspiration available.
         </Text>
+  
+        {user?.userType === "MODERATOR" && (
+          <TouchableOpacity
+          onPress={() => setShowCreateModal(true)}
+            style={{
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              backgroundColor: colors[theme].primary,
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>
+              Create New Inspiration
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
+  
 
   return (
     <View style={styles.quoteContainer}>

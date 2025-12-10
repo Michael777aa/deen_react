@@ -256,7 +256,7 @@ export default function IslamicAssistantScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1,},
+  container: { flex: 1, },
   messageList: { padding: 16, paddingBottom: 40 },
   loadingContainer: {
     flexDirection: "row",
@@ -270,7 +270,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     borderTopWidth: 1,
-    paddingBottom:10
+    paddingBottom:40
+
   },
   voiceButton: { padding: 8, position: "relative" },
   recordingIndicator: {
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
     right: 12,
     width:40,
     height:40,
-    bottom: 85,
+    bottom: 110,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 30,
