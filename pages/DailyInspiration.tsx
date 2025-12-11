@@ -18,6 +18,8 @@ import {
   createInspiration,
 } from "@/redux/features/inspiration/inspirationApi";
 import { useAuth } from "@/context/auth";
+import { t } from "i18next";
+
 export const DailyInspiration: React.FC = () => {
   const { user } = useAuth();
   const { darkMode } = useSettingsStore();
@@ -90,7 +92,7 @@ export const DailyInspiration: React.FC = () => {
     return (
       <View style={[styles.quoteContainer, { alignItems: "center" }]}>
         <Text style={{ color: colors[theme].text, marginBottom: 12 }}>
-          No inspiration available.
+          {t("No inspiration available")}
         </Text>
   
         {user?.userType === "MODERATOR" && (
@@ -104,7 +106,7 @@ export const DailyInspiration: React.FC = () => {
             }}
           >
             <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>
-              Create New Inspiration
+              {t("Create New Inspiration")}
             </Text>
           </TouchableOpacity>
         )}
@@ -119,7 +121,7 @@ export const DailyInspiration: React.FC = () => {
         <View style={styles.quoteHeader}>
           <Heart size={20} color={colors[theme].primary} />
           <Text style={[styles.quoteLabel, { color: colors[theme].primary }]}>
-            Daily Inspiration
+            {t("Daily Inspiration")}
           </Text>
           {user?.userType === "MODERATOR" && (
             <TouchableOpacity onPress={() => setShowCreateModal(true)}>
@@ -141,7 +143,7 @@ export const DailyInspiration: React.FC = () => {
             <Text
               style={[styles.quoteActionText, { color: colors[theme].primary }]}
             >
-              Save
+              {t("Save")}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.quoteAction} onPress={shareInspiration}>
@@ -152,7 +154,7 @@ export const DailyInspiration: React.FC = () => {
                 { color: colors[theme].inactive },
               ]}
             >
-              Share
+              {t("Share")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -165,7 +167,7 @@ export const DailyInspiration: React.FC = () => {
     <View style={styles.modalContent}>
       {/* Header with title and close button */}
       <View style={styles.modalHeader}>
-        <Text style={styles.modalTitle}>Create New Inspiration</Text>
+        <Text style={styles.modalTitle}>{t("Create New Inspiration")}</Text>
         <TouchableOpacity onPress={() => setShowCreateModal(false)}>
           <Text style={styles.modalClose}>✕</Text>
         </TouchableOpacity>
@@ -191,14 +193,14 @@ export const DailyInspiration: React.FC = () => {
         style={[styles.modalButton, { backgroundColor: colors[theme].primary }]}
         onPress={handleCreateInspiration}
       >
-        <Text style={styles.modalButtonText}>Create</Text>
+        <Text style={styles.modalButtonText}>{t("Create")}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={[styles.modalButton, { backgroundColor: "#ddd" }]}
         onPress={() => setShowCreateModal(false)}
       >
-        <Text style={[styles.modalButtonText, { color: "#333" }]}>Cancel</Text>
+        <Text style={[styles.modalButtonText, { color: "#333" }]}>{t("Cancel")}</Text>
       </TouchableOpacity>
     </View>
   </View>

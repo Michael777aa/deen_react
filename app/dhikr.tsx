@@ -21,10 +21,8 @@ import {
   Minus,
   Save,
   Award,
-  Clock,
   Calendar,
   ChevronRight,
-  ChevronLeft,
   Share2,
   ArrowLeft,
 } from "lucide-react-native";

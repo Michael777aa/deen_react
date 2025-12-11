@@ -12,7 +12,7 @@ import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
 import { useProductStore } from '@/store/useProductStore';
 import { Card } from '@/components/Card';
-import { Check, X, AlertTriangle, ArrowLeft, Share2 } from 'lucide-react-native';
+import { Check, X, AlertTriangle, Share2 } from 'lucide-react-native';
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();

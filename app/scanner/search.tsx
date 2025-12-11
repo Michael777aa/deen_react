@@ -12,7 +12,6 @@ import { Stack, router } from 'expo-router';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { colors } from '@/constants/colors';
 import { Card } from '@/components/Card';
-import { useProductStore } from '@/store/useProductStore';
 import { Product } from '@/types';
 import { Check, X, AlertTriangle, Search, ArrowLeft } from 'lucide-react-native';
 import { mockProducts } from '@/mocks/productData';

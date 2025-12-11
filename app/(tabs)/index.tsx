@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -26,13 +26,12 @@ import { featuredContent } from "@/mocks/prayerTimes";
 import { HomeHeader } from "@/pages/HomeHeader";
 import { DailyInspiration } from "@/pages/DailyInspiration";
 import { ChatgptHomepage } from "@/pages/Chatgpt";
-
+import { t } from "i18next";
 const { width } = Dimensions.get("window");
 export default function HomeScreen() {
   const { user } = useAuth();
   const { darkMode } = useSettingsStore();
   const theme = darkMode ? "dark" : "light";
-  const [refreshing, setRefreshing] = useState(false);
   const [greeting, setGreeting] = useState("");
   const [activeSlide, setActiveSlide] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -68,8 +67,6 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, [user]);
 
-
-
   if (!user) return null;
 
   return (
@@ -79,11 +76,8 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
     >
       {/* HEADER */}
-
       <HomeHeader user={user} greeting={greeting} theme={theme} />
-
       {/* PRAYER & QIBLA */}
-
       <Animated.View
         style={[
           styles.prayerCardContainer,
@@ -100,7 +94,7 @@ export default function HomeScreen() {
                   { color: colors[theme].text },
                 ]}
               >
-                Next Prayer
+                {t("Next Prayer")}
               </Text>
             </View>
           </View>
@@ -119,7 +113,7 @@ export default function HomeScreen() {
                   { color: colors[theme].primary },
                 ]}
               >
-                All Prayer Times
+                {t("All Prayer Times")}
               </Text>
             </TouchableOpacity>
 
@@ -130,16 +124,16 @@ export default function HomeScreen() {
               ]}
               onPress={() => router.push("/qibla")}
             >
-              <Text style={styles.prayerCardButtonText2}>Qibla Direction</Text>
+              <Text style={styles.prayerCardButtonText2}>
+                {t("Qibla Direction")}
+              </Text>
             </TouchableOpacity>
           </View>
         </Card>
       </Animated.View>
-
       {/* Daily Inspiration - Redesigned */}
       <DailyInspiration />
       <ChatgptHomepage />
-
       {/* Quick Actions - Redesigned */}
       <Text
         style={[
@@ -147,9 +141,8 @@ export default function HomeScreen() {
           { color: colors[theme].text, marginTop: 24 },
         ]}
       >
-        Quick Actions
+        {t("Quick Actions")}
       </Text>
-
       <View style={styles.quickActionsGrid}>
         <TouchableOpacity
           style={[
@@ -167,7 +160,7 @@ export default function HomeScreen() {
             <MapPin size={24} color="#9C27B0" />
           </View>
           <Text style={[styles.actionText, { color: colors[theme].text }]}>
-            Mosques
+            {t("Mosques")}
           </Text>
         </TouchableOpacity>
 
@@ -187,7 +180,7 @@ export default function HomeScreen() {
             <BookMarked size={24} color="#E91E63" />
           </View>
           <Text style={[styles.actionText, { color: colors[theme].text }]}>
-            Duas
+            {t("Duas")}
           </Text>
         </TouchableOpacity>
 
@@ -207,7 +200,7 @@ export default function HomeScreen() {
             <Moon size={24} color="#607D8B" />
           </View>
           <Text style={[styles.actionText, { color: colors[theme].text }]}>
-            Dhikr
+            {t("Dhikr")}
           </Text>
         </TouchableOpacity>
 
@@ -227,23 +220,21 @@ export default function HomeScreen() {
             <Video size={24} color="#F44336" />
           </View>
           <Text style={[styles.actionText, { color: colors[theme].text }]}>
-            Streams
+            {t("Streams")}
           </Text>
         </TouchableOpacity>
       </View>
-
       {/* Featured Content Carousel - Redesigned */}
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
-          Featured Content
+          {t("Featured Content")}
         </Text>
         <TouchableOpacity onPress={() => router.push("/learn")}>
           <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
-            See All
+            {t("See All")}
           </Text>
         </TouchableOpacity>
       </View>
-
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -269,14 +260,15 @@ export default function HomeScreen() {
                   {item.description}
                 </Text>
                 <View style={styles.featuredButton}>
-                  <Text style={styles.featuredButtonText}>View Guide</Text>
+                  <Text style={styles.featuredButtonText}>
+                    {t("View Guide")}
+                  </Text>
                 </View>
               </View>
             </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
-
       <View style={styles.carouselIndicators}>
         {featuredContent.map((_, index) => (
           <View
@@ -288,46 +280,74 @@ export default function HomeScreen() {
           />
         ))}
       </View>
-
       {/* Islamic Calendar - Redesigned */}
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors[theme].text }]}>
-          Islamic Calendar
+          {t("Islamic Calendar")}
         </Text>
         <TouchableOpacity onPress={() => router.push("/islamic-calendar")}>
           <Text style={[styles.seeAllText, { color: colors[theme].primary }]}>
-            Full Calendar
+            {t("Full Calendar")}
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Premium Upgrade - Redesigned */}
-      <TouchableOpacity
-        style={[
-          styles.premiumCard,
-          {
-            backgroundColor: colors[theme].primary,
-            shadowColor: colors[theme].primary,
-          },
-        ]}
-        onPress={() => router.push("/premium")}
-      >
-        <View style={styles.premiumContent}>
-          <View style={styles.premiumIcon}>
-            <Star size={24} color="#FFFFFF" fill="#FFFFFF" />
-          </View>
-          <View style={styles.premiumText}>
-            <Text style={styles.premiumTitle}>Upgrade to Premium</Text>
-            <Text style={styles.premiumDescription}>
-              Unlock exclusive content, advanced features, and ad-free
-              experience
-            </Text>
-          </View>
+      {/* Premium Upgrade - Redesigned */} */
+      <Card style={styles.subscriptionCard}>
+        <View style={styles.subscriptionHeader}>
+          <Text
+            style={[styles.subscriptionTitle, { color: colors[theme].text }]}
+          >
+            {user.userType === "MODERATOR"
+              ? "Premium Subscription"
+              : "Free Account"}
+          </Text>
+          {user.userType === "MODERATOR" ? (
+            <View
+              style={[
+                styles.premiumBadge,
+                { backgroundColor: colors[theme].primary },
+              ]}
+            >
+              <Text style={styles.premiumBadgeText}>PREMIUM</Text>
+            </View>
+          ) : null}
         </View>
-        <View style={styles.premiumButtonContainer}>
-          <Text style={styles.premiumButton}>Upgrade</Text>
-        </View>
-      </TouchableOpacity>
+        {user.userType === "MODERATOR" ? (
+          <Text
+            style={[styles.subscriptionInfo, { color: colors[theme].text }]}
+          >
+            {t("Your premium subscription is active until Dec 31, 2027")}
+          </Text>
+        ) : (
+          <TouchableOpacity
+            style={[
+              styles.premiumCard,
+              {
+                backgroundColor: colors[theme].primary,
+                shadowColor: colors[theme].primary,
+              },
+            ]}
+            onPress={() => router.push("/premium")}
+          >
+            <View style={styles.premiumContent}>
+              <View style={styles.premiumIcon}>
+                <Star size={24} color="#FFFFFF" fill="#FFFFFF" />
+              </View>
+              <View style={styles.premiumText}>
+                <Text style={styles.premiumTitle}>Upgrade to Premium</Text>
+                <Text style={styles.premiumDescription}>
+                  {t(
+                    "Unlock exclusive content, advanced features, and ad-free experience"
+                  )}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.premiumButtonContainer}>
+              <Text style={styles.premiumButton}>{t("Upgrade")}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      </Card>
     </ScrollView>
   );
 }
@@ -335,8 +355,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginBottom: 60
-
+    marginBottom: 60,
   },
   contentContainer: {
     paddingBottom: 24,
@@ -344,6 +363,10 @@ const styles = StyleSheet.create({
   headerContainer: {
     height: 200,
     marginBottom: 20,
+  },
+  subscriptionInfo: {
+    fontSize: 14,
+    marginBottom: 16,
   },
   headerBackground: {
     width: "100%",
@@ -412,8 +435,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 20,
   },
+  subscriptionButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
   prayerCard: {
     padding: 16,
+  },
+  premiumBadgeText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "bold",
   },
   prayerCardHeader: {
     flexDirection: "row",
@@ -424,6 +456,24 @@ const styles = StyleSheet.create({
   prayerCardTitle: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  subscriptionCard: {
+    marginBottom: 24,
+  },
+  subscriptionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  subscriptionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  premiumBadge: {
+    marginLeft: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
   },
   prayerCardTitleText: {
     fontSize: 16,

@@ -1,5 +1,3 @@
-// IslamicAssistantScreen.tsx
-
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
@@ -12,13 +10,12 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
-  Linking,
   Keyboard,
 } from "react-native";
 import { ChatMessage } from "@/components/ChatMessage";
 import { colors } from "@/constants/colors";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { Send, Mic, Link as LinkIcon, RefreshCw } from "lucide-react-native";
+import { Send, Mic, RefreshCw } from "lucide-react-native";
 import { Audio } from "expo-av";
 import { ErrorToast } from "@/components/ErrorToast";
 import { SuggestedQuestions } from "@/components/SuggestedQuestions";
@@ -31,7 +28,7 @@ const SUGGESTED_QUESTIONS = [
   "Explain Surah Al-Kahf benefits",
   "Authentic du'a for anxiety",
   "Rules of inheritance in Islam",
-  "How to keep discipline in life as a Muslim"
+  "How to keep discipline in life as a Muslim",
 ];
 
 export default function IslamicAssistantScreen() {
@@ -125,8 +122,6 @@ export default function IslamicAssistantScreen() {
     []
   );
 
-
-
   useEffect(() => {
     if (messages.length > 0) {
       setTimeout(() => {
@@ -139,7 +134,6 @@ export default function IslamicAssistantScreen() {
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors[theme].background }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-
     >
       {error && (
         <ErrorToast message={error} onDismiss={clearError} theme={theme} />
@@ -249,14 +243,14 @@ export default function IslamicAssistantScreen() {
         onPress={startNewSession}
         activeOpacity={0.8}
       >
-        <RefreshCw size={16} color="#FFF"  />
+        <RefreshCw size={16} color="#FFF" />
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, },
+  container: { flex: 1 },
   messageList: { padding: 16, paddingBottom: 40 },
   loadingContainer: {
     flexDirection: "row",
@@ -270,8 +264,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     borderTopWidth: 1,
-    paddingBottom:40
-
+    paddingBottom: 40,
   },
   voiceButton: { padding: 8, position: "relative" },
   recordingIndicator: {
@@ -320,11 +313,11 @@ const styles = StyleSheet.create({
   floatingNewSession: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent:"center",
+    justifyContent: "center",
     position: "absolute",
     right: 12,
-    width:40,
-    height:40,
+    width: 40,
+    height: 40,
     bottom: 110,
     paddingVertical: 10,
     paddingHorizontal: 16,

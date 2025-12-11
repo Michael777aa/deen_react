@@ -15,7 +15,6 @@ import {
 import { router } from "expo-router";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { colors } from "@/constants/colors";
-import { Card } from "@/components/Card";
 import {
   Search,
   BookOpen,

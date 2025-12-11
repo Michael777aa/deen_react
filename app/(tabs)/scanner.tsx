@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -7,7 +7,6 @@ import {
   ScrollView,
   FlatList,
   Image,
-  TextInput,
   Dimensions,
   Animated
 } from 'react-native';

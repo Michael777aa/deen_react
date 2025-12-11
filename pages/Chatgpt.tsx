@@ -4,6 +4,7 @@ import { MessageCircle } from "lucide-react-native";
 import { colors } from "@/constants/colors";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { router } from "expo-router";
+import { t } from "i18next";
 
 // ✅ CLEAN — MINIMAL — ONLY A NICE BUTTON THAT GOES TO CHAT PAGE
 export const ChatgptHomepage: React.FC = () => {
@@ -14,8 +15,8 @@ export const ChatgptHomepage: React.FC = () => {
     <View style={styles.container}>
       {/* Smooth rounded section */}
       <View style={[styles.box, { backgroundColor: colors[theme].card }]}>        
-        <Text style={[styles.label, { color: colors[theme].text }]}>Ask Anything</Text>
-        <Text style={[styles.sub, { color: colors[theme].inactive }]}>Chat instantly with your AI assistant</Text>
+        <Text style={[styles.label, { color: colors[theme].text }]}>{t("Ask Anything")}</Text>
+        <Text style={[styles.sub, { color: colors[theme].inactive }]}>{t("Chat instantly with your AI assistant")}</Text>
 
         {/* 🚀 CHAT BUTTON (ONLY FUNCTION) */}
         <TouchableOpacity
@@ -23,7 +24,7 @@ export const ChatgptHomepage: React.FC = () => {
           onPress={() => router.push("/chat")}
         >
           <MessageCircle size={20} color="#fff" />
-          <Text style={styles.chatText}>Start Chat</Text>
+          <Text style={styles.chatText}>{t("Start Chat")}</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -10,7 +10,6 @@ import {
   RefreshControl,
   Alert,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { PrayerTimeCard } from "@/components/PrayerTimeCard";
 import { colors } from "@/constants/colors";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -18,7 +17,6 @@ import { Card } from "@/components/Card";
 import { ArrowLeft, Bell, BellOff } from "lucide-react-native";
 import { useLocation } from "@/context/useLocation";
 import { IPrayerTime, IPrayerTimes } from "@/types/prayer";
-
 import { router } from "expo-router";
 import { getNextPrayer, getPrayerTimes } from "@/redux/features/prayers/prayersApi";
 

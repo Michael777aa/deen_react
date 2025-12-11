@@ -4,6 +4,7 @@ import { languages } from '@/constants/languages';
 import { colors } from '@/constants/colors';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { Check } from 'lucide-react-native';
+import i18n from '../i18nextConfig'; // <- added
 
 export const LanguageSelector: React.FC = () => {
   const { language, setLanguage, darkMode } = useSettingsStore();
@@ -14,6 +15,7 @@ export const LanguageSelector: React.FC = () => {
 
   const handleSelectLanguage = (langCode: string) => {
     setLanguage(langCode);
+    i18n.changeLanguage(langCode); // <-- update i18next
     setModalVisible(false);
   };
 
@@ -42,10 +44,7 @@ export const LanguageSelector: React.FC = () => {
             styles.modalContent,
             { backgroundColor: colors[theme].background }
           ]}>
-            <Text style={[
-              styles.modalTitle,
-              { color: colors[theme].text }
-            ]}>
+            <Text style={[styles.modalTitle, { color: colors[theme].text }]}>
               Select Language
             </Text>
             
@@ -62,34 +61,22 @@ export const LanguageSelector: React.FC = () => {
                   ]}
                   onPress={() => handleSelectLanguage(item.code)}
                 >
-                  <Text style={[
-                    styles.languageName,
-                    { color: colors[theme].text }
-                  ]}>
+                  <Text style={[styles.languageName, { color: colors[theme].text }]}>
                     {item.name}
                   </Text>
                   
                   {language === item.code && (
-                    <Check 
-                      size={20} 
-                      color={colors[theme].primary} 
-                    />
+                    <Check size={20} color={colors[theme].primary} />
                   )}
                 </TouchableOpacity>
               )}
             />
             
             <TouchableOpacity
-              style={[
-                styles.closeButton,
-                { backgroundColor: colors[theme].card }
-              ]}
+              style={[styles.closeButton, { backgroundColor: colors[theme].card }]}
               onPress={() => setModalVisible(false)}
             >
-              <Text style={[
-                styles.closeButtonText,
-                { color: colors[theme].text }
-              ]}>
+              <Text style={[styles.closeButtonText, { color: colors[theme].text }]}>
                 Close
               </Text>
             </TouchableOpacity>
